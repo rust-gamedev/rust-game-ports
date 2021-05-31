@@ -1,27 +1,21 @@
-import pgzero, pgzrun, pygame
-import math, sys, random
-from enum import Enum
-
-# Check Python version number. sys.version_info gives version as a tuple, e.g. if (3,7,2,'final',0) for version 3.7.2.
-# Unlike many languages, Python can compare two tuples in the same way that you can compare numbers.
-if sys.version_info < (3,5):
-    print("This game requires at least version 3.5 of Python. Please download it from www.python.org")
-    sys.exit()
-
-# Check Pygame Zero version. This is a bit trickier because Pygame Zero only lets us get its version number as a string.
-# So we have to split the string into a list, using '.' as the character to split on. We convert each element of the
-# version number into an integer - but only if the string contains numbers and nothing else, because it's possible for
-# a component of the version to contain letters as well as numbers (e.g. '2.0.dev0')
-# We're using a Python feature called list comprehension - this is explained in the Bubble Bobble/Cavern chapter.
-pgzero_version = [int(s) if s.isnumeric() else s for s in pgzero.__version__.split('.')]
-if pgzero_version < [1,2]:
-    print("This game requires at least version 1.2 of Pygame Zero. You have version {0}. Please upgrade using the command 'pip3 install --upgrade pgzero'".format(pgzero.__version__))
-    sys.exit()
-
-# Set up constants
-WIDTH = 800
-HEIGHT = 480
-TITLE = "Boing!"
+# DONE
+#
+# import pgzero, pgzrun, pygame
+# import math, sys, random
+# from enum import Enum
+#
+# if sys.version_info < (3,5):
+#     print("This game requires at least version 3.5 of Python. Please download it from www.python.org")
+#     sys.exit()
+#
+# pgzero_version = [int(s) if s.isnumeric() else s for s in pgzero.__version__.split('.')]
+# if pgzero_version < [1,2]:
+#     print("This game requires at least version 1.2 of Pygame Zero. You have version {0}. Please upgrade using the command 'pip3 install --upgrade pgzero'".format(pgzero.__version__))
+#     sys.exit()
+#
+# WIDTH = 800
+# HEIGHT = 480
+# TITLE = "Boing!"
 
 HALF_WIDTH = WIDTH // 2
 HALF_HEIGHT = HEIGHT // 2
@@ -265,21 +259,13 @@ class Bat(Actor):
 
 
 class Game:
-    def __init__(self, controls=(None, None)):
-        # Create a list of two bats, giving each a player number and a function to use to receive
-        # control inputs (or the value None if this is intended to be an AI player)
-        self.bats = [Bat(0, controls[0]), Bat(1, controls[1])]
-
-        # Create a ball object
-        self.ball = Ball(-1)
-
-        # Create an empty list which will later store the details of currently playing impact
-        # animations - these are displayed for a short time every time the ball bounces
-        self.impacts = []
-
-        # Add an offset to the AI player's target Y position, so it won't aim to hit the ball exactly
-        # in the centre of the bat
-        self.ai_offset = 0
+    # DONE
+    #
+    # def __init__(self, controls=(None, None)):
+    #     self.bats = [Bat(0, controls[0]), Bat(1, controls[1])]
+    #     self.ball = Ball(-1)
+    #     self.impacts = []
+    #     self.ai_offset = 0
 
     def update(self):
         # Update all active objects
@@ -466,8 +452,7 @@ except:
 # Set the initial game state
 state = State.MENU
 
-# Create a new Game object, without any players
-game = Game()
-
-# Tell Pygame Zero to start - this line is only required when running the game from an IDE such as IDLE or PyCharm
-pgzrun.go()
+# DONE
+#
+# game = Game()
+# pgzrun.go()
