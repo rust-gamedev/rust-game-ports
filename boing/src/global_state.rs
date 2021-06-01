@@ -126,6 +126,8 @@ impl EventHandler for GlobalState {
     }
 
     fn draw(&mut self, context: &mut Context) -> GameResult {
+        self.game.draw(context)?;
+
         match self.state {
             State::Menu => {
                 graphics::draw(

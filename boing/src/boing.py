@@ -423,10 +423,10 @@ def update():
             # Create a new Game object, without any players
             game = Game()
 
-def draw():
-    game.draw()
-
 # DONE
+#
+# def draw():
+#     game.draw()
 #
 #     if state == State.MENU:
 #         menu_image = "menu" + str(num_players - 1)
