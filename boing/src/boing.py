@@ -20,8 +20,10 @@
 HALF_WIDTH = WIDTH // 2
 HALF_HEIGHT = HEIGHT // 2
 
-PLAYER_SPEED = 6
-MAX_AI_SPEED = 6
+# DONE
+#
+# PLAYER_SPEED = 6
+# MAX_AI_SPEED = 6
 
 def normalised(x, y):
     # Return a unit vector
@@ -351,23 +353,23 @@ class Game:
             except:
                 pass
 
-def p1_controls():
-    move = 0
-    if keyboard.z or keyboard.down:
-        move = PLAYER_SPEED
-    elif keyboard.a or keyboard.up:
-        move = -PLAYER_SPEED
-    return move
-
-def p2_controls():
-    move = 0
-    if keyboard.m:
-        move = PLAYER_SPEED
-    elif keyboard.k:
-        move = -PLAYER_SPEED
-    return move
-
 # DONE
+#
+# def p1_controls():
+#     move = 0
+#     if keyboard.z or keyboard.down:
+#         move = PLAYER_SPEED
+#     elif keyboard.a or keyboard.up:
+#         move = -PLAYER_SPEED
+#     return move
+#
+# def p2_controls():
+#     move = 0
+#     if keyboard.m:
+#         move = PLAYER_SPEED
+#     elif keyboard.k:
+#         move = -PLAYER_SPEED
+#     return move
 #
 # class State(Enum):
 #     MENU = 1
@@ -383,35 +385,27 @@ def p2_controls():
 
 def update():
 #     global state, game, num_players, space_down
-
-    # Work out whether the space key has just been pressed - i.e. in the previous frame it wasn't down,
-    # and in this frame it is.
-    space_pressed = False
-    if keyboard.space and not space_down:
-        space_pressed = True
-    space_down = keyboard.space
-
-    if state == State.MENU:
-        if space_pressed:
-            # Switch to play state, and create a new Game object, passing it the controls function for
-            # player 1, and if we're in 2 player mode, the controls function for player 2 (otherwise the
-            # 'None' value indicating this player should be computer-controlled)
-            state = State.PLAY
-            controls = [p1_controls]
-            controls.append(p2_controls if num_players == 2 else None)
-            game = Game(controls)
-# DONE
-#         else:
 #
+#     space_pressed = False
+#     if keyboard.space and not space_down:
+#         space_pressed = True
+#     space_down = keyboard.space
+#
+#     if state == State.MENU:
+#         if space_pressed:
+#             state = State.PLAY
+#             controls = [p1_controls]
+#             controls.append(p2_controls if num_players == 2 else None)
+#             game = Game(controls)
+#         else:
 #             if num_players == 2 and keyboard.up:
 #                 sounds.up.play()
 #                 num_players = 1
 #             elif num_players == 1 and keyboard.down:
 #                 sounds.down.play()
 #                 num_players = 2
-
-            # Update the 'attract mode' game in the background (two AIs playing each other)
-            game.update()
+#
+#             game.update()
 
     elif state == State.PLAY:
         # Has anyone won?

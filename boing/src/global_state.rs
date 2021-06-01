@@ -4,8 +4,27 @@ use ggez::graphics::{self, Image};
 use ggez::input::keyboard::is_key_pressed;
 use ggez::{timer, Context, GameResult};
 
+use crate::actor::Actor;
 use crate::game::Game;
 use crate::state::State;
+
+const PLAYER_SPEED: i8 = 6;
+
+fn p1_controls() -> Box<dyn Fn(KeyCode) -> i8> {
+    Box::new(|keycode| match keycode {
+        KeyCode::Z | KeyCode::Down => PLAYER_SPEED,
+        KeyCode::A | KeyCode::Up => -PLAYER_SPEED,
+        _ => 0,
+    })
+}
+
+fn p2_controls() -> Box<dyn Fn(KeyCode) -> i8> {
+    Box::new(|keycode| match keycode {
+        KeyCode::M => PLAYER_SPEED,
+        KeyCode::K => -PLAYER_SPEED,
+        _ => 0,
+    })
+}
 
 /// Global state, not to be confused with the game state (which is a part of it).
 pub struct GlobalState {
@@ -63,14 +82,36 @@ impl GlobalState {
 
 impl EventHandler for GlobalState {
     fn update(&mut self, context: &mut Context) -> GameResult {
+        // Work out whether the space key has just been pressed - i.e. in the previous frame it wasn't
+        // down, and in this frame it is.
+        let space_pressed = is_key_pressed(context, KeyCode::Space) && !self.space_down;
+        self.space_down = is_key_pressed(context, KeyCode::Space);
+
         match self.state {
             State::Menu => {
-                if self.num_players == 2 && is_key_pressed(context, KeyCode::Up) {
-                    self.up_sound.play(context)?;
-                    self.num_players = 1;
-                } else if self.num_players == 1 && is_key_pressed(context, KeyCode::Down) {
-                    self.down_sound.play(context)?;
-                    self.num_players = 2;
+                if space_pressed {
+                    // Switch to play state, and create a new Game object, passing it the controls function for
+                    // player 1, and if we're in 2 player mode, the controls function for player 2 (otherwise the
+                    // 'None' value indicating this player should be computer-controlled)
+                    self.state = State::Play;
+
+                    let mut controls = (Some(p1_controls()), None);
+                    if self.num_players == 2 {
+                        controls.1 = Some(p2_controls());
+                    }
+
+                    self.game = Game::new(controls);
+                } else {
+                    if self.num_players == 2 && is_key_pressed(context, KeyCode::Up) {
+                        self.up_sound.play(context)?;
+                        self.num_players = 1;
+                    } else if self.num_players == 1 && is_key_pressed(context, KeyCode::Down) {
+                        self.down_sound.play(context)?;
+                        self.num_players = 2;
+                    }
+
+                    // Update the 'attract mode' game in the background (two AIs playing each other)
+                    self.game.update(context)?
                 }
             }
             State::GameOver => {
