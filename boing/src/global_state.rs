@@ -4,27 +4,11 @@ use ggez::graphics::{self, Image};
 use ggez::input::keyboard::is_key_pressed;
 use ggez::{timer, Context, GameResult};
 
-use crate::actor::Actor;
+use crate::ball::Ball;
+use crate::bat::Bat;
+use crate::controls::{p1_controls, p2_controls};
 use crate::game::Game;
 use crate::state::State;
-
-const PLAYER_SPEED: i8 = 6;
-
-fn p1_controls() -> Box<dyn Fn(KeyCode) -> i8> {
-    Box::new(|keycode| match keycode {
-        KeyCode::Z | KeyCode::Down => PLAYER_SPEED,
-        KeyCode::A | KeyCode::Up => -PLAYER_SPEED,
-        _ => 0,
-    })
-}
-
-fn p2_controls() -> Box<dyn Fn(KeyCode) -> i8> {
-    Box::new(|keycode| match keycode {
-        KeyCode::M => PLAYER_SPEED,
-        KeyCode::K => -PLAYER_SPEED,
-        _ => 0,
-    })
-}
 
 /// Global state, not to be confused with the game state (which is a part of it).
 pub struct GlobalState {
@@ -96,9 +80,13 @@ impl EventHandler for GlobalState {
                     // 'None' value indicating this player should be computer-controlled)
                     self.state = State::Play;
 
-                    let mut controls = (Some(p1_controls()), None);
+                    // Address confusing error "expected fn pointer, found fn item"; seems related to git.io/JGz2L.
+                    let p1_controls: fn(&Context, &Ball, f32, &Bat) -> f32 = p1_controls;
+                    let p2_controls: fn(&Context, &Ball, f32, &Bat) -> f32 = p2_controls;
+
+                    let mut controls = (Some(p1_controls), None);
                     if self.num_players == 2 {
-                        controls.1 = Some(p2_controls());
+                        controls.1 = Some(p2_controls);
                     }
 
                     self.game = Game::new(controls);

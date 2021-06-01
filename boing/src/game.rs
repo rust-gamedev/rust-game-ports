@@ -1,11 +1,8 @@
-use ggez::event::KeyCode;
 use ggez::{Context, GameResult};
 
 use crate::ball::Ball;
 use crate::bat::Bat;
 use crate::impact::Impact;
-
-use crate::actor::Actor;
 
 pub struct Game {
     pub bats: [Bat; 2],
@@ -14,27 +11,25 @@ pub struct Game {
     pub impacts: Vec<Impact>,
     /// Offset added to the AI player's target Y position, so it won't aim to hit the ball exactly in
     /// the centre of the bat.
-    pub ai_offset: i8,
+    pub ai_offset: f32,
 }
 
 impl Game {
     pub fn new(
         controls: (
-            Option<Box<dyn Fn(KeyCode) -> i8>>,
-            Option<Box<dyn Fn(KeyCode) -> i8>>,
+            Option<fn(&Context, &Ball, f32, &Bat) -> f32>,
+            Option<fn(&Context, &Ball, f32, &Bat) -> f32>,
         ),
     ) -> Self {
         Self {
             bats: [Bat::new(0, controls.0), Bat::new(1, controls.1)],
-            ball: Ball { dx: -1. },
+            ball: Ball::new(-1.),
             impacts: vec![],
-            ai_offset: 0,
+            ai_offset: 0.,
         }
     }
-}
 
-impl Actor for Game {
-    fn update(&mut self, context: &mut Context) -> GameResult {
+    pub fn update(&mut self, context: &mut Context) -> GameResult {
         // Update all active objects
         for bat in &mut self.bats {
             bat.update(context)?
@@ -51,7 +46,7 @@ impl Actor for Game {
         Ok(())
     }
 
-    fn draw(&mut self, _context: &mut Context) -> GameResult {
+    pub fn draw(&mut self, _context: &mut Context) -> GameResult {
         todo!()
     }
 }

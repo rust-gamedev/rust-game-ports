@@ -1,9 +1,9 @@
 // TODO: Remove me. Temporary until the codebase is fully written.
 #![allow(dead_code)]
 
-mod actor;
 mod ball;
 mod bat;
+mod controls;
 mod game;
 mod global_state;
 mod impact;

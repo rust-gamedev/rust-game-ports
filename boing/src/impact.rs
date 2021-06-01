@@ -4,8 +4,6 @@ use ggez::{
 };
 use glam::Vec2;
 
-use crate::actor::Actor;
-
 /// Type for an animation which is displayed briefly whenever the ball bounces
 pub struct Impact {
     pub x: f32,
@@ -34,10 +32,8 @@ impl Impact {
             images,
         }
     }
-}
 
-impl Actor for Impact {
-    fn update(&mut self, _context: &mut Context) -> GameResult {
+    pub fn update(&mut self, _context: &mut Context) -> GameResult {
         self.current_image = self.time as usize / 2;
 
         // The Game type maintains a list of Impact instances. In Game.update, if the timer for an
@@ -47,7 +43,7 @@ impl Actor for Impact {
         Ok(())
     }
 
-    fn draw(&mut self, context: &mut Context) -> GameResult {
+    pub fn draw(&mut self, context: &mut Context) -> GameResult {
         graphics::draw(
             context,
             &self.images[self.current_image],

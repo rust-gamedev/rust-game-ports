@@ -1,17 +1,27 @@
 use ggez::{Context, GameResult};
 
-use crate::actor::Actor;
+use crate::{HALF_HEIGHT, HALF_WIDTH};
 
 pub struct Ball {
+    pub x: f32,
+    pub y: f32,
     pub dx: f32,
 }
 
-impl Actor for Ball {
-    fn update(&mut self, _context: &mut Context) -> GameResult {
+impl Ball {
+    pub fn new(dx: f32) -> Self {
+        Self {
+            x: HALF_WIDTH,
+            y: HALF_HEIGHT,
+            dx,
+        }
+    }
+
+    pub fn update(&mut self, _context: &mut Context) -> GameResult {
         todo!()
     }
 
-    fn draw(&mut self, _context: &mut Context) -> GameResult {
+    pub fn draw(&mut self, _context: &mut Context) -> GameResult {
         todo!()
     }
 }
