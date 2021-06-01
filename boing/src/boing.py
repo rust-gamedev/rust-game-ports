@@ -437,17 +437,16 @@ def draw():
     elif state == State.GAME_OVER:
         screen.blit("over", (0,0))
 
-
-# The mixer allows us to play sounds and music
-try:
-    pygame.mixer.quit()
-    pygame.mixer.init(44100, -16, 2, 1024)
-
-    music.play("theme")
-    music.set_volume(0.3)
-except:
-    # If an error occurs (e.g. no sound device), just ignore it
-    pass
+# DONE
+#
+# try:
+#     pygame.mixer.quit()
+#     pygame.mixer.init(44100, -16, 2, 1024)
+#
+#     music.play("theme")
+#     music.set_volume(0.3)
+# except:
+#     pass
 
 # Set the initial game state
 state = State.MENU

@@ -50,8 +50,10 @@ fn main() -> GameResult {
         context_builder = context_builder.add_resource_path(dir);
     }
 
-    let (context, event_loop) = context_builder.build()?;
-    let state = GameState::new((None, None));
+    let (mut context, event_loop) = context_builder.build()?;
+    let mut state = GameState::new(&mut context, (None, None));
+
+    state.play_music(&mut context)?;
 
     event::run(context, event_loop, state)
 }
