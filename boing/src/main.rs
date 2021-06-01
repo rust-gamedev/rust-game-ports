@@ -4,6 +4,7 @@
 mod actor;
 mod ball;
 mod bat;
+mod game;
 mod global_state;
 mod impact;
 mod state;
@@ -52,7 +53,7 @@ fn main() -> GameResult {
     }
 
     let (mut context, event_loop) = context_builder.build()?;
-    let mut state = GlobalState::new(&mut context, (None, None));
+    let mut state = GlobalState::new(&mut context);
 
     state.play_music(&mut context)?;
 

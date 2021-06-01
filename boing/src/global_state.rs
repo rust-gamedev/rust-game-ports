@@ -4,22 +4,15 @@ use ggez::graphics::{self, Image};
 use ggez::input::keyboard::is_key_pressed;
 use ggez::{timer, Context, GameResult};
 
-use crate::ball::Ball;
-use crate::bat::Bat;
-use crate::impact::Impact;
+use crate::game::Game;
 use crate::state::State;
 
-/// Global game state.
-/// The name is a bit confusing (due to the State enum), however, this is the ggez naming.
-/// This holds also the concepts that in the original code, are stored in global variables.
+/// Global state, not to be confused with the game state (which is a part of it).
 pub struct GlobalState {
-    pub bats: [Bat; 2],
-    pub ball: Ball,
-    /// List of the current impacts to display.
-    pub impacts: Vec<Impact>,
-    /// Offset added to the AI player's target Y position, so it won't aim to hit the ball exactly in
-    /// the centre of the bat.
-    pub ai_offset: i8,
+    state: State,
+    game: Game,
+    num_players: usize,
+    space_down: bool,
 
     menu_images: Vec<Image>,
     game_over_image: Image,
@@ -28,28 +21,10 @@ pub struct GlobalState {
 
     down_sound: audio::Source,
     up_sound: audio::Source,
-
-    state: State,
-
-    num_players: usize,
 }
 
 impl GlobalState {
-    pub fn new(
-        context: &mut Context,
-        controls: (
-            Option<Box<dyn Fn(KeyCode) -> i8>>,
-            Option<Box<dyn Fn(KeyCode) -> i8>>,
-        ),
-    ) -> Self {
-        // For simplicity, we always assume that it's possible to play the music.
-        let music = audio::Source::new(context, "/theme.ogg").unwrap();
-
-        // It's not explicit, in the [docs](https://pygame-zero.readthedocs.io/en/stable/builtins.html),
-        // what happens if there is an error, so we just implement the intuitive logic.
-        let down_sound = audio::Source::new(context, "/down.ogg").unwrap();
-        let up_sound = audio::Source::new(context, "/up.ogg").unwrap();
-
+    pub fn new(context: &mut Context) -> Self {
         let menu_images = (0..2)
             .map(|i| {
                 let menu_image_filename = format!("/menu{}.png", i);
@@ -59,32 +34,24 @@ impl GlobalState {
 
         let game_over_image = Image::new(context, "/over.png").unwrap();
 
-        Self {
-            bats: [
-                Bat {
-                    player: 0,
-                    move_func: controls.0,
-                },
-                Bat {
-                    player: 1,
-                    move_func: controls.1,
-                },
-            ],
-            ball: Ball { dx: -1. },
-            impacts: vec![],
-            ai_offset: 0,
+        // For simplicity, we always assume that it's possible to play the music.
+        let music = audio::Source::new(context, "/theme.ogg").unwrap();
 
+        // In the [docs](https://pygame-zero.readthedocs.io/en/stable/builtins.html), it's not explicit
+        // what happens if there is an error, so we just implement the intuitive logic.
+        let down_sound = audio::Source::new(context, "/down.ogg").unwrap();
+        let up_sound = audio::Source::new(context, "/up.ogg").unwrap();
+
+        Self {
+            state: State::Menu,
+            game: Game::new((None, None)),
+            num_players: 1,
+            space_down: false,
             menu_images,
             game_over_image,
-
             music,
-
             down_sound,
             up_sound,
-
-            state: State::Menu,
-
-            num_players: 1,
         }
     }
 

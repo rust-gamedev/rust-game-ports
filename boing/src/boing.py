@@ -375,15 +375,14 @@ def p2_controls():
 #     GAME_OVER = 3
 #
 # num_players = 1
-
-# Is space currently being held down?
-space_down = False
+#
+# space_down = False
 
 
 # Pygame Zero calls the update and draw functions each frame
 
 def update():
-    global state, game, num_players, space_down
+#     global state, game, num_players, space_down
 
     # Work out whether the space key has just been pressed - i.e. in the previous frame it wasn't down,
     # and in this frame it is.
