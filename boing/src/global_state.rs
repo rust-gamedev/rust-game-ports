@@ -81,6 +81,7 @@ impl GlobalState {
 }
 
 impl EventHandler for GlobalState {
+    /// Pygame Zero and ggez call the update and draw functions each frame
     fn update(&mut self, context: &mut Context) -> GameResult {
         // Work out whether the space key has just been pressed - i.e. in the previous frame it wasn't
         // down, and in this frame it is.
@@ -123,7 +124,14 @@ impl EventHandler for GlobalState {
                 }
             }
             State::GameOver => {
-                //
+                if space_pressed {
+                    // Reset to menu state
+                    self.state = State::Menu;
+                    self.num_players = 1;
+
+                    // Create a new Game object, without any players
+                    self.game = Game::new((None, None));
+                }
             }
         }
 

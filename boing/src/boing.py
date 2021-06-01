@@ -377,11 +377,8 @@ class Game:
 # num_players = 1
 #
 # space_down = False
-
-
-# Pygame Zero calls the update and draw functions each frame
-
-def update():
+#
+# def update():
 #     global state, game, num_players, space_down
 #
 #     space_pressed = False
@@ -410,17 +407,13 @@ def update():
 #             state = State.GAME_OVER
 #         else:
 #             game.update()
-
-    elif state == State.GAME_OVER:
-        if space_pressed:
-            # Reset to menu state
-            state = State.MENU
-            num_players = 1
-
-            # Create a new Game object, without any players
-            game = Game()
-
-# DONE
+#
+#     elif state == State.GAME_OVER:
+#         if space_pressed:
+#             state = State.MENU
+#             num_players = 1
+#
+#             game = Game()
 #
 # def draw():
 #     game.draw()
