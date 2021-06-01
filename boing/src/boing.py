@@ -22,34 +22,29 @@
 #
 # PLAYER_SPEED = 6
 # MAX_AI_SPEED = 6
-
-def normalised(x, y):
-    # Return a unit vector
-    # Get length of vector (x,y) - math.hypot uses Pythagoras' theorem to get length of hypotenuse
-    # of right-angle triangle with sides of length x and y
-    # todo note on safety
-    length = math.hypot(x, y)
-    return (x / length, y / length)
-
-def sign(x):
-    # Returns -1 or 1 depending on whether number is positive or negative
-    return -1 if x < 0 else 1
-
-
-class Impact(Actor):
-# DONE
 #
+# def normalised(x, y):
+#     # Return a unit vector
+#     # Get length of vector (x,y) - math.hypot uses Pythagoras' theorem to get length of hypotenuse
+#     # of right-angle triangle with sides of length x and y
+#     # todo note on safety
+#     length = math.hypot(x, y)
+#     return (x / length, y / length)
+#
+# def sign(x):
+#     # Returns -1 or 1 depending on whether number is positive or negative
+#     return -1 if x < 0 else 1
+#
+#
+# class Impact(Actor):
 #     def __init__(self, pos):
 #         super().__init__("blank", pos)
 #         self.time = 0
-
-    def update(self):
-        # There are 5 impact sprites numbered 0 to 4. We update to a new sprite every 2 frames.
-        self.image = "impact" + str(self.time // 2)
-
-        # The Game class maintains a list of Impact instances. In Game.update, if the timer for an object
-        # has gone beyond 10, the object is removed from the list.
-        self.time += 1
+#
+#     def update(self):
+#         self.image = "impact" + str(self.time // 2)
+#
+#         self.time += 1
 
 
 class Ball(Actor):
