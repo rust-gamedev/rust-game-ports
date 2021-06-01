@@ -34,8 +34,21 @@ impl Game {
 }
 
 impl Actor for Game {
-    fn update(&mut self, _context: &mut Context) -> GameResult {
-        todo!()
+    fn update(&mut self, context: &mut Context) -> GameResult {
+        // Update all active objects
+        for bat in &mut self.bats {
+            bat.update(context)?
+        }
+        self.ball.update(context)?;
+        for impact in &mut self.impacts {
+            impact.update(context)?
+        }
+
+        // Remove any expired impact effects from the list.
+        // Interesting, this is easier in Rust :)
+        self.impacts.retain(|impact| impact.time < 10);
+
+        Ok(())
     }
 
     fn draw(&mut self, _context: &mut Context) -> GameResult {

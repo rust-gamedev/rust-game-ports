@@ -36,11 +36,12 @@ def sign(x):
     return -1 if x < 0 else 1
 
 
-# Class for an animation which is displayed briefly whenever the ball bounces
 class Impact(Actor):
-    def __init__(self, pos):
-        super().__init__("blank", pos)
-        self.time = 0
+# DONE
+#
+#     def __init__(self, pos):
+#         super().__init__("blank", pos)
+#         self.time = 0
 
     def update(self):
         # There are 5 impact sprites numbered 0 to 4. We update to a new sprite every 2 frames.
@@ -268,17 +269,14 @@ class Game:
     #     self.ai_offset = 0
 
     def update(self):
-        # Update all active objects
-        for obj in self.bats + [self.ball] + self.impacts:
-            obj.update()
-
-        # Remove any expired impact effects from the list. We go through the list backwards, starting from the last
-        # element, and delete any elements those time attribute has reached 10. We go backwards through the list
-        # instead of forwards to avoid a number of issues which occur in that scenario. In the next chapter we will
-        # look at an alternative technique for removing items from a list, using list comprehensions.
-        for i in range(len(self.impacts) - 1, -1, -1):
-            if self.impacts[i].time >= 10:
-                del self.impacts[i]
+# DONE
+#
+#         for obj in self.bats + [self.ball] + self.impacts:
+#             obj.update()
+#
+#         for i in range(len(self.impacts) - 1, -1, -1):
+#             if self.impacts[i].time >= 10:
+#                 del self.impacts[i]
 
         # Has ball gone off the left or right edge of the screen?
         if self.ball.out():
