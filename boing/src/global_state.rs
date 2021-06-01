@@ -114,10 +114,15 @@ impl EventHandler for GlobalState {
                     self.game.update(context)?
                 }
             }
-            State::GameOver => {
-                //
-            }
             State::Play => {
+                // Has anyone won?
+                if self.game.bats[0].score.max(self.game.bats[1].score) > 9 {
+                    self.state = State::GameOver;
+                } else {
+                    self.game.update(context)?
+                }
+            }
+            State::GameOver => {
                 //
             }
         }

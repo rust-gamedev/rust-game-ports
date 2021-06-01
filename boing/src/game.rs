@@ -25,16 +25,7 @@ impl Game {
         ),
     ) -> Self {
         Self {
-            bats: [
-                Bat {
-                    player: 0,
-                    move_func: controls.0,
-                },
-                Bat {
-                    player: 1,
-                    move_func: controls.1,
-                },
-            ],
+            bats: [Bat::new(0, controls.0), Bat::new(1, controls.1)],
             ball: Ball { dx: -1. },
             impacts: vec![],
             ai_offset: 0,

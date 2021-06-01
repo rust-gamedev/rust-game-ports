@@ -16,11 +16,9 @@
 # WIDTH = 800
 # HEIGHT = 480
 # TITLE = "Boing!"
-
-HALF_WIDTH = WIDTH // 2
-HALF_HEIGHT = HEIGHT // 2
-
-# DONE
+#
+# HALF_WIDTH = WIDTH // 2
+# HALF_HEIGHT = HEIGHT // 2
 #
 # PLAYER_SPEED = 6
 # MAX_AI_SPEED = 6
@@ -181,12 +179,12 @@ class Ball(Actor):
 
 class Bat(Actor):
     def __init__(self, player, move_func=None):
-        x = 40 if player == 0 else 760
-        y = HALF_HEIGHT
-        super().__init__("blank", (x, y))
-
-        self.player = player
-        self.score = 0
+#         x = 40 if player == 0 else 760
+#         y = HALF_HEIGHT
+#         super().__init__("blank", (x, y))
+#
+#         self.player = player
+#         self.score = 0
 
         # move_func is a function we may or may not have been passed by the code which created this object. If this bat
         # is meant to be player controlled, move_func will be a function that when called, returns a number indicating
@@ -406,13 +404,12 @@ def update():
 #                 num_players = 2
 #
 #             game.update()
-
-    elif state == State.PLAY:
-        # Has anyone won?
-        if max(game.bats[0].score, game.bats[1].score) > 9:
-            state = State.GAME_OVER
-        else:
-            game.update()
+#
+#     elif state == State.PLAY:
+#         if max(game.bats[0].score, game.bats[1].score) > 9:
+#             state = State.GAME_OVER
+#         else:
+#             game.update()
 
     elif state == State.GAME_OVER:
         if space_pressed:

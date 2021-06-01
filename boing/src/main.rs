@@ -26,6 +26,9 @@ const WINDOW_TITLE: &str = GAME_ID;
 const WINDOW_WIDTH: f32 = 800.;
 const WINDOW_HEIGHT: f32 = 480.;
 
+const HALF_WIDTH: f32 = WINDOW_WIDTH / 2.;
+const HALF_HEIGHT: f32 = WINDOW_HEIGHT / 2.;
+
 fn get_resource_dirs() -> Vec<PathBuf> {
     let resources_root_dir = if let Ok(manifest_dir) = env::var("CARGO_MANIFEST_DIR") {
         let mut path = PathBuf::from(manifest_dir);
