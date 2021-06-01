@@ -12,7 +12,7 @@ use crate::state::State;
 /// Global game state.
 /// The name is a bit confusing (due to the State enum), however, this is the ggez naming.
 /// This holds also the concepts that in the original code, are stored in global variables.
-pub struct GameState {
+pub struct GlobalState {
     pub bats: [Bat; 2],
     pub ball: Ball,
     /// List of the current impacts to display.
@@ -34,7 +34,7 @@ pub struct GameState {
     num_players: usize,
 }
 
-impl GameState {
+impl GlobalState {
     pub fn new(
         context: &mut Context,
         controls: (
@@ -94,7 +94,7 @@ impl GameState {
     }
 }
 
-impl EventHandler for GameState {
+impl EventHandler for GlobalState {
     fn update(&mut self, context: &mut Context) -> GameResult {
         match self.state {
             State::Menu => {

@@ -4,7 +4,7 @@
 mod actor;
 mod ball;
 mod bat;
-mod game_state;
+mod global_state;
 mod impact;
 mod state;
 
@@ -13,7 +13,7 @@ use std::path::PathBuf;
 
 use ggez::{event, GameResult};
 
-use game_state::GameState;
+use global_state::GlobalState;
 
 const RESOURCES_DIR_NAME: &str = "resources";
 const RESOURCE_SUBDIRS: [&str; 3] = ["images", "music", "sounds"];
@@ -52,7 +52,7 @@ fn main() -> GameResult {
     }
 
     let (mut context, event_loop) = context_builder.build()?;
-    let mut state = GameState::new(&mut context, (None, None));
+    let mut state = GlobalState::new(&mut context, (None, None));
 
     state.play_music(&mut context)?;
 
