@@ -1,6 +1,7 @@
 use ggez::audio::{self, SoundSource};
 use ggez::event::{EventHandler, KeyCode};
 use ggez::graphics::{self, Image};
+use ggez::input::keyboard::is_key_pressed;
 use ggez::{timer, Context, GameResult};
 
 use crate::ball::Ball;
@@ -25,6 +26,9 @@ pub struct GameState {
 
     music: audio::Source,
 
+    down_sound: audio::Source,
+    up_sound: audio::Source,
+
     state: State,
 
     num_players: usize,
@@ -40,6 +44,11 @@ impl GameState {
     ) -> Self {
         // For simplicity, we always assume that it's possible to play the music.
         let music = audio::Source::new(context, "/theme.ogg").unwrap();
+
+        // It's not explicit, in the [docs](https://pygame-zero.readthedocs.io/en/stable/builtins.html),
+        // what happens if there is an error, so we just implement the intuitive logic.
+        let down_sound = audio::Source::new(context, "/down.ogg").unwrap();
+        let up_sound = audio::Source::new(context, "/up.ogg").unwrap();
 
         let menu_images = (0..2)
             .map(|i| {
@@ -70,6 +79,9 @@ impl GameState {
 
             music,
 
+            down_sound,
+            up_sound,
+
             state: State::Menu,
 
             num_players: 1,
@@ -83,8 +95,25 @@ impl GameState {
 }
 
 impl EventHandler for GameState {
-    fn update(&mut self, _context: &mut Context) -> GameResult {
-        println!("TODO: GameState");
+    fn update(&mut self, context: &mut Context) -> GameResult {
+        match self.state {
+            State::Menu => {
+                if self.num_players == 2 && is_key_pressed(context, KeyCode::Up) {
+                    self.up_sound.play(context)?;
+                    self.num_players = 1;
+                } else if self.num_players == 1 && is_key_pressed(context, KeyCode::Down) {
+                    self.down_sound.play(context)?;
+                    self.num_players = 2;
+                }
+            }
+            State::GameOver => {
+                //
+            }
+            State::Play => {
+                //
+            }
+        }
+
         Ok(())
     }
 

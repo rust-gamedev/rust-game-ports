@@ -401,14 +401,15 @@ def update():
             controls = [p1_controls]
             controls.append(p2_controls if num_players == 2 else None)
             game = Game(controls)
-        else:
-            # Detect up/down keys
-            if num_players == 2 and keyboard.up:
-                sounds.up.play()
-                num_players = 1
-            elif num_players == 1 and keyboard.down:
-                sounds.down.play()
-                num_players = 2
+# DONE
+#         else:
+#
+#             if num_players == 2 and keyboard.up:
+#                 sounds.up.play()
+#                 num_players = 1
+#             elif num_players == 1 and keyboard.down:
+#                 sounds.down.play()
+#                 num_players = 2
 
             # Update the 'attract mode' game in the background (two AIs playing each other)
             game.update()
