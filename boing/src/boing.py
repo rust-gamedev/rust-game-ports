@@ -367,12 +367,14 @@ def p2_controls():
         move = -PLAYER_SPEED
     return move
 
-class State(Enum):
-    MENU = 1
-    PLAY = 2
-    GAME_OVER = 3
-
-num_players = 1
+# DONE
+#
+# class State(Enum):
+#     MENU = 1
+#     PLAY = 2
+#     GAME_OVER = 3
+#
+# num_players = 1
 
 # Is space currently being held down?
 space_down = False
@@ -430,14 +432,14 @@ def update():
 def draw():
     game.draw()
 
-    if state == State.MENU:
-        menu_image = "menu" + str(num_players - 1)
-        screen.blit(menu_image, (0,0))
-
-    elif state == State.GAME_OVER:
-        screen.blit("over", (0,0))
-
 # DONE
+#
+#     if state == State.MENU:
+#         menu_image = "menu" + str(num_players - 1)
+#         screen.blit(menu_image, (0,0))
+#
+#     elif state == State.GAME_OVER:
+#         screen.blit("over", (0,0))
 #
 # try:
 #     pygame.mixer.quit()
@@ -447,11 +449,8 @@ def draw():
 #     music.set_volume(0.3)
 # except:
 #     pass
-
-# Set the initial game state
-state = State.MENU
-
-# DONE
+#
+# state = State.MENU
 #
 # game = Game()
 # pgzrun.go()

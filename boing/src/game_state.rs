@@ -1,11 +1,16 @@
 use ggez::audio::{self, SoundSource};
 use ggez::event::{EventHandler, KeyCode};
-use ggez::{Context, GameResult};
+use ggez::graphics::{self, Image};
+use ggez::{timer, Context, GameResult};
 
 use crate::ball::Ball;
 use crate::bat::Bat;
 use crate::impact::Impact;
+use crate::state::State;
 
+/// Global game state.
+/// The name is a bit confusing (due to the State enum), however, this is the ggez naming.
+/// This holds also the concepts that in the original code, are stored in global variables.
 pub struct GameState {
     pub bats: [Bat; 2],
     pub ball: Ball,
@@ -15,7 +20,14 @@ pub struct GameState {
     /// the centre of the bat.
     pub ai_offset: i8,
 
+    menu_images: Vec<Image>,
+    game_over_image: Image,
+
     music: audio::Source,
+
+    state: State,
+
+    num_players: usize,
 }
 
 impl GameState {
@@ -28,6 +40,15 @@ impl GameState {
     ) -> Self {
         // For simplicity, we always assume that it's possible to play the music.
         let music = audio::Source::new(context, "/theme.ogg").unwrap();
+
+        let menu_images = (0..2)
+            .map(|i| {
+                let menu_image_filename = format!("/menu{}.png", i);
+                Image::new(context, menu_image_filename).unwrap()
+            })
+            .collect();
+
+        let game_over_image = Image::new(context, "/over.png").unwrap();
 
         Self {
             bats: [
@@ -43,7 +64,15 @@ impl GameState {
             ball: Ball { dx: -1. },
             impacts: vec![],
             ai_offset: 0,
+
+            menu_images,
+            game_over_image,
+
             music,
+
+            state: State::Menu,
+
+            num_players: 1,
         }
     }
 
@@ -59,8 +88,25 @@ impl EventHandler for GameState {
         Ok(())
     }
 
-    fn draw(&mut self, _context: &mut Context) -> GameResult {
-        println!("TODO: GameState");
+    fn draw(&mut self, context: &mut Context) -> GameResult {
+        match self.state {
+            State::Menu => {
+                graphics::draw(
+                    context,
+                    &self.menu_images[self.num_players - 1],
+                    graphics::DrawParam::new(),
+                )?;
+            }
+            State::GameOver => {
+                graphics::draw(context, &self.game_over_image, graphics::DrawParam::new())?;
+            }
+            State::Play => {}
+        }
+
+        graphics::present(context)?;
+
+        timer::yield_now();
+
         Ok(())
     }
 }

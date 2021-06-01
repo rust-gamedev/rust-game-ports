@@ -6,6 +6,7 @@ mod ball;
 mod bat;
 mod game_state;
 mod impact;
+mod state;
 
 use std::env;
 use std::path::PathBuf;
