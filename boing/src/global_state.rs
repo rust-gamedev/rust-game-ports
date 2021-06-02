@@ -47,7 +47,7 @@ impl GlobalState {
 
         Self {
             state: State::Menu,
-            game: Game::new((None, None)),
+            game: Game::new(context, (None, None)),
             num_players: 1,
             space_down: false,
             menu_images,
@@ -89,7 +89,7 @@ impl EventHandler for GlobalState {
                         controls.1 = Some(p2_controls);
                     }
 
-                    self.game = Game::new(controls);
+                    self.game = Game::new(context, controls);
                 } else {
                     if self.num_players == 2 && is_key_pressed(context, KeyCode::Up) {
                         self.up_sound.play(context)?;
@@ -118,7 +118,7 @@ impl EventHandler for GlobalState {
                     self.num_players = 1;
 
                     // Create a new Game object, without any players
-                    self.game = Game::new((None, None));
+                    self.game = Game::new(context, (None, None));
                 }
             }
         }

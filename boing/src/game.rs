@@ -16,6 +16,7 @@ pub struct Game {
 
 impl Game {
     pub fn new(
+        context: &mut Context,
         controls: (
             Option<fn(&Context, &Ball, f32, &Bat) -> f32>,
             Option<fn(&Context, &Ball, f32, &Bat) -> f32>,
@@ -23,7 +24,7 @@ impl Game {
     ) -> Self {
         Self {
             bats: [Bat::new(0, controls.0), Bat::new(1, controls.1)],
-            ball: Ball::new(-1.),
+            ball: Ball::new(context, -1.),
             impacts: vec![],
             ai_offset: 0.,
         }
@@ -34,7 +35,12 @@ impl Game {
         for bat in &mut self.bats {
             bat.update(context)?
         }
-        self.ball.update(context)?;
+        self.ball.update(
+            context,
+            &mut self.bats,
+            &mut self.impacts,
+            &mut self.ai_offset,
+        )?;
         for impact in &mut self.impacts {
             impact.update(context)?
         }
