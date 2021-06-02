@@ -23,7 +23,10 @@ impl Game {
         ),
     ) -> Self {
         Self {
-            bats: [Bat::new(0, controls.0), Bat::new(1, controls.1)],
+            bats: [
+                Bat::new(context, 0, controls.0),
+                Bat::new(context, 1, controls.1),
+            ],
             ball: Ball::new(context, -1.),
             impacts: vec![],
             ai_offset: 0.,
@@ -33,7 +36,7 @@ impl Game {
     pub fn update(&mut self, context: &mut Context) -> GameResult {
         // Update all active objects
         for bat in &mut self.bats {
-            bat.update(context)?
+            bat.update(context, &self.ball, self.ai_offset)?
         }
         self.ball.update(
             context,

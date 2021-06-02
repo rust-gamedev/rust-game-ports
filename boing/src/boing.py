@@ -151,31 +151,29 @@ class Bat(Actor):
 #             self.move_func = self.ai
 #
 #         self.timer = 0
-
-    def update(self):
-        self.timer -= 1
-
-        # Our movement function tells us how much to move on the Y axis
-        y_movement = self.move_func()
-
-        # Apply y_movement to y position, ensuring bat does not go through the side walls
-        self.y = min(400, max(80, self.y + y_movement))
-
-        # Choose the appropriate sprite. There are 3 sprites per player - e.g. bat00 is the left-hand player's
-        # standard bat sprite, bat01 is the sprite to use when the ball has just bounced off the bat, and bat02
-        # is the sprite to use when the bat has just missed the ball and the ball has gone out of bounds.
-        # bat10, 11 and 12 are the equivalents for the right-hand player
-
-        frame = 0
-        if self.timer > 0:
-            if game.ball.out():
-                frame = 2
-            else:
-                frame = 1
-
-        self.image = "bat" + str(self.player) + str(frame)
-
-# DONE
+#
+#     def update(self):
+#         self.timer -= 1
+#
+#         # Our movement function tells us how much to move on the Y axis
+#         y_movement = self.move_func()
+#
+#         # Apply y_movement to y position, ensuring bat does not go through the side walls
+#         self.y = min(400, max(80, self.y + y_movement))
+#
+#         # Choose the appropriate sprite. There are 3 sprites per player - e.g. bat00 is the left-hand player's
+#         # standard bat sprite, bat01 is the sprite to use when the ball has just bounced off the bat, and bat02
+#         # is the sprite to use when the bat has just missed the ball and the ball has gone out of bounds.
+#         # bat10, 11 and 12 are the equivalents for the right-hand player
+#
+#         frame = 0
+#         if self.timer > 0:
+#             if game.ball.out():
+#                 frame = 2
+#             else:
+#                 frame = 1
+#
+#         self.image = "bat" + str(self.player) + str(frame)
 #
 #     def ai(self):
 #         x_distance = abs(game.ball.x - self.x)
