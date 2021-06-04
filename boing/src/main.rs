@@ -7,6 +7,7 @@ mod bat;
 mod controls;
 mod game;
 mod global_state;
+mod graphic_entity;
 mod impact;
 mod state;
 
