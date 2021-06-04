@@ -1,13 +1,9 @@
-use ggez::{
-    audio,
-    graphics::{DrawParam, Drawable, Image},
-    Context, GameResult,
-};
+use ggez::{audio, graphics::Image, Context, GameResult};
 use glam::Vec2;
 
 use crate::{
-    audio_entity::AudioEntity, bat::Bat, impact::Impact, state::State, HALF_HEIGHT, HALF_WIDTH,
-    WINDOW_WIDTH,
+    audio_entity::AudioEntity, bat::Bat, graphic_entity::GraphicEntity, impact::Impact,
+    state::State, HALF_HEIGHT, HALF_WIDTH, WINDOW_WIDTH,
 };
 
 pub struct Ball {
@@ -36,6 +32,20 @@ pub struct Ball {
 }
 
 impl AudioEntity for Ball {}
+
+impl GraphicEntity for Ball {
+    fn image(&self) -> &Image {
+        &self.image
+    }
+
+    fn x(&self) -> f32 {
+        self.x
+    }
+
+    fn y(&self) -> f32 {
+        self.y
+    }
+}
 
 impl Ball {
     pub fn new(context: &mut Context, dx: f32) -> Self {
@@ -202,11 +212,6 @@ impl Ball {
         }
 
         Ok(())
-    }
-
-    pub fn draw(&mut self, context: &mut Context) -> GameResult {
-        self.image
-            .draw(context, DrawParam::new().dest(Vec2::new(self.x, self.y)))
     }
 
     pub fn out(&self) -> bool {

@@ -5,6 +5,7 @@ use glam::Vec2;
 use crate::audio_entity::AudioEntity;
 use crate::ball::Ball;
 use crate::bat::Bat;
+use crate::graphic_entity::GraphicEntity;
 use crate::impact::Impact;
 use crate::state::State;
 use crate::WINDOW_WIDTH;

@@ -1,8 +1,6 @@
-use ggez::{
-    graphics::{self, DrawParam, Image},
-    Context, GameResult,
-};
-use glam::Vec2;
+use ggez::{graphics::Image, Context, GameResult};
+
+use crate::graphic_entity::GraphicEntity;
 
 /// Type for an animation which is displayed briefly whenever the ball bounces
 pub struct Impact {
@@ -12,6 +10,20 @@ pub struct Impact {
 
     current_image: usize,
     images: Vec<Image>,
+}
+
+impl GraphicEntity for Impact {
+    fn image(&self) -> &Image {
+        &self.images[self.current_image]
+    }
+
+    fn x(&self) -> f32 {
+        self.x
+    }
+
+    fn y(&self) -> f32 {
+        self.y
+    }
 }
 
 impl Impact {
@@ -39,16 +51,6 @@ impl Impact {
         // The Game type maintains a list of Impact instances. In Game.update, if the timer for an
         // object has gone beyond 10, the object is removed from the list.
         self.time += 1;
-
-        Ok(())
-    }
-
-    pub fn draw(&mut self, context: &mut Context) -> GameResult {
-        graphics::draw(
-            context,
-            &self.images[self.current_image],
-            DrawParam::new().dest(Vec2::new(self.x, self.y)),
-        )?;
 
         Ok(())
     }

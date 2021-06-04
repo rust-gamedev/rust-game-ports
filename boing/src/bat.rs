@@ -1,10 +1,6 @@
-use ggez::{
-    graphics::{self, DrawParam, Image},
-    Context, GameResult,
-};
-use glam::Vec2;
+use ggez::{graphics::Image, Context, GameResult};
 
-use crate::{ball::Ball, controls::ai, HALF_HEIGHT};
+use crate::{ball::Ball, controls::ai, graphic_entity::GraphicEntity, HALF_HEIGHT};
 
 pub struct Bat {
     pub x: f32,
@@ -32,6 +28,20 @@ pub struct Bat {
     // Although these are arrays [of fixed size], which is also semantically more precise, working with
     // arrays can be cumbersome (ie. from iterators), so just use `Vec`.
     pub images: Vec<Vec<Image>>,
+}
+
+impl GraphicEntity for Bat {
+    fn image(&self) -> &Image {
+        &self.images[self.player as usize][self.current_image]
+    }
+
+    fn x(&self) -> f32 {
+        self.x
+    }
+
+    fn y(&self) -> f32 {
+        self.y
+    }
 }
 
 impl Bat {
@@ -97,15 +107,5 @@ impl Bat {
         self.current_image = frame;
 
         Ok(())
-    }
-
-    pub fn draw(&mut self, context: &mut Context) -> GameResult {
-        let image = &self.images[self.player as usize][self.current_image];
-        println!("{}", self.y);
-        graphics::draw(
-            context,
-            image,
-            DrawParam::new().dest(Vec2::new(self.x, self.y)),
-        )
     }
 }
