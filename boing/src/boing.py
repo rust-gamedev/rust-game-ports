@@ -132,11 +132,9 @@
 #     def out(self):
 #         # Has ball gone off the left or right edge of the screen?
 #         return self.x < 0 or self.x > WIDTH
-
-
-class Bat(Actor):
-# DONE
 #
+#
+# class Bat(Actor):
 #     def __init__(self, player, move_func=None):
 #         x = 40 if player == 0 else 760
 #         y = HALF_HEIGHT
@@ -198,72 +196,70 @@ class Game:
     #     self.ball = Ball(-1)
     #     self.impacts = []
     #     self.ai_offset = 0
-
-    def update(self):
-# DONE
 #
+#     def update(self):
 #         for obj in self.bats + [self.ball] + self.impacts:
 #             obj.update()
 #
 #         for i in range(len(self.impacts) - 1, -1, -1):
 #             if self.impacts[i].time >= 10:
 #                 del self.impacts[i]
-
-        # Has ball gone off the left or right edge of the screen?
-        if self.ball.out():
-            # Work out which player gained a point, based on whether the ball
-            # was on the left or right-hand side of the screen
-            scoring_player = 1 if self.ball.x < WIDTH // 2 else 0
-            losing_player = 1 - scoring_player
-
-            # We use the timer of the player who has just conceded a point to decide when to create a new ball in the
-            # centre of the level. This timer starts at zero at the beginning of the game and counts down by one every
-            # frame. Therefore, on the frame where the ball first goes off the screen, the timer will be less than zero.
-            # We set it to 20, which means that this player's bat will display a different animation frame for 20
-            # frames, and a new ball will be created after 20 frames
-            if self.bats[losing_player].timer < 0:
-                self.bats[scoring_player].score += 1
-
-                game.play_sound("score_goal", 1)
-
-                self.bats[losing_player].timer = 20
-
-            elif self.bats[losing_player].timer == 0:
-                # After 20 frames, create a new ball, heading in the direction of the player who just missed the ball
-                direction = -1 if losing_player == 0 else 1
-                self.ball = Ball(direction)
-
-    def draw(self):
-        # Draw background
-        screen.blit("table", (0,0))
-
-        # Draw 'just scored' effects, if required
-        for p in (0,1):
-            if self.bats[p].timer > 0 and game.ball.out():
-                screen.blit("effect" + str(p), (0,0))
-
-        # Draw bats, ball and impact effects - in that order. Square brackets are needed around the ball because
-        # it's just an object, whereas the other two are lists - and you can't directly join an object onto a
-        # list without first putting it in a list
-        for obj in self.bats + [self.ball] + self.impacts:
-            obj.draw()
-
-        # Display scores - outer loop goes through each player
-        for p in (0,1):
-            # Convert score into a string of 2 digits (e.g. "05") so we can later get the individual digits
-            score = "{0:02d}".format(self.bats[p].score)
-            # Inner loop goes through each digit
-            for i in (0,1):
-                # Digit sprites are numbered 00 to 29, where the first digit is the colour (0 = grey,
-                # 1 = blue, 2 = green) and the second digit is the digit itself
-                # Colour is usually grey but turns red or green (depending on player number) when a
-                # point has just been scored
-                colour = "0"
-                other_p = 1 - p
-                if self.bats[other_p].timer > 0 and game.ball.out():
-                    colour = "2" if p == 0  else "1"
-                image = "digit" + colour + str(score[i])
-                screen.blit(image, (255 + (160 * p) + (i * 55), 46))
+#
+#         # Has ball gone off the left or right edge of the screen?
+#         if self.ball.out():
+#             # Work out which player gained a point, based on whether the ball
+#             # was on the left or right-hand side of the screen
+#             scoring_player = 1 if self.ball.x < WIDTH // 2 else 0
+#             losing_player = 1 - scoring_player
+#
+#             # We use the timer of the player who has just conceded a point to decide when to create a new ball in the
+#             # centre of the level. This timer starts at zero at the beginning of the game and counts down by one every
+#             # frame. Therefore, on the frame where the ball first goes off the screen, the timer will be less than zero.
+#             # We set it to 20, which means that this player's bat will display a different animation frame for 20
+#             # frames, and a new ball will be created after 20 frames
+#             if self.bats[losing_player].timer < 0:
+#                 self.bats[scoring_player].score += 1
+#
+#                 game.play_sound("score_goal", 1)
+#
+#                 self.bats[losing_player].timer = 20
+#
+#             elif self.bats[losing_player].timer == 0:
+#                 # After 20 frames, create a new ball, heading in the direction of the player who just missed the ball
+#                 direction = -1 if losing_player == 0 else 1
+#                 self.ball = Ball(direction)
+#
+#     def draw(self):
+#         # Draw background
+#         screen.blit("table", (0,0))
+#
+#         # Draw 'just scored' effects, if required
+#         for p in (0,1):
+#             if self.bats[p].timer > 0 and game.ball.out():
+#                 screen.blit("effect" + str(p), (0,0))
+#
+#         # Draw bats, ball and impact effects - in that order. Square brackets are needed around the ball because
+#         # it's just an object, whereas the other two are lists - and you can't directly join an object onto a
+#         # list without first putting it in a list
+#         for obj in self.bats + [self.ball] + self.impacts:
+#             obj.draw()
+#
+#         # Display scores - outer loop goes through each player
+#         for p in (0,1):
+#             # Convert score into a string of 2 digits (e.g. "05") so we can later get the individual digits
+#             score = "{0:02d}".format(self.bats[p].score)
+#             # Inner loop goes through each digit
+#             for i in (0,1):
+#                 # Digit sprites are numbered 00 to 29, where the first digit is the colour (0 = grey,
+#                 # 1 = blue, 2 = green) and the second digit is the digit itself
+#                 # Colour is usually grey but turns red or green (depending on player number) when a
+#                 # point has just been scored
+#                 colour = "0"
+#                 other_p = 1 - p
+#                 if self.bats[other_p].timer > 0 and game.ball.out():
+#                     colour = "2" if p == 0  else "1"
+#                 image = "digit" + colour + str(score[i])
+#                 screen.blit(image, (255 + (160 * p) + (i * 55), 46))
 
     def play_sound(self, name, count=1):
         # Some sounds have multiple varieties. If count > 1, we'll randomly choose one from those
