@@ -100,7 +100,7 @@ impl EventHandler for GlobalState {
                     }
 
                     // Update the 'attract mode' game in the background (two AIs playing each other)
-                    self.game.update(context)?
+                    self.game.update(context, self.state)?
                 }
             }
             State::Play => {
@@ -108,7 +108,7 @@ impl EventHandler for GlobalState {
                 if self.game.bats[0].score.max(self.game.bats[1].score) > 9 {
                     self.state = State::GameOver;
                 } else {
-                    self.game.update(context)?
+                    self.game.update(context, self.state)?
                 }
             }
             State::GameOver => {

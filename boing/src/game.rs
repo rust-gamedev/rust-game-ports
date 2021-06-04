@@ -1,11 +1,12 @@
-use ggez::audio::{self, SoundSource};
 use ggez::graphics::{DrawParam, Drawable, Image};
-use ggez::{Context, GameResult};
+use ggez::{audio, Context, GameResult};
 use glam::Vec2;
 
 use crate::ball::Ball;
 use crate::bat::Bat;
 use crate::impact::Impact;
+use crate::sounds_playback::play_in_game_sound;
+use crate::state::State;
 use crate::WINDOW_WIDTH;
 
 pub struct Game {
@@ -74,7 +75,7 @@ impl Game {
         }
     }
 
-    pub fn update(&mut self, context: &mut Context) -> GameResult {
+    pub fn update(&mut self, context: &mut Context, state: State) -> GameResult {
         // Update all active objects
         for bat in &mut self.bats {
             bat.update(context, &self.ball, self.ai_offset)?
@@ -84,6 +85,7 @@ impl Game {
             &mut self.bats,
             &mut self.impacts,
             &mut self.ai_offset,
+            state,
         )?;
         for impact in &mut self.impacts {
             impact.update(context)?
@@ -108,7 +110,7 @@ impl Game {
             if self.bats[losing_player].timer < 0 {
                 self.bats[scoring_player].score += 1;
 
-                self.score_goal_sound.play(context)?;
+                play_in_game_sound(context, state, &mut self.score_goal_sound)?;
 
                 self.bats[losing_player].timer = 20;
             } else if self.bats[losing_player].timer == 0 {

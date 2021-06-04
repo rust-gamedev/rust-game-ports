@@ -1,11 +1,17 @@
 use ggez::{
-    audio::{self, SoundSource},
+    audio,
     graphics::{DrawParam, Drawable, Image},
     Context, GameResult,
 };
 use glam::Vec2;
 
-use crate::{bat::Bat, impact::Impact, HALF_HEIGHT, HALF_WIDTH, WINDOW_WIDTH};
+use crate::{
+    bat::Bat,
+    impact::Impact,
+    sounds_playback::{play_in_game_random_sound, play_in_game_sound},
+    state::State,
+    HALF_HEIGHT, HALF_WIDTH, WINDOW_WIDTH,
+};
 
 pub struct Ball {
     pub x: f32,
@@ -28,7 +34,7 @@ pub struct Ball {
     pub hit_medium_sound: audio::Source,
     pub hit_fast_sound: audio::Source,
     pub hit_veryfast_sound: audio::Source,
-    pub bounce_sound: audio::Source,
+    pub bounce_sounds: Vec<audio::Source>,
     pub bounce_synth_sound: audio::Source,
 }
 
@@ -45,7 +51,12 @@ impl Ball {
         let hit_medium_sound = audio::Source::new(context, "/hit_medium0.ogg").unwrap();
         let hit_fast_sound = audio::Source::new(context, "/hit_fast0.ogg").unwrap();
         let hit_veryfast_sound = audio::Source::new(context, "/hit_veryfast0.ogg").unwrap();
-        let bounce_sound = audio::Source::new(context, "/bounce.ogg").unwrap();
+        let bounce_sounds = (0..5)
+            .map(|i| {
+                let sound_name = format!("/bounce{}.ogg", i);
+                audio::Source::new(context, sound_name).unwrap()
+            })
+            .collect();
         let bounce_synth_sound = audio::Source::new(context, "/bounce_synth0.ogg").unwrap();
 
         Self {
@@ -64,7 +75,7 @@ impl Ball {
             hit_medium_sound,
             hit_fast_sound,
             hit_veryfast_sound,
-            bounce_sound,
+            bounce_sounds,
             bounce_synth_sound,
         }
     }
@@ -75,6 +86,7 @@ impl Ball {
         bats: &mut [Bat],
         impacts: &mut Vec<Impact>,
         ai_offset: &mut f32,
+        state: State,
     ) -> GameResult {
         // Each frame, we move the ball in a series of small steps - the number of steps being based
         // on its speed attribute
@@ -160,19 +172,16 @@ impl Ball {
                     // Bat glows for 10 frames
                     bat.timer = 10;
 
-                    // Play hit sounds, with more intense sound effects as the ball gets faster
-                    for hit_sound in &self.hit_sounds {
-                        hit_sound.play_later()?;
-                    }
+                    play_in_game_random_sound(context, state, &mut self.hit_sounds)?;
 
                     if self.speed <= 10 {
-                        self.hit_slow_sound.play(context)?;
+                        play_in_game_sound(context, state, &mut self.hit_slow_sound)?;
                     } else if self.speed <= 12 {
-                        self.hit_medium_sound.play(context)?;
+                        play_in_game_sound(context, state, &mut self.hit_medium_sound)?;
                     } else if self.speed <= 16 {
-                        self.hit_fast_sound.play(context)?;
+                        play_in_game_sound(context, state, &mut self.hit_fast_sound)?;
                     } else {
-                        self.hit_veryfast_sound.play(context)?;
+                        play_in_game_sound(context, state, &mut self.hit_veryfast_sound)?;
                     }
                 }
             }
@@ -188,10 +197,8 @@ impl Ball {
                 impacts.push(Impact::new(context, self.x, self.y));
 
                 // Sound effect
-                for _ in 0..5 {
-                    self.bounce_sound.play_later()?;
-                }
-                self.bounce_synth_sound.play(context)?;
+                play_in_game_random_sound(context, state, &mut self.bounce_sounds)?;
+                play_in_game_sound(context, state, &mut self.bounce_synth_sound)?;
             }
         }
 

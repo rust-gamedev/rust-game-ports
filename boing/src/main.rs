@@ -7,6 +7,7 @@ mod controls;
 mod game;
 mod global_state;
 mod impact;
+mod sounds_playback;
 mod state;
 
 use std::env;
