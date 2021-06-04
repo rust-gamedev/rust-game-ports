@@ -101,7 +101,7 @@ impl Bat {
 
     pub fn draw(&mut self, context: &mut Context) -> GameResult {
         let image = &self.images[self.player as usize][self.current_image];
-
+        println!("{}", self.y);
         graphics::draw(
             context,
             image,

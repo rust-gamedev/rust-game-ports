@@ -2,10 +2,10 @@ use ggez::graphics::{DrawParam, Drawable, Image};
 use ggez::{audio, Context, GameResult};
 use glam::Vec2;
 
+use crate::audio_entity::AudioEntity;
 use crate::ball::Ball;
 use crate::bat::Bat;
 use crate::impact::Impact;
-use crate::sounds_playback::play_in_game_sound;
 use crate::state::State;
 use crate::WINDOW_WIDTH;
 
@@ -27,6 +27,8 @@ pub struct Game {
 
     pub score_goal_sound: audio::Source,
 }
+
+impl AudioEntity for Game {}
 
 impl Game {
     pub fn new(
@@ -110,7 +112,7 @@ impl Game {
             if self.bats[losing_player].timer < 0 {
                 self.bats[scoring_player].score += 1;
 
-                play_in_game_sound(context, state, &mut self.score_goal_sound)?;
+                Self::play_in_game_sound(context, state, &mut self.score_goal_sound)?;
 
                 self.bats[losing_player].timer = 20;
             } else if self.bats[losing_player].timer == 0 {

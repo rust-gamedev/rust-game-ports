@@ -1,13 +1,13 @@
 // TODO: Remove me. Temporary until the codebase is fully written.
 #![allow(dead_code)]
 
+mod audio_entity;
 mod ball;
 mod bat;
 mod controls;
 mod game;
 mod global_state;
 mod impact;
-mod sounds_playback;
 mod state;
 
 use std::env;

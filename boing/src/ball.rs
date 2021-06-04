@@ -6,11 +6,8 @@ use ggez::{
 use glam::Vec2;
 
 use crate::{
-    bat::Bat,
-    impact::Impact,
-    sounds_playback::{play_in_game_random_sound, play_in_game_sound},
-    state::State,
-    HALF_HEIGHT, HALF_WIDTH, WINDOW_WIDTH,
+    audio_entity::AudioEntity, bat::Bat, impact::Impact, state::State, HALF_HEIGHT, HALF_WIDTH,
+    WINDOW_WIDTH,
 };
 
 pub struct Ball {
@@ -37,6 +34,8 @@ pub struct Ball {
     pub bounce_sounds: Vec<audio::Source>,
     pub bounce_synth_sound: audio::Source,
 }
+
+impl AudioEntity for Ball {}
 
 impl Ball {
     pub fn new(context: &mut Context, dx: f32) -> Self {
@@ -172,16 +171,16 @@ impl Ball {
                     // Bat glows for 10 frames
                     bat.timer = 10;
 
-                    play_in_game_random_sound(context, state, &mut self.hit_sounds)?;
+                    Self::play_in_game_random_sound(context, state, &mut self.hit_sounds)?;
 
                     if self.speed <= 10 {
-                        play_in_game_sound(context, state, &mut self.hit_slow_sound)?;
+                        Self::play_in_game_sound(context, state, &mut self.hit_slow_sound)?;
                     } else if self.speed <= 12 {
-                        play_in_game_sound(context, state, &mut self.hit_medium_sound)?;
+                        Self::play_in_game_sound(context, state, &mut self.hit_medium_sound)?;
                     } else if self.speed <= 16 {
-                        play_in_game_sound(context, state, &mut self.hit_fast_sound)?;
+                        Self::play_in_game_sound(context, state, &mut self.hit_fast_sound)?;
                     } else {
-                        play_in_game_sound(context, state, &mut self.hit_veryfast_sound)?;
+                        Self::play_in_game_sound(context, state, &mut self.hit_veryfast_sound)?;
                     }
                 }
             }
@@ -197,8 +196,8 @@ impl Ball {
                 impacts.push(Impact::new(context, self.x, self.y));
 
                 // Sound effect
-                play_in_game_random_sound(context, state, &mut self.bounce_sounds)?;
-                play_in_game_sound(context, state, &mut self.bounce_synth_sound)?;
+                Self::play_in_game_random_sound(context, state, &mut self.bounce_sounds)?;
+                Self::play_in_game_sound(context, state, &mut self.bounce_synth_sound)?;
             }
         }
 
