@@ -1,6 +1,3 @@
-// TODO: Remove me. Temporary until the codebase is fully written.
-#![allow(dead_code)]
-
 mod audio_entity;
 mod ball;
 mod bat;
