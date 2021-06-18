@@ -1,0 +1,8 @@
+[package]
+authors = ["Saverio Miroddi <saverio.pub2@gmail.com>"]
+edition = "2018"
+name = "cavern-macroquad-naive"
+version = "0.1.0"
+
+[dependencies]
+macroquad = "0.3"
