@@ -6,7 +6,7 @@ set -o nounset
 set -o errtrace
 shopt -s inherit_errexit
 
-c_reference_project=boing
+c_reference_project=boing-ggez
 v_project_name=
 
 function decode_cmdline_args {
