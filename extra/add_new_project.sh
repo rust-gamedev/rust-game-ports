@@ -41,11 +41,14 @@ function add_project {
 }
 
 function move_original_code {
-  mv "original_code/$v_original_project-master" "$v_new_project/resources"
-  cp "$v_original_project/resources/$v_original_project.py" "$v_new_project/src"
-  sed -i '1i #!/usr/bin/env python3' "$v_new_project/resources/$v_original_project.py"
-  chmod 755 "$v_new_project/resources/$v_original_project.py"
-  git ca -m "${v_new_project^}: Move original project inside the Rust project"
+  cp "original_code/$v_original_project-master/$v_original_project.py" "$v_new_project/src"
+  ln -s "../resources/$v_original_project" "$v_new_project/resources"
+
+  mv "original_code/$v_original_project-master" "resources/$v_original_project"
+  sed -i '1i #!/usr/bin/env python3' "resources/$v_original_project/$v_original_project.py"
+  chmod 755 "resources/$v_original_project/$v_original_project.py"
+
+  git ca -m "${v_new_project^}: Move original project inside the shared resources dir"
 }
 
 decode_cmdline_args "$@"
