@@ -32,7 +32,7 @@ function check_project_name {
 function add_project {
   perl -i -0777 -pe "s/]$/  \"$v_project_name\",\n]/" Cargo.toml
   cargo new "$v_project_name"
-  rsync -v --relative "$c_reference_project/./Cargo.toml" "$c_reference_project/./rust-toolchain" "$c_reference_project/./.cargo" "$v_project_name/"
+  rsync -av --relative "$c_reference_project/./Cargo.toml" "$c_reference_project/./rust-toolchain" "$c_reference_project/./.cargo" "$v_project_name/"
   perl -i -pe "s/$c_reference_project/$v_project_name/" "$v_project_name/Cargo.toml"
   git ca -m "Add ${v_project_name^} project"
 }
@@ -46,7 +46,7 @@ function move_original_code {
 }
 
 decode_cmdline_args "$@"
-check_project_name
 change_dir
+check_project_name
 add_project
 move_original_code
