@@ -18,7 +18,7 @@ function decode_cmdline_args {
   v_project_name=$1
 }
 
-function change_dir {
+function move_to_root_dir {
   cd "$(dirname "$0")/.."
 }
 
@@ -46,7 +46,7 @@ function move_original_code {
 }
 
 decode_cmdline_args "$@"
-change_dir
+move_to_root_dir
 check_project_name
 add_project
 move_original_code
