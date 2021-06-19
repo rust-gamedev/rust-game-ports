@@ -1,3 +1,8 @@
+use macroquad::{
+    audio::{self, Sound},
+    rand::ChooseRandom,
+};
+
 use crate::player::Player;
 
 pub struct Game {
@@ -20,7 +25,13 @@ impl Game {
         println!("WRITEME: Game#draw");
     }
 
-    pub fn play_sound(&self, _name: &str) {
-        println!("WRITEME: Game#play_sound");
+    pub fn play_sound(&self, sound: &Sound) {
+        if self.player.is_some() {
+            audio::play_sound_once(*sound);
+        }
+    }
+
+    pub fn play_random_sound(&self, sounds: Vec<Sound>) {
+        self.play_sound(sounds.choose().unwrap())
     }
 }

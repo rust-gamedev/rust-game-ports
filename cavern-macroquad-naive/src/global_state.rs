@@ -30,8 +30,10 @@ impl GlobalState {
                 }
             }
             State::Play => {
+                let resources = storage::get::<Resources>();
+
                 if self.game.player.as_ref().unwrap().lives < 0 {
-                    self.game.play_sound("over");
+                    self.game.play_sound(&resources.over_sound);
                     self.state = State::GameOver;
                 } else {
                     self.game.update();

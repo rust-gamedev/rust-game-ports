@@ -627,23 +627,23 @@ class Game:
             if obj:
                 obj.draw()
 
-    def play_sound(self, name, count=1):
-        # Some sounds have multiple varieties. If count > 1, we'll randomly choose one from those
-        # We don't play any sounds if there is no player (e.g. if we're on the menu)
-        if self.player:
-            try:
-                # Pygame Zero allows you to write things like 'sounds.explosion.play()'
-                # This automatically loads and plays a file named 'explosion.wav' (or .ogg) from the sounds folder (if
-                # such a file exists)
-                # But what if you have files named 'explosion0.ogg' to 'explosion5.ogg' and want to randomly choose
-                # one of them to play? You can generate a string such as 'explosion3', but to use such a string
-                # to access an attribute of Pygame Zero's sounds object, we must use Python's built-in function getattr
-                sound = getattr(sounds, name + str(randint(0, count - 1)))
-                sound.play()
-            except Exception as e:
-                # If no such sound file exists, print the name
-                print(e)
-
+#     def play_sound(self, name, count=1):
+#         # Some sounds have multiple varieties. If count > 1, we'll randomly choose one from those
+#         # We don't play any sounds if there is no player (e.g. if we're on the menu)
+#         if self.player:
+#             try:
+#                 # Pygame Zero allows you to write things like 'sounds.explosion.play()'
+#                 # This automatically loads and plays a file named 'explosion.wav' (or .ogg) from the sounds folder (if
+#                 # such a file exists)
+#                 # But what if you have files named 'explosion0.ogg' to 'explosion5.ogg' and want to randomly choose
+#                 # one of them to play? You can generate a string such as 'explosion3', but to use such a string
+#                 # to access an attribute of Pygame Zero's sounds object, we must use Python's built-in function getattr
+#                 sound = getattr(sounds, name + str(randint(0, count - 1)))
+#                 sound.play()
+#             except Exception as e:
+#                 # If no such sound file exists, print the name
+#                 print(e)
+#
 # Widths of the letters A to Z in the font images
 CHAR_WIDTH = [27, 26, 25, 26, 25, 25, 26, 25, 12, 26, 26, 25, 33, 25, 26,
               25, 27, 26, 26, 25, 26, 26, 38, 25, 25, 25]
