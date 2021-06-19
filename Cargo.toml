@@ -1,6 +1,0 @@
-[workspace]
-
-members = [
-  "boing-ggez",
-  "cavern-macroquad-naive",
-]

@@ -33,7 +33,6 @@ function check_project_name {
 }
 
 function add_project {
-  perl -i -0777 -pe "s/]$/  \"$v_new_project\",\n]/" Cargo.toml
   cargo new "$v_new_project"
   rsync -av --relative "$c_reference_project/./Cargo.toml" "$c_reference_project/./rust-toolchain" "$c_reference_project/./.cargo" "$v_new_project/"
   perl -i -pe "s/$c_reference_project/$v_new_project/" "$v_new_project/Cargo.toml"
