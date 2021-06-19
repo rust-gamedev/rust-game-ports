@@ -1,6 +1,8 @@
+mod drawing;
 mod game;
 mod global_state;
 mod levels;
+mod orb;
 mod player;
 mod resources;
 mod robot;

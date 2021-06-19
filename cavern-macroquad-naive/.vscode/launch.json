@@ -1,0 +1,45 @@
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "Debug executable 'cavern-macroquad-naive'",
+      "cargo": {
+        "args": [
+          "build",
+          "--bin=cavern-macroquad-naive",
+          "--package=cavern-macroquad-naive"
+        ],
+        "filter": {
+          "name": "cavern-macroquad-naive",
+          "kind": "bin"
+        }
+      },
+      "args": [],
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "Debug unit tests in executable 'cavern-macroquad-naive'",
+      "cargo": {
+        "args": [
+          "test",
+          "--no-run",
+          "--bin=cavern-macroquad-naive",
+          "--package=cavern-macroquad-naive"
+        ],
+        "filter": {
+          "name": "cavern-macroquad-naive",
+          "kind": "bin"
+        }
+      },
+      "args": [],
+      "cwd": "${workspaceFolder}"
+    }
+  ]
+}

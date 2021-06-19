@@ -1,6 +1,13 @@
 use macroquad::prelude::{collections::storage, draw_texture, is_key_down, KeyCode, WHITE};
 
-use crate::{game::Game, player::Player, resources::Resources, state::State};
+use crate::{
+    drawing::{draw_game_text, CHAR_WIDTH, IMAGE_WIDTH},
+    game::Game,
+    player::Player,
+    resources::Resources,
+    state::State,
+    WIDTH,
+};
 
 pub struct GlobalState {
     state: State,
@@ -94,6 +101,34 @@ impl GlobalState {
     }
 
     fn draw_status(&self) {
-        eprintln!("WRITEME: GlobalStatus#draw_status")
+        // For Rust convenience
+        let player = self.game.player.as_ref().unwrap();
+
+        // Display score, right-justified at edge of screen
+        let number_width = CHAR_WIDTH[0];
+        let s = player.score.to_string();
+        draw_game_text(&s, 451, Some(WIDTH - 2 - (number_width * s.len() as i32)));
+
+        // Display level number
+        draw_game_text(&format!("LEVEL {}", self.game.level + 1), 451, None);
+
+        // Display lives and health
+        // We only display a maximum of two lives - if there are more than two, a plus symbol is displayed
+        let mut lives_health = ["life"].repeat(2.min(player.lives as usize));
+        if player.lives > 2 {
+            lives_health.push("plus");
+        }
+        if player.lives >= 0 {
+            lives_health.extend(["health"].repeat(player.health as usize));
+        };
+
+        let status_textures = &storage::get::<Resources>().status_textures;
+
+        let mut x = 0;
+        for image in lives_health {
+            let texture = status_textures[image];
+            draw_texture(texture, x as f32, 450., WHITE);
+            x += IMAGE_WIDTH[image];
+        }
     }
 }
