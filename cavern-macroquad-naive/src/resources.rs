@@ -9,7 +9,9 @@ pub struct Resources {
     pub title_texture: Texture2D,
     pub over_texture: Texture2D,
     pub space_textures: Vec<Texture2D>,
+
     pub over_sound: Sound,
+    pub level_sound: Sound,
 }
 
 impl Resources {
@@ -23,6 +25,7 @@ impl Resources {
         }
 
         let over_sound = audio::load_sound("resources/sounds/over0.ogg").await?;
+        let level_sound = audio::load_sound("resources/sounds/level0.ogg").await?;
 
         Ok(Resources {
             title_texture,
@@ -30,6 +33,7 @@ impl Resources {
             space_textures,
 
             over_sound,
+            level_sound,
         })
     }
 }

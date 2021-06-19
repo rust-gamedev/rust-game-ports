@@ -1,7 +1,9 @@
 mod game;
 mod global_state;
+mod levels;
 mod player;
 mod resources;
+mod robot;
 mod state;
 
 use macroquad::{

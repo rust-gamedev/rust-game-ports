@@ -32,35 +32,35 @@ GRID_BLOCK_SIZE = 25
 ANCHOR_CENTRE = ("center", "center")
 ANCHOR_CENTRE_BOTTOM = ("center", "bottom")
 
-LEVELS = [ ["XXXXX     XXXXXXXX     XXXXX",
-            "","","","",
-            "   XXXXXXX        XXXXXXX   ",
-            "","","",
-            "   XXXXXXXXXXXXXXXXXXXXXX   ",
-            "","","",
-            "XXXXXXXXX          XXXXXXXXX",
-            "","",""],
-
-           ["XXXX    XXXXXXXXXXXX    XXXX",
-            "","","","",
-            "    XXXXXXXXXXXXXXXXXXXX    ",
-            "","","",
-            "XXXXXX                XXXXXX",
-            "      X              X      ",
-            "       X            X       ",
-            "        X          X        ",
-            "         X        X         ",
-            "","",""],
-
-           ["XXXX    XXXX    XXXX    XXXX",
-            "","","","",
-            "  XXXXXXXX        XXXXXXXX  ",
-            "","","",
-            "XXXX      XXXXXXXX      XXXX",
-            "","","",
-            "    XXXXXX        XXXXXX    ",
-            "","",""]]
-
+# LEVELS = [ ["XXXXX     XXXXXXXX     XXXXX",
+#             "","","","",
+#             "   XXXXXXX        XXXXXXX   ",
+#             "","","",
+#             "   XXXXXXXXXXXXXXXXXXXXXX   ",
+#             "","","",
+#             "XXXXXXXXX          XXXXXXXXX",
+#             "","",""],
+#
+#            ["XXXX    XXXXXXXXXXXX    XXXX",
+#             "","","","",
+#             "    XXXXXXXXXXXXXXXXXXXX    ",
+#             "","","",
+#             "XXXXXX                XXXXXX",
+#             "      X              X      ",
+#             "       X            X       ",
+#             "        X          X        ",
+#             "         X        X         ",
+#             "","",""],
+#
+#            ["XXXX    XXXX    XXXX    XXXX",
+#             "","","","",
+#             "  XXXXXXXX        XXXXXXXX  ",
+#             "","","",
+#             "XXXX      XXXXXXXX      XXXX",
+#             "","","",
+#             "    XXXXXX        XXXXXX    ",
+#             "","",""]]
+#
 def block(x,y):
     # Is there a level grid block at these coordinates?
     grid_x = (x - LEVEL_X_OFFSET) // GRID_BLOCK_SIZE
@@ -411,8 +411,8 @@ class Player(GravityActor):
                 self.image = "run" + dir_index + str((game.timer // 8) % 4)
 
 class Robot(GravityActor):
-    TYPE_NORMAL = 0
-    TYPE_AGGRESSIVE = 1
+    # TYPE_NORMAL = 0
+    # TYPE_AGGRESSIVE = 1
 
     def __init__(self, pos, type):
         super().__init__(pos)
@@ -489,13 +489,13 @@ class Robot(GravityActor):
 
 
 class Game:
-    def __init__(self, player=None):
-        self.player = player
-        self.level_colour = -1
-        self.level = -1
-
-        self.next_level()
-
+#     def __init__(self, player=None):
+#         self.player = player
+#         self.level_colour = -1
+#         self.level = -1
+#
+#         self.next_level()
+#
     def fire_probability(self):
         # Likelihood per frame of each robot firing a bolt - they fire more often on higher levels
         return 0.001 + (0.0001 * min(100, self.level))
@@ -504,52 +504,52 @@ class Game:
         # Maximum number of enemies on-screen at once – increases as you progress through the levels
         return min((self.level + 6) // 2, 8)
 
-    def next_level(self):
-        self.level_colour = (self.level_colour + 1) % 4
-        self.level += 1
-
-        # Set up grid
-        self.grid = LEVELS[self.level % len(LEVELS)]
-
-        # The last row is a copy of the first row
-        # Note that we don't do 'self.grid.append(self.grid[0])'. That would alter the original data in the LEVELS list
-        # Instead, what this line does is create a brand new list, which is distinct from the list in LEVELS, and
-        # consists of the level data plus the first row of the level. It's also interesting to note that you can't
-        # do 'self.grid += [self.grid[0]]', because that's equivalent to using append.
-        # As an alternative, we could have copied the list on the line below '# Set up grid', by writing
-        # 'self.grid = list(LEVELS...', then used append or += on the line below.
-        self.grid = self.grid + [self.grid[0]]
-
-        self.timer = -1
-
-        if self.player:
-            self.player.reset()
-
-        self.fruits = []
-        self.bolts = []
-        self.enemies = []
-        self.pops = []
-        self.orbs = []
-
-        # At the start of each level we create a list of pending enemies - enemies to be created as the level plays out.
-        # When this list is empty, we have no more enemies left to create, and the level will end once we have destroyed
-        # all enemies currently on-screen. Each element of the list will be either 0 or 1, where 0 corresponds to
-        # a standard enemy, and 1 is a more powerful enemy.
-        # First we work out how many total enemies and how many of each type to create
-        num_enemies = 10 + self.level
-        num_strong_enemies = 1 + int(self.level / 1.5)
-        num_weak_enemies = num_enemies - num_strong_enemies
-
-        # Then we create the list of pending enemies, using Python's ability to create a list by multiplying a list
-        # by a number, and by adding two lists together. The resulting list will consist of a series of copies of
-        # the number 1 (the number depending on the value of num_strong_enemies), followed by a series of copies of
-        # the number zero, based on num_weak_enemies.
-        self.pending_enemies = num_strong_enemies * [Robot.TYPE_AGGRESSIVE] + num_weak_enemies * [Robot.TYPE_NORMAL]
-
-        # Finally we shuffle the list so that the order is randomised (using Python's random.shuffle function)
-        shuffle(self.pending_enemies)
-
-        self.play_sound("level", 1)
+#     def next_level(self):
+#         self.level_colour = (self.level_colour + 1) % 4
+#         self.level += 1
+#
+#         # Set up grid
+#         self.grid = LEVELS[self.level % len(LEVELS)]
+#
+#         # The last row is a copy of the first row
+#         # Note that we don't do 'self.grid.append(self.grid[0])'. That would alter the original data in the LEVELS list
+#         # Instead, what this line does is create a brand new list, which is distinct from the list in LEVELS, and
+#         # consists of the level data plus the first row of the level. It's also interesting to note that you can't
+#         # do 'self.grid += [self.grid[0]]', because that's equivalent to using append.
+#         # As an alternative, we could have copied the list on the line below '# Set up grid', by writing
+#         # 'self.grid = list(LEVELS...', then used append or += on the line below.
+#         self.grid = self.grid + [self.grid[0]]
+#
+#         self.timer = -1
+#
+#         if self.player:
+#             self.player.reset()
+#
+#         self.fruits = []
+#         self.bolts = []
+#         self.enemies = []
+#         self.pops = []
+#         self.orbs = []
+#
+#         # At the start of each level we create a list of pending enemies - enemies to be created as the level plays out.
+#         # When this list is empty, we have no more enemies left to create, and the level will end once we have destroyed
+#         # all enemies currently on-screen. Each element of the list will be either 0 or 1, where 0 corresponds to
+#         # a standard enemy, and 1 is a more powerful enemy.
+#         # First we work out how many total enemies and how many of each type to create
+#         num_enemies = 10 + self.level
+#         num_strong_enemies = 1 + int(self.level / 1.5)
+#         num_weak_enemies = num_enemies - num_strong_enemies
+#
+#         # Then we create the list of pending enemies, using Python's ability to create a list by multiplying a list
+#         # by a number, and by adding two lists together. The resulting list will consist of a series of copies of
+#         # the number 1 (the number depending on the value of num_strong_enemies), followed by a series of copies of
+#         # the number zero, based on num_weak_enemies.
+#         self.pending_enemies = num_strong_enemies * [Robot.TYPE_AGGRESSIVE] + num_weak_enemies * [Robot.TYPE_NORMAL]
+#
+#         # Finally we shuffle the list so that the order is randomised (using Python's random.shuffle function)
+#         shuffle(self.pending_enemies)
+#
+#         self.play_sound("level", 1)
 
     def get_robot_spawn_x(self):
         # Find a spawn location for a robot, by checking the top row of the grid for empty spots

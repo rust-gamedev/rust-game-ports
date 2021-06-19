@@ -30,10 +30,9 @@ impl GlobalState {
                 }
             }
             State::Play => {
-                let resources = storage::get::<Resources>();
-
                 if self.game.player.as_ref().unwrap().lives < 0 {
-                    self.game.play_sound(&resources.over_sound);
+                    self.game
+                        .play_sound(&storage::get::<Resources>().over_sound);
                     self.state = State::GameOver;
                 } else {
                     self.game.update();
@@ -95,6 +94,6 @@ impl GlobalState {
     }
 
     fn draw_status(&self) {
-        println!("WRITEME: GlobalStatus#draw_status")
+        eprintln!("WRITEME: GlobalStatus#draw_status")
     }
 }
