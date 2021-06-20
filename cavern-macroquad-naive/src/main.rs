@@ -1,9 +1,11 @@
 mod actor;
 mod bolt;
+mod collide_actor;
 mod drawing;
 mod fruit;
 mod game;
 mod global_state;
+mod gravity_actor;
 mod levels;
 mod orb;
 mod player;

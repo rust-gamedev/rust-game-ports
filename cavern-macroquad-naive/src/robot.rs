@@ -5,6 +5,8 @@ use macroquad::{
 
 use crate::{
     actor::{Actor, Anchor},
+    collide_actor::CollideActor,
+    gravity_actor::GravityActor,
     resources::Resources,
 };
 
@@ -66,3 +68,7 @@ impl Actor for Robot {
         self.anchor
     }
 }
+
+impl CollideActor for Robot {}
+
+impl GravityActor for Robot {}
