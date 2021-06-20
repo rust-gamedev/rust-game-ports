@@ -72,14 +72,15 @@ impl Robot {
         player: Option<&Player>,
         mut fire_probability: f32,
         game_timer: i32,
+        grid: &[&str],
     ) {
-        GravityActor::update(self, true);
+        GravityActor::update(self, true, grid);
 
         self.change_dir_timer -= 1;
         self.fire_timer += 1;
 
         // Move in current direction - turn around if we hit a wall
-        if self.move_(self.direction_x, 0, self.speed) {
+        if self.move_(self.direction_x, 0, self.speed, grid) {
             self.change_dir_timer = 0;
         }
 

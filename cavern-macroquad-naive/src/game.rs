@@ -104,6 +104,7 @@ impl Game {
                 self.player.as_ref(),
                 fire_probability,
                 self.timer,
+                &self.grid,
             )
         }
         self.pops.iter_mut().for_each(|p| p.update());

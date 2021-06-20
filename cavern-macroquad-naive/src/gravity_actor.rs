@@ -8,7 +8,7 @@ pub trait GravityActor: CollideActor {
     fn landed(&self) -> bool;
     fn landed_mut(&mut self) -> &mut bool;
 
-    fn update(&mut self, detect: bool) {
+    fn update(&mut self, detect: bool, grid: &[&str]) {
         // Apply gravity, without going over the maximum fall speed
         *self.vel_y_mut() = (self.vel_y() + 1).min(MAX_FALL_SPEED);
 
@@ -18,7 +18,7 @@ pub trait GravityActor: CollideActor {
         // in this case.
         if detect {
             // Move vertically in the appropriate direction, at the appropriate speed
-            if self.move_(0, self.vel_y().signum(), self.vel_y().abs()) {
+            if self.move_(0, self.vel_y().signum(), self.vel_y().abs(), grid) {
                 // If move returned True, we must have landed on a block.
                 // Note that move doesn't apply any collision detection when the player is moving up - only down
                 *self.vel_y_mut() = 0;
