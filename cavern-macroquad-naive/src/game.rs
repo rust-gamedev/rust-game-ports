@@ -5,8 +5,9 @@ use crate::pop::Pop;
 use crate::resources::Resources;
 use crate::robot::{Robot, RobotType};
 use crate::{levels::LEVELS, player::Player};
-use crate::{GRID_BLOCK_SIZE, LEVEL_X_OFFSET, NUM_COLUMNS, WIDTH};
+use crate::{GRID_BLOCK_SIZE, LEVEL_X_OFFSET, NUM_COLUMNS, NUM_ROWS, WIDTH};
 
+use macroquad::prelude::{draw_texture, WHITE};
 use macroquad::rand::gen_range;
 use macroquad::{
     audio::{self, Sound},
@@ -145,7 +146,46 @@ impl Game {
     }
 
     pub fn draw(&self) {
-        eprintln!("WRITEME: Game#draw");
+        let resources = storage::get::<Resources>();
+
+        draw_texture(
+            resources.background_textures[self.level as usize % 4],
+            0.,
+            0.,
+            WHITE,
+        );
+
+        let block_sprite = resources.block_textures[(self.level % 4) as usize];
+
+        // Display blocks
+        for row_y in 0..NUM_ROWS {
+            let row = self.grid[row_y as usize];
+            if row.len() > 0 {
+                // Initial offset - large blocks at edge of level are 50 pixels wide
+                let mut x = LEVEL_X_OFFSET;
+                for block in row.chars() {
+                    if block != ' ' {
+                        draw_texture(
+                            block_sprite,
+                            x as f32,
+                            (row_y * GRID_BLOCK_SIZE) as f32,
+                            WHITE,
+                        );
+                    }
+                    x += GRID_BLOCK_SIZE;
+                }
+            }
+        }
+
+        // Draw all objects
+        self.fruits.iter().for_each(|f| f.draw());
+        self.bolts.iter().for_each(|b| b.draw());
+        self.enemies.iter().for_each(|e| e.draw());
+        self.pops.iter().for_each(|p| p.draw());
+        self.orbs.iter().for_each(|o| o.draw());
+        if let Some(p) = &self.player {
+            p.draw();
+        }
     }
 
     fn next_level(&mut self) {

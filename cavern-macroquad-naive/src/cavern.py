@@ -602,31 +602,31 @@ class Game:
 #         if len(self.pending_enemies + self.fruits + self.enemies + self.pops) == 0:
 #             if len([orb for orb in self.orbs if orb.trapped_enemy_type != None]) == 0:
 #                 self.next_level()
-
-    def draw(self):
-        # Draw appropriate background for this level
-        screen.blit("bg%d" % self.level_colour, (0, 0))
-
-        block_sprite = "block" + str(self.level % 4)
-
-        # Display blocks
-        for row_y in range(NUM_ROWS):
-            row = self.grid[row_y]
-            if len(row) > 0:
-                # Initial offset - large blocks at edge of level are 50 pixels wide
-                x = LEVEL_X_OFFSET
-                for block in row:
-                    if block != ' ':
-                        screen.blit(block_sprite, (x, row_y * GRID_BLOCK_SIZE))
-                    x += GRID_BLOCK_SIZE
-
-        # Draw all objects
-        all_objs = self.fruits + self.bolts + self.enemies + self.pops + self.orbs
-        all_objs.append(self.player)
-        for obj in all_objs:
-            if obj:
-                obj.draw()
-
+#
+#     def draw(self):
+#         # Draw appropriate background for this level
+#         screen.blit("bg%d" % self.level_colour, (0, 0))
+#
+#         block_sprite = "block" + str(self.level % 4)
+#
+#         # Display blocks
+#         for row_y in range(NUM_ROWS):
+#             row = self.grid[row_y]
+#             if len(row) > 0:
+#                 # Initial offset - large blocks at edge of level are 50 pixels wide
+#                 x = LEVEL_X_OFFSET
+#                 for block in row:
+#                     if block != ' ':
+#                         screen.blit(block_sprite, (x, row_y * GRID_BLOCK_SIZE))
+#                     x += GRID_BLOCK_SIZE
+#
+#         # Draw all objects
+#         all_objs = self.fruits + self.bolts + self.enemies + self.pops + self.orbs
+#         all_objs.append(self.player)
+#         for obj in all_objs:
+#             if obj:
+#                 obj.draw()
+#
 #     def play_sound(self, name, count=1):
 #         # Some sounds have multiple varieties. If count > 1, we'll randomly choose one from those
 #         # We don't play any sounds if there is no player (e.g. if we're on the menu)

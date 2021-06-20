@@ -11,7 +11,6 @@ impl Orb {
         eprintln!("WRITEME: Orb#update");
     }
 
-    #[allow(dead_code)]
     pub fn draw(&self) {
         eprintln!("WRITEME: Orb#draw");
     }

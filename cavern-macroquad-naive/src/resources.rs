@@ -44,6 +44,8 @@ pub struct Resources {
     pub over_texture: Texture2D,
     pub space_textures: Vec<Texture2D>,
     pub status_textures: HashMap<&'static str, Texture2D>,
+    pub background_textures: Vec<Texture2D>,
+    pub block_textures: Vec<Texture2D>,
 
     pub over_sound: Sound,
     pub level_sound: Sound,
@@ -57,6 +59,8 @@ impl Resources {
         let over_texture = load_texture("resources/images/over.png").await?;
         let space_textures = load_textures_list("space", 10).await?;
         let status_textures = load_textures_map(&["life", "plus", "health"]).await?;
+        let background_textures = load_textures_list("bg", 4).await?;
+        let block_textures = load_textures_list("block", 4).await?;
 
         let over_sound = audio::load_sound("resources/sounds/over0.ogg").await?;
         let level_sound = audio::load_sound("resources/sounds/level0.ogg").await?;
@@ -73,6 +77,8 @@ impl Resources {
             over_texture,
             space_textures,
             status_textures,
+            background_textures,
+            block_textures,
 
             over_sound,
             level_sound,

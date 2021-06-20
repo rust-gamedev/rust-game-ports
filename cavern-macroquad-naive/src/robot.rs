@@ -26,7 +26,6 @@ impl Robot {
         eprintln!("WRITEME: Robot#update");
     }
 
-    #[allow(dead_code)]
     pub fn draw(&self) {
         eprintln!("WRITEME: Robot#draw");
     }

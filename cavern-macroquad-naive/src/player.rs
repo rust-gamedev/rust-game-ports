@@ -36,7 +36,6 @@ impl Player {
         eprintln!("WRITEME: Player#update");
     }
 
-    #[allow(dead_code)]
     pub fn draw(&self) {
         eprintln!("WRITEME: Player#draw");
     }

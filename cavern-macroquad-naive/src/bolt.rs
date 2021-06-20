@@ -7,7 +7,6 @@ impl Bolt {
         eprintln!("WRITEME: Bolt#update");
     }
 
-    #[allow(dead_code)]
     pub fn draw(&self) {
         eprintln!("WRITEME: Bolt#draw");
     }

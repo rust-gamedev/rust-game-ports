@@ -7,7 +7,6 @@ impl Pop {
         eprintln!("WRITEME: Pop#update");
     }
 
-    #[allow(dead_code)]
     pub fn draw(&self) {
         eprintln!("WRITEME: Pop#draw");
     }
