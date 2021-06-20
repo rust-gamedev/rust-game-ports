@@ -1,4 +1,7 @@
-use macroquad::prelude::{collections::storage, Texture2D};
+use macroquad::{
+    prelude::{collections::storage, Texture2D},
+    rand::gen_range,
+};
 
 use crate::{
     actor::{Actor, Anchor},
@@ -18,7 +21,11 @@ pub struct Robot {
     pub image: Texture2D,
     pub anchor: Anchor,
     pub type_: RobotType,
+    pub speed: i32,
+    pub direction_x: i32,
     pub alive: bool,
+    pub change_dir_timer: i32,
+    pub fire_timer: i32,
 }
 
 impl Robot {
@@ -29,7 +36,11 @@ impl Robot {
             image: storage::get::<Resources>().blank_texture,
             anchor: Anchor::CentreBottom,
             type_,
+            speed: gen_range(1, 4),
+            direction_x: 1,
             alive: true,
+            change_dir_timer: 0,
+            fire_timer: 100,
         }
     }
 

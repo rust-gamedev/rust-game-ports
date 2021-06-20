@@ -413,18 +413,18 @@ class Player(GravityActor):
 class Robot(GravityActor):
     # TYPE_NORMAL = 0
     # TYPE_AGGRESSIVE = 1
-
-    def __init__(self, pos, type):
-        super().__init__(pos)
-
-        self.type = type
-
-        self.speed = randint(1, 3)
-        self.direction_x = 1
-        # self.alive = True
-
-        self.change_dir_timer = 0
-        self.fire_timer = 100
+#
+#     def __init__(self, pos, type):
+#         super().__init__(pos)
+#
+#         self.type = type
+#
+#         self.speed = randint(1, 3)
+#         self.direction_x = 1
+#         # self.alive = True
+#
+#         self.change_dir_timer = 0
+#         self.fire_timer = 100
 
     def update(self):
         super().update()
