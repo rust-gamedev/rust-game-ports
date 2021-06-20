@@ -1,3 +1,4 @@
+mod actor;
 mod bolt;
 mod drawing;
 mod fruit;

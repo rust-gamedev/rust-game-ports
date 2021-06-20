@@ -28,10 +28,10 @@ from random import choice, randint, random, shuffle
 #
 # LEVEL_X_OFFSET = 50
 # GRID_BLOCK_SIZE = 25
-
-ANCHOR_CENTRE = ("center", "center")
-ANCHOR_CENTRE_BOTTOM = ("center", "bottom")
-
+#
+# ANCHOR_CENTRE = ("center", "center")
+# ANCHOR_CENTRE_BOTTOM = ("center", "bottom")
+#
 # LEVELS = [ ["XXXXX     XXXXXXXX     XXXXX",
 #             "","","","",
 #             "   XXXXXXX        XXXXXXX   ",

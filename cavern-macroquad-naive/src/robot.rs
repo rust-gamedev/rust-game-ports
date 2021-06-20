@@ -1,3 +1,10 @@
+use macroquad::prelude::{collections::storage, Texture2D};
+
+use crate::{
+    actor::{Actor, Anchor},
+    resources::Resources,
+};
+
 #[derive(Clone, Copy)]
 pub enum RobotType {
     Aggressive,
@@ -8,6 +15,8 @@ pub enum RobotType {
 pub struct Robot {
     pub x: i32,
     pub y: i32,
+    pub image: Texture2D,
+    pub anchor: Anchor,
     pub type_: RobotType,
     pub alive: bool,
 }
@@ -17,6 +26,8 @@ impl Robot {
         Self {
             x,
             y,
+            image: storage::get::<Resources>().blank_texture,
+            anchor: Anchor::CentreBottom,
             type_,
             alive: true,
         }
@@ -25,8 +36,22 @@ impl Robot {
     pub fn update(&mut self) {
         eprintln!("WRITEME: Robot#update");
     }
+}
 
-    pub fn draw(&self) {
-        eprintln!("WRITEME: Robot#draw");
+impl Actor for Robot {
+    fn x(&self) -> i32 {
+        self.x
+    }
+
+    fn y(&self) -> i32 {
+        self.y
+    }
+
+    fn image(&self) -> macroquad::prelude::Texture2D {
+        self.image
+    }
+
+    fn anchor(&self) -> Anchor {
+        self.anchor
     }
 }

@@ -1,3 +1,4 @@
+use crate::actor::Actor;
 use crate::bolt::Bolt;
 use crate::fruit::Fruit;
 use crate::orb::Orb;
