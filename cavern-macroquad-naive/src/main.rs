@@ -22,6 +22,12 @@ pub const WIDTH: i32 = 800;
 pub const HEIGHT: i32 = 480;
 pub const TITLE: &str = "Cavern Macroquad Naive";
 
+pub const NUM_ROWS: i32 = 18;
+pub const NUM_COLUMNS: i32 = 28;
+
+pub const LEVEL_X_OFFSET: i32 = 50;
+pub const GRID_BLOCK_SIZE: i32 = 25;
+
 fn window_conf() -> Conf {
     Conf {
         window_title: TITLE.into(),

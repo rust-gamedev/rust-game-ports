@@ -1,7 +1,9 @@
 use crate::resources::Resources;
 use crate::robot::RobotType;
 use crate::{levels::LEVELS, player::Player};
+use crate::{GRID_BLOCK_SIZE, LEVEL_X_OFFSET, NUM_COLUMNS, WIDTH};
 
+use macroquad::rand::gen_range;
 use macroquad::{
     audio::{self, Sound},
     prelude::collections::storage,
@@ -48,6 +50,36 @@ impl Game {
     #[allow(dead_code)]
     pub fn play_random_sound(&self, sounds: Vec<Sound>) {
         self.play_sound(sounds.choose().unwrap())
+    }
+
+    #[allow(dead_code)]
+    pub fn fire_probability(&self) -> f32 {
+        // Likelihood per frame of each robot firing a bolt - they fire more often on higher levels
+        0.001 + (0.0001 * 100.min(self.level) as f32)
+    }
+
+    pub fn max_enemies(&self) -> i32 {
+        // Maximum number of enemies on-screen at once – increases as you progress through the levels
+        ((self.level + 6) / 2).min(8) as i32
+    }
+
+    pub fn get_robot_spawn_x(&self) -> i32 {
+        // Find a spawn location for a robot, by checking the top row of the grid for empty spots
+        // Start by choosing a random grid column
+        let r = gen_range(0, NUM_COLUMNS);
+
+        for i in 0..NUM_COLUMNS {
+            // Keep looking at successive columns (wrapping round if we go off the right-hand side) until
+            // we find one where the top grid column is unoccupied
+            let grid_x = (r + i) % NUM_COLUMNS;
+            if self.grid[0].as_bytes()[grid_x as usize] == ' ' as u8 {
+                return GRID_BLOCK_SIZE * grid_x + LEVEL_X_OFFSET + 12;
+            }
+        }
+
+        // If we failed to find an opening in the top grid row (shouldn't ever happen), just spawn the enemy
+        // in the centre of the screen
+        WIDTH / 2
     }
 
     pub fn update(&mut self) {

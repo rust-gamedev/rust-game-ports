@@ -22,12 +22,12 @@ from random import choice, randint, random, shuffle
 # WIDTH = 800
 # HEIGHT = 480
 # TITLE = "Cavern"
-
-NUM_ROWS = 18
-NUM_COLUMNS = 28
-
-LEVEL_X_OFFSET = 50
-GRID_BLOCK_SIZE = 25
+#
+# NUM_ROWS = 18
+# NUM_COLUMNS = 28
+#
+# LEVEL_X_OFFSET = 50
+# GRID_BLOCK_SIZE = 25
 
 ANCHOR_CENTRE = ("center", "center")
 ANCHOR_CENTRE_BOTTOM = ("center", "bottom")
@@ -496,14 +496,14 @@ class Game:
 #
 #         self.next_level()
 #
-    def fire_probability(self):
-        # Likelihood per frame of each robot firing a bolt - they fire more often on higher levels
-        return 0.001 + (0.0001 * min(100, self.level))
-
-    def max_enemies(self):
-        # Maximum number of enemies on-screen at once – increases as you progress through the levels
-        return min((self.level + 6) // 2, 8)
-
+#     def fire_probability(self):
+#         # Likelihood per frame of each robot firing a bolt - they fire more often on higher levels
+#         return 0.001 + (0.0001 * min(100, self.level))
+#
+#     def max_enemies(self):
+#         # Maximum number of enemies on-screen at once – increases as you progress through the levels
+#         return min((self.level + 6) // 2, 8)
+#
 #     def next_level(self):
 #         self.level_colour = (self.level_colour + 1) % 4
 #         self.level += 1
@@ -550,23 +550,23 @@ class Game:
 #         shuffle(self.pending_enemies)
 #
 #         self.play_sound("level", 1)
-
-    def get_robot_spawn_x(self):
-        # Find a spawn location for a robot, by checking the top row of the grid for empty spots
-        # Start by choosing a random grid column
-        r = randint(0, NUM_COLUMNS-1)
-
-        for i in range(NUM_COLUMNS):
-            # Keep looking at successive columns (wrapping round if we go off the right-hand side) until
-            # we find one where the top grid column is unoccupied
-            grid_x = (r+i) % NUM_COLUMNS
-            if self.grid[0][grid_x] == ' ':
-                return GRID_BLOCK_SIZE * grid_x + LEVEL_X_OFFSET + 12
-
-        # If we failed to find an opening in the top grid row (shouldn't ever happen), just spawn the enemy
-        # in the centre of the screen
-        return WIDTH/2
-
+#
+#     def get_robot_spawn_x(self):
+#         # Find a spawn location for a robot, by checking the top row of the grid for empty spots
+#         # Start by choosing a random grid column
+#         r = randint(0, NUM_COLUMNS-1)
+#
+#         for i in range(NUM_COLUMNS):
+#             # Keep looking at successive columns (wrapping round if we go off the right-hand side) until
+#             # we find one where the top grid column is unoccupied
+#             grid_x = (r+i) % NUM_COLUMNS
+#             if self.grid[0][grid_x] == ' ':
+#                 return GRID_BLOCK_SIZE * grid_x + LEVEL_X_OFFSET + 12
+#
+#         # If we failed to find an opening in the top grid row (shouldn't ever happen), just spawn the enemy
+#         # in the centre of the screen
+#         return WIDTH/2
+#
     def update(self):
         # self.timer += 1
 
