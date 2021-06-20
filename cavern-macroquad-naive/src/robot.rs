@@ -8,3 +8,15 @@ pub enum RobotType {
 pub struct Robot {
     pub type_: RobotType,
 }
+
+impl Robot {
+    #[allow(dead_code)]
+    pub fn update(&mut self) {
+        eprintln!("WRITEME: Robot#update");
+    }
+
+    #[allow(dead_code)]
+    pub fn draw(&self) {
+        eprintln!("WRITEME: Robot#draw");
+    }
+}

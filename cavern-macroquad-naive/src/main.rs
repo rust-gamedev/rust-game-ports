@@ -1,9 +1,12 @@
+mod bolt;
 mod drawing;
+mod fruit;
 mod game;
 mod global_state;
 mod levels;
 mod orb;
 mod player;
+mod pop;
 mod resources;
 mod robot;
 mod state;

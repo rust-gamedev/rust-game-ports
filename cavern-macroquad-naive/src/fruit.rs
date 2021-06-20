@@ -1,13 +1,13 @@
-pub struct Orb {}
+pub struct Fruit {}
 
-impl Orb {
+impl Fruit {
     #[allow(dead_code)]
     pub fn update(&mut self) {
-        eprintln!("WRITEME: Orb#update");
+        eprintln!("WRITEME: Fruit#update");
     }
 
     #[allow(dead_code)]
     pub fn draw(&self) {
-        eprintln!("WRITEME: Orb#draw");
+        eprintln!("WRITEME: Fruit#draw");
     }
 }

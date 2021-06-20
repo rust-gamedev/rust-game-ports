@@ -1,5 +1,9 @@
+use crate::bolt::Bolt;
+use crate::fruit::Fruit;
+use crate::orb::Orb;
+use crate::pop::Pop;
 use crate::resources::Resources;
-use crate::robot::RobotType;
+use crate::robot::{Robot, RobotType};
 use crate::{levels::LEVELS, player::Player};
 use crate::{GRID_BLOCK_SIZE, LEVEL_X_OFFSET, NUM_COLUMNS, WIDTH};
 
@@ -18,12 +22,12 @@ pub struct Game {
     pub timer: i32,
     pub grid: Vec<&'static str>,
 
-    pub fruits: Vec<u32>,
-    pub bolts: Vec<u32>,
-    pub enemies: Vec<u32>,
+    pub fruits: Vec<Fruit>,
+    pub bolts: Vec<Bolt>,
+    pub enemies: Vec<Robot>,
     pub pending_enemies: Vec<RobotType>,
-    pub pops: Vec<u32>,
-    pub orbs: Vec<u32>,
+    pub pops: Vec<Pop>,
+    pub orbs: Vec<Orb>,
 }
 
 impl Game {
