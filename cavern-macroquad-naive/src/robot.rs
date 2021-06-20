@@ -29,16 +29,18 @@ impl RobotType {
 }
 
 pub struct Robot {
-    pub x: i32,
-    pub y: i32,
-    pub image: Texture2D,
-    pub anchor: Anchor,
     pub type_: RobotType,
     pub speed: i32,
     pub direction_x: i32,
     pub alive: bool,
     pub change_dir_timer: i32,
     pub fire_timer: i32,
+
+    // Actor trait
+    pub x: i32,
+    pub y: i32,
+    pub image: Texture2D,
+    pub anchor: Anchor,
 }
 
 impl Robot {
