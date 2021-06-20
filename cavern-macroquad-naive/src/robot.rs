@@ -73,7 +73,7 @@ impl Robot {
         mut fire_probability: f32,
         game_timer: i32,
     ) {
-        GravityActor::update(self);
+        GravityActor::update(self, true);
 
         self.change_dir_timer -= 1;
         self.fire_timer += 1;
