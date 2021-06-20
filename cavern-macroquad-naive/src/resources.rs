@@ -10,6 +10,35 @@ const AVAILABLE_FONTS: [u8; 37] = [
     78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90,
 ];
 
+// Async blocks are (as of Jun/2021) unstable, so cycles are used where required.
+//
+async fn load_textures_list(
+    name_prefix: &str,
+    number: u8,
+) -> Result<Vec<Texture2D>, Box<dyn error::Error>> {
+    let mut textures = vec![];
+
+    for i in 0..number {
+        textures.push(load_texture(&format!("resources/images/{}{}.png", name_prefix, i)).await?);
+    }
+
+    Ok(textures)
+}
+
+async fn load_textures_map(
+    names: &[&'static str],
+) -> Result<HashMap<&'static str, Texture2D>, Box<dyn error::Error>> {
+    let mut textures = HashMap::new();
+
+    for name in names {
+        let filename = format!("resources/images/{}.png", name);
+        let texture = load_texture(&filename).await?;
+        textures.insert(*name, texture);
+    }
+
+    Ok(textures)
+}
+
 pub struct Resources {
     pub title_texture: Texture2D,
     pub over_texture: Texture2D,
@@ -24,20 +53,10 @@ pub struct Resources {
 
 impl Resources {
     pub async fn new() -> Result<Resources, Box<dyn error::Error>> {
-        // Async blocks are (as of Jun/2021) unstable, so cycles are used where required.
-
         let title_texture = load_texture("resources/images/title.png").await?;
         let over_texture = load_texture("resources/images/over.png").await?;
-        let mut space_textures = vec![];
-        for i in 0..10 {
-            space_textures.push(load_texture(&format!("resources/images/space{}.png", i)).await?);
-        }
-        let mut status_textures = HashMap::new();
-        for status in ["life", "plus", "health"] {
-            let filename = format!("resources/images/{}.png", status);
-            let texture = load_texture(&filename).await?;
-            status_textures.insert(status, texture);
-        }
+        let space_textures = load_textures_list("space", 10).await?;
+        let status_textures = load_textures_map(&["life", "plus", "health"]).await?;
 
         let over_sound = audio::load_sound("resources/sounds/over0.ogg").await?;
         let level_sound = audio::load_sound("resources/sounds/level0.ogg").await?;
