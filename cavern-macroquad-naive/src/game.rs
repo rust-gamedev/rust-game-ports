@@ -89,7 +89,59 @@ impl Game {
     pub fn update(&mut self) {
         self.timer += 1;
 
-        eprintln!("WRITEME: Game#update");
+        // Update all objects
+        self.fruits.iter_mut().for_each(|f| f.update());
+        self.bolts.iter_mut().for_each(|b| b.update());
+        self.enemies.iter_mut().for_each(|e| e.update());
+        self.pops.iter_mut().for_each(|p| p.update());
+        if let Some(p) = &mut self.player {
+            p.update();
+        }
+        self.orbs.iter_mut().for_each(|o| o.update());
+
+        // Remove objects which are no longer wanted from the lists. For example, we recreate
+        // self.fruits such that it contains all existing fruits except those whose time_to_live counter has reached zero
+        self.fruits.retain(|f| f.time_to_live > 0);
+        self.bolts.retain(|b| b.active);
+        self.enemies.retain(|e| e.alive);
+        self.pops.retain(|p| p.timer < 12);
+        self.orbs.retain(|o| o.timer < 250 && o.y > -40);
+
+        // Every 100 frames, create a random fruit (unless there are no remaining enemies on this level)
+        if self.timer % 100 == 0 && (self.pending_enemies.len() + self.enemies.len()) > 0 {
+            // Create fruit at random position
+            self.fruits
+                .push(Fruit::new(gen_range(70, 730 + 1), gen_range(75, 400 + 1)));
+        }
+
+        // Every 81 frames, if there is at least 1 pending enemy, and the number of active enemies is below the current
+        // level's maximum enemies, create a robot
+        if self.timer % 81 == 0
+            && self.pending_enemies.len() > 0
+            && self.enemies.len() < self.max_enemies() as usize
+        {
+            // Retrieve and remove the last element from the pending enemies list
+            let robot_type = self.pending_enemies.pop().unwrap();
+            let (x, y) = (self.get_robot_spawn_x(), -30);
+            self.enemies.push(Robot::new(x, y, robot_type));
+        }
+
+        // End level if there are no enemies remaining to be created, no existing enemies, no fruit, no popping orbs,
+        // and no orbs containing trapped enemies. (We don't want to include orbs which don't contain trapped enemies,
+        // as the level would never end if the player kept firing new orbs)
+        if self.pending_enemies.len() + self.fruits.len() + self.enemies.len() + self.pops.len()
+            == 0
+        {
+            if self
+                .orbs
+                .iter()
+                .filter(|orb| orb.trapped_enemy_type.is_some())
+                .collect::<Vec<_>>()
+                .is_empty()
+            {
+                self.next_level();
+            }
+        }
     }
 
     pub fn draw(&self) {

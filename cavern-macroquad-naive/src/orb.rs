@@ -1,7 +1,12 @@
-pub struct Orb {}
+use crate::robot::RobotType;
+
+pub struct Orb {
+    pub timer: i32,
+    pub y: i32,
+    pub trapped_enemy_type: Option<RobotType>,
+}
 
 impl Orb {
-    #[allow(dead_code)]
     pub fn update(&mut self) {
         eprintln!("WRITEME: Orb#update");
     }

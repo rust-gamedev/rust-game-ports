@@ -1,7 +1,8 @@
-pub struct Bolt {}
+pub struct Bolt {
+    pub active: bool,
+}
 
 impl Bolt {
-    #[allow(dead_code)]
     pub fn update(&mut self) {
         eprintln!("WRITEME: Bolt#update");
     }

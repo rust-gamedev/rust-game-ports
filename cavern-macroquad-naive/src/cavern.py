@@ -259,7 +259,7 @@ class Fruit(GravityActor):
             types += [Fruit.EXTRA_LIFE]                                 # This only appears once
             self.type = choice(types)                                   # Randomly choose one from the list
 
-        self.time_to_live = 500 # Counts down to zero
+        # self.time_to_live = 500 # Counts down to zero
 
     def update(self):
         super().update()
@@ -421,7 +421,7 @@ class Robot(GravityActor):
 
         self.speed = randint(1, 3)
         self.direction_x = 1
-        self.alive = True
+        # self.alive = True
 
         self.change_dir_timer = 0
         self.fire_timer = 100
@@ -567,41 +567,41 @@ class Game:
 #         # in the centre of the screen
 #         return WIDTH/2
 #
-    def update(self):
-        # self.timer += 1
-
-        # Update all objects
-        for obj in self.fruits + self.bolts + self.enemies + self.pops + [self.player] + self.orbs:
-            if obj:
-                obj.update()
-
-        # Use list comprehensions to remove objects which are no longer wanted from the lists. For example, we recreate
-        # self.fruits such that it contains all existing fruits except those whose time_to_live counter has reached zero
-        self.fruits = [f for f in self.fruits if f.time_to_live > 0]
-        self.bolts = [b for b in self.bolts if b.active]
-        self.enemies = [e for e in self.enemies if e.alive]
-        self.pops = [p for p in self.pops if p.timer < 12]
-        self.orbs = [o for o in self.orbs if o.timer < 250 and o.y > -40]
-
-        # Every 100 frames, create a random fruit (unless there are no remaining enemies on this level)
-        if self.timer % 100 == 0 and len(self.pending_enemies + self.enemies) > 0:
-            # Create fruit at random position
-            self.fruits.append(Fruit((randint(70, 730), randint(75, 400))))
-
-        # Every 81 frames, if there is at least 1 pending enemy, and the number of active enemies is below the current
-        # level's maximum enemies, create a robot
-        if self.timer % 81 == 0 and len(self.pending_enemies) > 0 and len(self.enemies) < self.max_enemies():
-            # Retrieve and remove the last element from the pending enemies list
-            robot_type = self.pending_enemies.pop()
-            pos = (self.get_robot_spawn_x(), -30)
-            self.enemies.append(Robot(pos, robot_type))
-
-        # End level if there are no enemies remaining to be created, no existing enemies, no fruit, no popping orbs,
-        # and no orbs containing trapped enemies. (We don't want to include orbs which don't contain trapped enemies,
-        # as the level would never end if the player kept firing new orbs)
-        if len(self.pending_enemies + self.fruits + self.enemies + self.pops) == 0:
-            if len([orb for orb in self.orbs if orb.trapped_enemy_type != None]) == 0:
-                self.next_level()
+#     def update(self):
+#         self.timer += 1
+#
+#         # Update all objects
+#         for obj in self.fruits + self.bolts + self.enemies + self.pops + [self.player] + self.orbs:
+#             if obj:
+#                 obj.update()
+#
+#         # Use list comprehensions to remove objects which are no longer wanted from the lists. For example, we recreate
+#         # self.fruits such that it contains all existing fruits except those whose time_to_live counter has reached zero
+#         self.fruits = [f for f in self.fruits if f.time_to_live > 0]
+#         self.bolts = [b for b in self.bolts if b.active]
+#         self.enemies = [e for e in self.enemies if e.alive]
+#         self.pops = [p for p in self.pops if p.timer < 12]
+#         self.orbs = [o for o in self.orbs if o.timer < 250 and o.y > -40]
+#
+#         # Every 100 frames, create a random fruit (unless there are no remaining enemies on this level)
+#         if self.timer % 100 == 0 and len(self.pending_enemies + self.enemies) > 0:
+#             # Create fruit at random position
+#             self.fruits.append(Fruit((randint(70, 730), randint(75, 400))))
+#
+#         # Every 81 frames, if there is at least 1 pending enemy, and the number of active enemies is below the current
+#         # level's maximum enemies, create a robot
+#         if self.timer % 81 == 0 and len(self.pending_enemies) > 0 and len(self.enemies) < self.max_enemies():
+#             # Retrieve and remove the last element from the pending enemies list
+#             robot_type = self.pending_enemies.pop()
+#             pos = (self.get_robot_spawn_x(), -30)
+#             self.enemies.append(Robot(pos, robot_type))
+#
+#         # End level if there are no enemies remaining to be created, no existing enemies, no fruit, no popping orbs,
+#         # and no orbs containing trapped enemies. (We don't want to include orbs which don't contain trapped enemies,
+#         # as the level would never end if the player kept firing new orbs)
+#         if len(self.pending_enemies + self.fruits + self.enemies + self.pops) == 0:
+#             if len([orb for orb in self.orbs if orb.trapped_enemy_type != None]) == 0:
+#                 self.next_level()
 
     def draw(self):
         # Draw appropriate background for this level

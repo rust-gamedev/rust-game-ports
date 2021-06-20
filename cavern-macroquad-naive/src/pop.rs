@@ -1,7 +1,8 @@
-pub struct Pop {}
+pub struct Pop {
+    pub timer: i32,
+}
 
 impl Pop {
-    #[allow(dead_code)]
     pub fn update(&mut self) {
         eprintln!("WRITEME: Pop#update");
     }

@@ -31,4 +31,13 @@ impl Player {
         self.health = 3;
         self.blowing_orb = None;
     }
+
+    pub fn update(&mut self) {
+        eprintln!("WRITEME: Player#update");
+    }
+
+    #[allow(dead_code)]
+    pub fn draw(&self) {
+        eprintln!("WRITEME: Player#draw");
+    }
 }
