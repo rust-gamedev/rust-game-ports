@@ -160,6 +160,10 @@ impl Actor for Robot {
         self.x
     }
 
+    fn x_mut(&mut self) -> &mut i32 {
+        &mut self.x
+    }
+
     fn y(&self) -> i32 {
         self.y
     }

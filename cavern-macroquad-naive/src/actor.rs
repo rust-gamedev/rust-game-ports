@@ -23,6 +23,7 @@ pub trait Actor {
     // Rust: We can't use a tuple, because we'll need mutable access to one field; Vec2 would work,
     // but it has f32 field. For simplicity, we separate x/y, which doesn't make any meaningful difference.
     fn x(&self) -> i32;
+    fn x_mut(&mut self) -> &mut i32;
     fn y(&self) -> i32;
     fn y_mut(&mut self) -> &mut i32;
     fn image(&self) -> Texture2D;
