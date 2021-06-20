@@ -2,6 +2,7 @@ use crate::{actor::Actor, robot::RobotType};
 
 pub struct Orb {
     pub timer: i32,
+    pub floating: bool,
     pub trapped_enemy_type: Option<RobotType>,
 
     // Actor trait

@@ -58,7 +58,6 @@ impl Game {
         self.play_sound(sounds.choose().unwrap())
     }
 
-    #[allow(dead_code)]
     pub fn fire_probability(&self) -> f32 {
         // Likelihood per frame of each robot firing a bolt - they fire more often on higher levels
         0.001 + (0.0001 * 100.min(self.level) as f32)
@@ -91,10 +90,22 @@ impl Game {
     pub fn update(&mut self) {
         self.timer += 1;
 
+        // Rust: We precompute this here, since it can't be done inside the enemies cycle, due to borrowing
+        // rules.
+        let fire_probability = self.fire_probability();
+
         // Update all objects
         self.fruits.iter_mut().for_each(|f| f.update());
         self.bolts.iter_mut().for_each(|b| b.update());
-        self.enemies.iter_mut().for_each(|e| e.update());
+        for enemy in &mut self.enemies {
+            enemy.update(
+                &mut self.bolts,
+                &mut self.orbs,
+                self.player.as_ref(),
+                fire_probability,
+                self.timer,
+            )
+        }
         self.pops.iter_mut().for_each(|p| p.update());
         if let Some(p) = &mut self.player {
             p.update();

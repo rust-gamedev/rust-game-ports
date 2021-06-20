@@ -39,6 +39,17 @@ async fn load_textures_map(
     Ok(textures)
 }
 
+async fn load_robot_textures() -> Result<Vec<Texture2D>, Box<dyn error::Error>> {
+    let mut textures = vec![];
+
+    textures.extend(load_textures_list("robot00", 8).await?);
+    textures.extend(load_textures_list("robot01", 8).await?);
+    textures.extend(load_textures_list("robot10", 8).await?);
+    textures.extend(load_textures_list("robot11", 8).await?);
+
+    Ok(textures)
+}
+
 pub struct Resources {
     pub title_texture: Texture2D,
     pub over_texture: Texture2D,
@@ -47,6 +58,8 @@ pub struct Resources {
     pub background_textures: Vec<Texture2D>,
     pub block_textures: Vec<Texture2D>,
     pub blank_texture: Texture2D,
+    /// Rust: Stored contiguously ("00..." -> "01..." -> "10..." -> "11...")
+    pub robot_textures: Vec<Texture2D>,
 
     pub over_sound: Sound,
     pub level_sound: Sound,
@@ -63,6 +76,7 @@ impl Resources {
         let background_textures = load_textures_list("bg", 4).await?;
         let block_textures = load_textures_list("block", 4).await?;
         let blank_texture = load_texture("resources/images/blank.png").await?;
+        let robot_textures = load_robot_textures().await?;
 
         let over_sound = audio::load_sound("resources/sounds/over0.ogg").await?;
         let level_sound = audio::load_sound("resources/sounds/level0.ogg").await?;
@@ -82,6 +96,7 @@ impl Resources {
             background_textures,
             block_textures,
             blank_texture,
+            robot_textures,
 
             over_sound,
             level_sound,
