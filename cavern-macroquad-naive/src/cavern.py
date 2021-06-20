@@ -206,12 +206,12 @@ class Pop(Actor):
 class GravityActor(CollideActor):
     MAX_FALL_SPEED = 10
 
-    def __init__(self, pos):
-        super().__init__(pos, ANCHOR_CENTRE_BOTTOM)
-
-        self.vel_y = 0
-        self.landed = False
-
+#     def __init__(self, pos):
+#         super().__init__(pos, ANCHOR_CENTRE_BOTTOM)
+#
+#         self.vel_y = 0
+#         self.landed = False
+#
     def update(self, detect=True):
         # Apply gravity, without going over the maximum fall speed
         self.vel_y = min(self.vel_y + 1, GravityActor.MAX_FALL_SPEED)

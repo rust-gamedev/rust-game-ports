@@ -41,6 +41,10 @@ pub struct Robot {
     pub y: i32,
     pub image: Texture2D,
     pub anchor: Anchor,
+
+    // GravityActor trait
+    pub vel_y: i32,
+    pub landed: bool,
 }
 
 impl Robot {
@@ -56,6 +60,8 @@ impl Robot {
             alive: true,
             change_dir_timer: 0,
             fire_timer: 100,
+            vel_y: 0,
+            landed: false,
         }
     }
 
@@ -169,4 +175,20 @@ impl Actor for Robot {
 
 impl CollideActor for Robot {}
 
-impl GravityActor for Robot {}
+impl GravityActor for Robot {
+    fn vel_y(&self) -> i32 {
+        self.vel_y
+    }
+
+    fn vel_y_mut(&mut self) -> &mut i32 {
+        &mut self.vel_y
+    }
+
+    fn landed(&self) -> bool {
+        self.landed
+    }
+
+    fn landed_mut(&mut self) -> &mut bool {
+        &mut self.landed
+    }
+}
