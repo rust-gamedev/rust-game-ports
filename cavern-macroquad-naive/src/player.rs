@@ -54,6 +54,10 @@ impl Actor for Player {
         self.y
     }
 
+    fn y_mut(&mut self) -> &mut i32 {
+        &mut self.y
+    }
+
     fn image(&self) -> macroquad::prelude::Texture2D {
         todo!()
     }

@@ -24,6 +24,7 @@ pub trait Actor {
     // but it has f32 field. For simplicity, we separate x/y, which doesn't make any meaningful difference.
     fn x(&self) -> i32;
     fn y(&self) -> i32;
+    fn y_mut(&mut self) -> &mut i32;
     fn image(&self) -> Texture2D;
     fn anchor(&self) -> Anchor;
 

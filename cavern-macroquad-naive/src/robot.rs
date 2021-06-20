@@ -164,6 +164,10 @@ impl Actor for Robot {
         self.y
     }
 
+    fn y_mut(&mut self) -> &mut i32 {
+        &mut self.y
+    }
+
     fn image(&self) -> macroquad::prelude::Texture2D {
         self.image
     }
