@@ -2,9 +2,21 @@ use macroquad::prelude::{draw_texture, Texture2D, WHITE};
 
 #[derive(Clone, Copy)]
 pub enum Anchor {
-    #[allow(dead_code)]
     Centre,
     CentreBottom,
+}
+
+// Rust: A private trait could be used, but it doesn't help much.
+//
+fn top_left_pos(anchor: Anchor, x: i32, y: i32, image: &Texture2D) -> (i32, i32) {
+    let (image_width, image_height) = (image.width() as i32, image.height() as i32);
+
+    let (diff_x, diff_y) = match anchor {
+        Anchor::Centre => (image_width / 2, image_height / 2),
+        Anchor::CentreBottom => (image_width / 2, image_height),
+    };
+
+    (x - diff_x, y - diff_y)
 }
 
 pub trait Actor {
@@ -15,19 +27,46 @@ pub trait Actor {
     fn image(&self) -> Texture2D;
     fn anchor(&self) -> Anchor;
 
+    // Rust: All the geometry methods below are meant to be conveniently implemented, not fast.
+
+    fn top(&self) -> i32 {
+        let image = self.image();
+        let top_left_pos = top_left_pos(self.anchor(), self.x(), self.y(), &image);
+
+        top_left_pos.1
+    }
+
+    fn bottom(&self) -> i32 {
+        self.top() + self.image().height() as i32
+    }
+
+    fn left(&self) -> i32 {
+        let image = self.image();
+        let top_left_pos = top_left_pos(self.anchor(), self.x(), self.y(), &image);
+
+        top_left_pos.0
+    }
+
+    fn right(&self) -> i32 {
+        self.left() + self.image().width() as i32
+    }
+
+    fn center(&self) -> (i32, i32) {
+        let center_x = self.left() + self.image().width() as i32 / 2;
+        let center_y = self.top() + self.image().height() as i32 / 2;
+
+        (center_x, center_y)
+    }
+
+    fn collidepoint(&self, _pos: (i32, i32)) -> bool {
+        eprintln!("WRITEME: Actor#collidepoint(");
+        false
+    }
+
     fn draw(&self) {
         let image = self.image();
+        let top_left_pos = top_left_pos(self.anchor(), self.x(), self.y(), &image);
 
-        let (diff_x, diff_y) = match self.anchor() {
-            Anchor::Centre => (image.width() / 2., image.height() / 2.),
-            Anchor::CentreBottom => (image.width() / 2., image.height()),
-        };
-
-        draw_texture(
-            image,
-            self.x() as f32 - diff_x,
-            self.y() as f32 - diff_y,
-            WHITE,
-        );
+        draw_texture(image, top_left_pos.0 as f32, top_left_pos.1 as f32, WHITE);
     }
 }
