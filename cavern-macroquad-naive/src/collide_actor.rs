@@ -1,4 +1,9 @@
-use crate::{actor::Actor, GRID_BLOCK_SIZE, LEVEL_X_OFFSET, NUM_COLUMNS, NUM_ROWS};
+use crate::{
+    actor::{Actor, Anchor},
+    GRID_BLOCK_SIZE, LEVEL_X_OFFSET, NUM_COLUMNS, NUM_ROWS,
+};
+
+pub const COLLIDE_ACTOR_DEFAULT_ANCHOR: Anchor = Anchor::Centre;
 
 fn block(x: i32, y: i32, grid: &[&str]) -> bool {
     // Is there a level grid block at these coordinates?

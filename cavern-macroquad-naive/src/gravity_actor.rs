@@ -1,4 +1,6 @@
-use crate::{collide_actor::CollideActor, HEIGHT};
+use crate::{actor::Anchor, collide_actor::CollideActor, HEIGHT};
+
+pub const GRAVITY_ACTOR_DEFAULT_ANCHOR: Anchor = Anchor::CentreBottom;
 
 const MAX_FALL_SPEED: i32 = 10;
 

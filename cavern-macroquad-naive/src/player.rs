@@ -1,10 +1,17 @@
-use crate::{actor::Actor, orb::Orb, WIDTH};
+use macroquad::prelude::{collections::storage, Texture2D};
 
-#[derive(Default)]
+use crate::{
+    actor::{Actor, Anchor},
+    collide_actor::CollideActor,
+    gravity_actor::{GravityActor, GRAVITY_ACTOR_DEFAULT_ANCHOR},
+    orb::Orb,
+    resources::Resources,
+    WIDTH,
+};
+
 pub struct Player {
     pub lives: i32,
     pub score: i32,
-    pub vel_y: f32,
     pub direction_x: i32, // -1 = left, 1 = right
     pub fire_timer: i32,
     pub hurt_timer: i32,
@@ -14,6 +21,12 @@ pub struct Player {
     // Actor trait
     pub x: i32,
     pub y: i32,
+    pub image: Texture2D,
+    pub anchor: Anchor,
+
+    // GravityActor trait
+    pub vel_y: i32,
+    pub landed: bool,
 }
 
 impl Player {
@@ -21,14 +34,26 @@ impl Player {
         Self {
             lives: 2,
             score: 0,
-            ..Default::default()
+            direction_x: 0,
+            fire_timer: 0,
+            hurt_timer: 0,
+            health: 0,
+            blowing_orb: None,
+
+            x: 0,
+            y: 0,
+            image: storage::get::<Resources>().blank_texture,
+            anchor: GRAVITY_ACTOR_DEFAULT_ANCHOR,
+
+            vel_y: 0,
+            landed: false,
         }
     }
 
     pub fn reset(&mut self) {
         self.x = WIDTH / 2;
         self.y = 100;
-        self.vel_y = 0.;
+        self.vel_y = 0;
         self.direction_x = 1; // -1 = left, 1 = right
         self.fire_timer = 0;
         self.hurt_timer = 100; // Invulnerable for this many frames
@@ -38,10 +63,6 @@ impl Player {
 
     pub fn update(&mut self) {
         eprintln!("WRITEME: Player#update");
-    }
-
-    pub fn draw(&self) {
-        eprintln!("WRITEME: Player#draw");
     }
 }
 
@@ -62,11 +83,31 @@ impl Actor for Player {
         &mut self.y
     }
 
-    fn image(&self) -> macroquad::prelude::Texture2D {
-        todo!()
+    fn image(&self) -> Texture2D {
+        self.image
     }
 
-    fn anchor(&self) -> crate::actor::Anchor {
-        todo!()
+    fn anchor(&self) -> Anchor {
+        self.anchor
+    }
+}
+
+impl CollideActor for Player {}
+
+impl GravityActor for Player {
+    fn vel_y(&self) -> i32 {
+        self.vel_y
+    }
+
+    fn vel_y_mut(&mut self) -> &mut i32 {
+        &mut self.vel_y
+    }
+
+    fn landed(&self) -> bool {
+        self.landed
+    }
+
+    fn landed_mut(&mut self) -> &mut bool {
+        &mut self.landed
     }
 }

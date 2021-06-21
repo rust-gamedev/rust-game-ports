@@ -1,4 +1,9 @@
-use crate::{actor::Actor, robot::RobotType};
+use macroquad::prelude::Texture2D;
+
+use crate::{
+    actor::{Actor, Anchor},
+    robot::RobotType,
+};
 
 pub struct Orb {
     pub timer: i32,
@@ -8,15 +13,13 @@ pub struct Orb {
     // Actor trait
     pub x: i32,
     pub y: i32,
+    pub image: Texture2D,
+    pub anchor: Anchor,
 }
 
 impl Orb {
     pub fn update(&mut self) {
         eprintln!("WRITEME: Orb#update");
-    }
-
-    pub fn draw(&self) {
-        eprintln!("WRITEME: Orb#draw");
     }
 }
 
@@ -38,10 +41,10 @@ impl Actor for Orb {
     }
 
     fn image(&self) -> macroquad::prelude::Texture2D {
-        todo!()
+        self.image
     }
 
     fn anchor(&self) -> crate::actor::Anchor {
-        todo!()
+        self.anchor
     }
 }
