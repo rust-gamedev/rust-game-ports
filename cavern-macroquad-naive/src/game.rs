@@ -109,7 +109,7 @@ impl Game {
         }
         self.pops.iter_mut().for_each(|p| p.update());
         if let Some(p) = &mut self.player {
-            p.update();
+            p.update(&mut self.orbs, &self.grid, self.timer);
         }
         self.orbs.iter_mut().for_each(|o| o.update());
 

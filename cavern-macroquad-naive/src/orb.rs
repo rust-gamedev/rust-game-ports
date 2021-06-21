@@ -6,6 +6,7 @@ use crate::{
     robot::RobotType,
 };
 
+#[derive(Clone, Copy)]
 pub struct Orb {
     pub direction_x: i32,
     pub timer: i32,

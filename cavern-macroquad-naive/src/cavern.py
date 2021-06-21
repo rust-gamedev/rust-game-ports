@@ -324,92 +324,92 @@ class Player(GravityActor):
         else:
             return False
 
-    def update(self):
-        # Call GravityActor.update - parameter is whether we want to perform collision detection as we fall. If health
-        # is zero, we want the player to just fall out of the level
-        super().update(self.health > 0)
-
-        self.fire_timer -= 1
-        self.hurt_timer -= 1
-
-        if self.landed:
-            # Hurt timer starts at 200, but drops to 100 once the player has landed
-            self.hurt_timer = min(self.hurt_timer, 100)
-
-        if self.hurt_timer > 100:
-            # We've just been hurt. Either carry out the sideways motion from being knocked by a bolt, or if health is
-            # zero, we're dropping out of the level, so check for our sprite reaching a certain Y coordinate before
-            # reducing our lives count and responding the player. We check for the Y coordinate being the screen height
-            # plus 50%, rather than simply the screen height, because the former effectively gives us a short delay
-            # before the player respawns.
-            if self.health > 0:
-                self.move(self.direction_x, 0, 4)
-            else:
-                if self.top >= HEIGHT*1.5:
-                    self.lives -= 1
-                    self.reset()
-        else:
-            # We're not hurt
-            # Get keyboard input. dx represents the direction the player is facing
-            dx = 0
-            if keyboard.left:
-                dx = -1
-            elif keyboard.right:
-                dx = 1
-
-            if dx != 0:
-                self.direction_x = dx
-
-                # If we haven't just fired an orb, carry out horizontal movement
-                if self.fire_timer < 10:
-                    self.move(dx, 0, 4)
-
-            # Do we need to create a new orb? Space must have been pressed and released, the minimum time between
-            # orbs must have passed, and there is a limit of 5 orbs.
-            if space_pressed() and self.fire_timer <= 0 and len(game.orbs) < 5:
-                # x position will be 38 pixels in front of the player position, while ensuring it is within the
-                # bounds of the level
-                x = min(730, max(70, self.x + self.direction_x * 38))
-                y = self.y - 35
-                self.blowing_orb = Orb((x,y), self.direction_x)
-                game.orbs.append(self.blowing_orb)
-                game.play_sound("blow", 4)
-                self.fire_timer = 20
-
-            if keyboard.up and self.vel_y == 0 and self.landed:
-                # Jump
-                self.vel_y = -16
-                self.landed = False
-                game.play_sound("jump")
-
-        # Holding down space causes the current orb (if there is one) to be blown further
-        if keyboard.space:
-            if self.blowing_orb:
-                # Increase blown distance up to a maximum of 120
-                self.blowing_orb.blown_frames += 4
-                if self.blowing_orb.blown_frames >= 120:
-                    # Can't be blown any further
-                    self.blowing_orb = None
-        else:
-            # If we let go of space, we relinquish control over the current orb - it can't be blown any further
-            self.blowing_orb = None
-
-        # Set sprite image. If we're currently hurt, the sprite will flash on and off on alternate frames.
-        self.image = "blank"
-        if self.hurt_timer <= 0 or self.hurt_timer % 2 == 1:
-            dir_index = "1" if self.direction_x > 0 else "0"
-            if self.hurt_timer > 100:
-                if self.health > 0:
-                    self.image = "recoil" + dir_index
-                else:
-                    self.image = "fall" + str((game.timer // 4) % 2)
-            elif self.fire_timer > 0:
-                self.image = "blow" + dir_index
-            elif dx == 0:
-                self.image = "still"
-            else:
-                self.image = "run" + dir_index + str((game.timer // 8) % 4)
-
+#     def update(self):
+#         # Call GravityActor.update - parameter is whether we want to perform collision detection as we fall. If health
+#         # is zero, we want the player to just fall out of the level
+#         super().update(self.health > 0)
+#
+#         self.fire_timer -= 1
+#         self.hurt_timer -= 1
+#
+#         if self.landed:
+#             # Hurt timer starts at 200, but drops to 100 once the player has landed
+#             self.hurt_timer = min(self.hurt_timer, 100)
+#
+#         if self.hurt_timer > 100:
+#             # We've just been hurt. Either carry out the sideways motion from being knocked by a bolt, or if health is
+#             # zero, we're dropping out of the level, so check for our sprite reaching a certain Y coordinate before
+#             # reducing our lives count and responding the player. We check for the Y coordinate being the screen height
+#             # plus 50%, rather than simply the screen height, because the former effectively gives us a short delay
+#             # before the player respawns.
+#             if self.health > 0:
+#                 self.move(self.direction_x, 0, 4)
+#             else:
+#                 if self.top >= HEIGHT*1.5:
+#                     self.lives -= 1
+#                     self.reset()
+#         else:
+#             # We're not hurt
+#             # Get keyboard input. dx represents the direction the player is facing
+#             dx = 0
+#             if keyboard.left:
+#                 dx = -1
+#             elif keyboard.right:
+#                 dx = 1
+#
+#             if dx != 0:
+#                 self.direction_x = dx
+#
+#                 # If we haven't just fired an orb, carry out horizontal movement
+#                 if self.fire_timer < 10:
+#                     self.move(dx, 0, 4)
+#
+#             # Do we need to create a new orb? Space must have been pressed and released, the minimum time between
+#             # orbs must have passed, and there is a limit of 5 orbs.
+#             if space_pressed() and self.fire_timer <= 0 and len(game.orbs) < 5:
+#                 # x position will be 38 pixels in front of the player position, while ensuring it is within the
+#                 # bounds of the level
+#                 x = min(730, max(70, self.x + self.direction_x * 38))
+#                 y = self.y - 35
+#                 self.blowing_orb = Orb((x,y), self.direction_x)
+#                 game.orbs.append(self.blowing_orb)
+#                 game.play_sound("blow", 4)
+#                 self.fire_timer = 20
+#
+#             if keyboard.up and self.vel_y == 0 and self.landed:
+#                 # Jump
+#                 self.vel_y = -16
+#                 self.landed = False
+#                 game.play_sound("jump")
+#
+#         # Holding down space causes the current orb (if there is one) to be blown further
+#         if keyboard.space:
+#             if self.blowing_orb:
+#                 # Increase blown distance up to a maximum of 120
+#                 self.blowing_orb.blown_frames += 4
+#                 if self.blowing_orb.blown_frames >= 120:
+#                     # Can't be blown any further
+#                     self.blowing_orb = None
+#         else:
+#             # If we let go of space, we relinquish control over the current orb - it can't be blown any further
+#             self.blowing_orb = None
+#
+#         # Set sprite image. If we're currently hurt, the sprite will flash on and off on alternate frames.
+#         self.image = "blank"
+#         if self.hurt_timer <= 0 or self.hurt_timer % 2 == 1:
+#             dir_index = "1" if self.direction_x > 0 else "0"
+#             if self.hurt_timer > 100:
+#                 if self.health > 0:
+#                     self.image = "recoil" + dir_index
+#                 else:
+#                     self.image = "fall" + str((game.timer // 4) % 2)
+#             elif self.fire_timer > 0:
+#                 self.image = "blow" + dir_index
+#             elif dx == 0:
+#                 self.image = "still"
+#             else:
+#                 self.image = "run" + dir_index + str((game.timer // 8) % 4)
+#
 # class Robot(GravityActor):
     # TYPE_NORMAL = 0
     # TYPE_AGGRESSIVE = 1
