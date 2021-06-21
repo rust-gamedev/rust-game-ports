@@ -1,4 +1,4 @@
-use macroquad::prelude::{collections::storage, draw_texture, is_key_down, KeyCode, WHITE};
+use macroquad::prelude::{collections::storage, draw_texture, is_key_pressed, KeyCode, WHITE};
 
 use crate::{
     drawing::{draw_game_text, CHAR_WIDTH, IMAGE_WIDTH},
@@ -12,7 +12,6 @@ use crate::{
 pub struct GlobalState {
     state: State,
     game: Game,
-    space_down: bool,
 }
 
 impl GlobalState {
@@ -21,14 +20,13 @@ impl GlobalState {
             // Set the initial game state
             state: State::Menu,
             game: Game::new(None),
-            space_down: false,
         }
     }
 
     pub fn update(&mut self) {
         match self.state {
             State::Menu => {
-                if self.space_pressed() {
+                if is_key_pressed(KeyCode::Space) {
                     // Switch to play state, and create a new Game object, passing it a new Player object to use
                     self.state = State::Play;
                     self.game = Game::new(Some(Player::new()));
@@ -46,7 +44,7 @@ impl GlobalState {
                 }
             }
             State::GameOver => {
-                if self.space_pressed() {
+                if is_key_pressed(KeyCode::Space) {
                     self.state = State::Menu;
                     self.game = Game::new(None);
                 }
@@ -81,22 +79,6 @@ impl GlobalState {
                 // Display "Game Over" image
                 draw_texture(resources.over_texture, 0., 0., WHITE);
             }
-        }
-    }
-
-    fn space_pressed(&mut self) -> bool {
-        if is_key_down(KeyCode::Space) {
-            if self.space_down {
-                // Space was down previous frame, and is still down
-                false
-            } else {
-                // Space wasn't down previous frame, but now is
-                self.space_down = true;
-                true
-            }
-        } else {
-            self.space_down = false;
-            false
         }
     }
 
