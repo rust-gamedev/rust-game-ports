@@ -118,16 +118,16 @@ from random import choice, randint, random, shuffle
 class Orb(CollideActor):
     MAX_TIMER = 250
 
-    def __init__(self, pos, dir_x):
-        super().__init__(pos)
-
-        # Orbs are initially blown horizontally, then start floating upwards
-        self.direction_x = dir_x
-        self.floating = False
-        self.trapped_enemy_type = None      # Number representing which type of enemy is trapped in this bubble
-        self.timer = -1
-        self.blown_frames = 6  # Number of frames during which we will be pushed horizontally
-
+#     def __init__(self, pos, dir_x):
+#         super().__init__(pos)
+#
+#         # Orbs are initially blown horizontally, then start floating upwards
+#         self.direction_x = dir_x
+#         self.floating = False
+#         self.trapped_enemy_type = None      # Number representing which type of enemy is trapped in this bubble
+#         self.timer = -1
+#         self.blown_frames = 6  # Number of frames during which we will be pushed horizontally
+#
     def hit_test(self, bolt):
         # Check for collision with a bolt
         collided = self.collidepoint(bolt.pos)
