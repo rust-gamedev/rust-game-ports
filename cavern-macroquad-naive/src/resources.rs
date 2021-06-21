@@ -50,6 +50,15 @@ async fn load_robot_textures() -> Result<Vec<Texture2D>, Box<dyn error::Error>> 
     Ok(textures)
 }
 
+async fn load_run_textures() -> Result<Vec<Texture2D>, Box<dyn error::Error>> {
+    let mut textures = vec![];
+
+    textures.extend(load_textures_list("run0", 4).await?);
+    textures.extend(load_textures_list("run1", 4).await?);
+
+    Ok(textures)
+}
+
 pub struct Resources {
     pub title_texture: Texture2D,
     pub over_texture: Texture2D,
@@ -60,6 +69,12 @@ pub struct Resources {
     pub blank_texture: Texture2D,
     /// Rust: Stored contiguously ("00..." -> "01..." -> "10..." -> "11...")
     pub robot_textures: Vec<Texture2D>,
+    pub recoil_textures: Vec<Texture2D>,
+    pub fall_textures: Vec<Texture2D>,
+    pub blow_textures: Vec<Texture2D>,
+    pub still_texture: Texture2D,
+    /// Rust: Stored contiguously ("0..." -> "1...")
+    pub run_textures: Vec<Texture2D>,
 
     pub over_sound: Sound,
     pub level_sound: Sound,
@@ -77,6 +92,11 @@ impl Resources {
         let block_textures = load_textures_list("block", 4).await?;
         let blank_texture = load_texture("resources/images/blank.png").await?;
         let robot_textures = load_robot_textures().await?;
+        let recoil_textures = load_textures_list("recoil", 2).await?;
+        let fall_textures = load_textures_list("fall", 2).await?;
+        let blow_textures = load_textures_list("blow", 2).await?;
+        let still_texture: Texture2D = load_texture("resources/images/still.png").await?;
+        let run_textures = load_run_textures().await?;
 
         let over_sound = audio::load_sound("resources/sounds/over0.ogg").await?;
         let level_sound = audio::load_sound("resources/sounds/level0.ogg").await?;
@@ -97,6 +117,11 @@ impl Resources {
             block_textures,
             blank_texture,
             robot_textures,
+            recoil_textures,
+            fall_textures,
+            blow_textures,
+            still_texture,
+            run_textures,
 
             over_sound,
             level_sound,
