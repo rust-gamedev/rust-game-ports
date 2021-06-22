@@ -8,7 +8,7 @@ use crate::{
     actor::{Actor, Anchor},
     collide_actor::CollideActor,
     gravity_actor::GravityActor,
-    orb::Orb,
+    orb::RcOrb,
     player::Player,
     resources::Resources,
 };
@@ -68,7 +68,7 @@ impl Robot {
     pub fn update(
         &mut self,
         bolts: &mut Vec<Bolt>,
-        orbs: &mut [Orb],
+        orbs: &mut [RcOrb],
         player: Option<&Player>,
         mut fire_probability: f32,
         game_timer: i32,
@@ -99,6 +99,7 @@ impl Robot {
         if matches!(self.type_, RobotType::Aggressive) && self.fire_timer >= 24 {
             // Go through all orbs to see if any can be shot at
             for orb in orbs.iter_mut() {
+                let orb = orb.borrow();
                 // The orb must be at our height, and within 200 pixels on the x axis
                 if orb.y >= self.top() && orb.y < self.bottom() && (orb.x() - self.x()).abs() < 200
                 {
@@ -133,6 +134,7 @@ impl Robot {
 
         // Am I colliding with an orb? If so, become trapped by it
         for orb in orbs.iter_mut() {
+            let mut orb = orb.borrow_mut();
             if orb.trapped_enemy_type.is_none() && self.collidepoint(orb.center()) {
                 self.alive = false;
                 orb.floating = true;

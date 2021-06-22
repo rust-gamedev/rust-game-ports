@@ -3,7 +3,7 @@ use macroquad::prelude::{collections::storage, Texture2D};
 use crate::{
     actor::{Actor, Anchor},
     collide_actor::{CollideActor, COLLIDE_ACTOR_DEFAULT_ANCHOR},
-    orb::Orb,
+    orb::RcOrb,
     player::Player,
     resources::Resources,
 };
@@ -36,7 +36,7 @@ impl Bolt {
 
     pub fn update(
         &mut self,
-        orbs: &mut Vec<Orb>,
+        orbs: &mut Vec<RcOrb>,
         player: Option<&mut Player>,
         game_timer: i32,
         grid: &[&str],
@@ -48,7 +48,7 @@ impl Bolt {
         } else {
             // We didn't collide with a block - check to see if we collided with an orb or the player
             for orb in orbs {
-                if orb.hit_test(self) {
+                if orb.borrow_mut().hit_test(self) {
                     self.active = false;
                     break;
                 }

@@ -1,7 +1,7 @@
 use crate::actor::Actor;
 use crate::bolt::Bolt;
 use crate::fruit::Fruit;
-use crate::orb::Orb;
+use crate::orb::RcOrb;
 use crate::pop::Pop;
 use crate::resources::Resources;
 use crate::robot::{Robot, RobotType};
@@ -29,7 +29,7 @@ pub struct Game {
     pub enemies: Vec<Robot>,
     pub pending_enemies: Vec<RobotType>,
     pub pops: Vec<Pop>,
-    pub orbs: Vec<Orb>,
+    pub orbs: Vec<RcOrb>,
 }
 
 impl Game {
@@ -116,7 +116,8 @@ impl Game {
             p.update(&mut self.orbs, &self.grid, self.timer);
         }
         for orb in &mut self.orbs {
-            orb.update(&mut self.fruits, &mut self.pops, &self.grid)
+            orb.borrow_mut()
+                .update(&mut self.fruits, &mut self.pops, &self.grid)
         }
 
         // Remove objects which are no longer wanted from the lists. For example, we recreate
@@ -125,7 +126,8 @@ impl Game {
         self.bolts.retain(|b| b.active);
         self.enemies.retain(|e| e.alive);
         self.pops.retain(|p| p.timer < 12);
-        self.orbs.retain(|o| o.timer < 250 && o.y > -40);
+        self.orbs
+            .retain(|o| o.borrow().timer < 250 && o.borrow().y > -40);
 
         // Every 100 frames, create a random fruit (unless there are no remaining enemies on this level)
         if self.timer % 100 == 0 && (self.pending_enemies.len() + self.enemies.len()) > 0 {
@@ -158,7 +160,7 @@ impl Game {
             if self
                 .orbs
                 .iter()
-                .filter(|orb| orb.trapped_enemy_type.is_some())
+                .filter(|orb| orb.borrow().trapped_enemy_type.is_some())
                 .collect::<Vec<_>>()
                 .is_empty()
             {
@@ -204,7 +206,7 @@ impl Game {
         self.bolts.iter().for_each(|b| b.draw());
         self.enemies.iter().for_each(|e| e.draw());
         self.pops.iter().for_each(|p| p.draw());
-        self.orbs.iter().for_each(|o| o.draw());
+        self.orbs.iter().for_each(|o| o.borrow().draw());
         if let Some(p) = &self.player {
             p.draw();
         }

@@ -1,3 +1,8 @@
+use std::{
+    cell::RefCell,
+    rc::{Rc, Weak},
+};
+
 use macroquad::{
     prelude::{collections::storage, Texture2D},
     rand::gen_range,
@@ -15,7 +20,11 @@ use crate::{
 
 const MAX_TIMER: i32 = 250;
 
+pub type RcOrb = Rc<RefCell<Orb>>;
+pub type WkOrb = Weak<RefCell<Orb>>;
+
 #[derive(Clone, Copy)]
+
 pub struct Orb {
     pub direction_x: i32,
     pub timer: i32,

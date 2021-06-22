@@ -1,3 +1,8 @@
+use std::{
+    cell::RefCell,
+    rc::{Rc, Weak},
+};
+
 use macroquad::prelude::{collections::storage, is_key_down, is_key_pressed, KeyCode, Texture2D};
 
 use crate::{
@@ -5,7 +10,7 @@ use crate::{
     bolt::Bolt,
     collide_actor::CollideActor,
     gravity_actor::{GravityActor, GRAVITY_ACTOR_DEFAULT_ANCHOR},
-    orb::Orb,
+    orb::{Orb, RcOrb, WkOrb},
     resources::Resources,
     HEIGHT, WIDTH,
 };
@@ -17,7 +22,12 @@ pub struct Player {
     pub fire_timer: i32,
     pub hurt_timer: i32,
     pub health: i32,
-    pub blowing_orb: Option<Orb>,
+    /// There are different approaches to keeping a reference to the blowing orb (in the existing Orbs
+    /// array). This is the simplest in terms of management (although it makes access verbose). An alternative
+    /// is to store here the index instead; it's considerably less verbose, but it introduces manual
+    /// management and coupling (when an Orb is removed, this reference to be updated accordingly).
+    /// There's not best solution, but a compromise.
+    pub blowing_orb: WkOrb,
 
     // Actor trait
     pub x: i32,
@@ -39,7 +49,7 @@ impl Player {
             fire_timer: 0,
             hurt_timer: 0,
             health: 0,
-            blowing_orb: None,
+            blowing_orb: Weak::new(),
 
             x: 0,
             y: 0,
@@ -59,7 +69,7 @@ impl Player {
         self.fire_timer = 0;
         self.hurt_timer = 100; // Invulnerable for this many frames
         self.health = 3;
-        self.blowing_orb = None;
+        self.blowing_orb = Weak::new();
     }
 
     pub fn hit_test(&mut self, other: &Bolt) -> bool {
@@ -86,7 +96,7 @@ impl Player {
         }
     }
 
-    pub fn update(&mut self, orbs: &mut Vec<Orb>, grid: &[&str], game_timer: i32) {
+    pub fn update(&mut self, orbs: &mut Vec<RcOrb>, grid: &[&str], game_timer: i32) {
         // Call GravityActor.update - parameter is whether we want to perform collision detection as we fall. If health
         // is zero, we want the player to just fall out of the level
         GravityActor::update(self, self.health > 0, grid);
@@ -142,8 +152,9 @@ impl Player {
                 // bounds of the level
                 let x = (self.x() + self.direction_x * 38).clamp(70, 730);
                 let y = self.y() - 35;
-                self.blowing_orb = Some(Orb::new(x, y, self.direction_x));
-                orbs.push(self.blowing_orb.unwrap().clone());
+                let new_orb = Rc::new(RefCell::new(Orb::new(x, y, self.direction_x)));
+                self.blowing_orb = Rc::downgrade(&new_orb);
+                orbs.push(new_orb);
                 eprint!("WRITEME: play_sound inside Player#update()");
                 // game.play_sound("blow", 4);
                 self.fire_timer = 20;
@@ -160,17 +171,18 @@ impl Player {
 
         // Holding down space causes the current orb (if there is one) to be blown further
         if is_key_down(KeyCode::Space) {
-            if let Some(blowing_orb) = &mut self.blowing_orb {
+            if let Some(blowing_orb) = Weak::upgrade(&self.blowing_orb) {
+                let mut blowing_orb = blowing_orb.borrow_mut();
                 // Increase blown distance up to a maximum of 120
                 blowing_orb.blown_frames += 4;
                 if blowing_orb.blown_frames >= 120 {
                     // Can't be blown any further
-                    self.blowing_orb = None;
+                    self.blowing_orb = Weak::new();
                 }
             }
         } else {
             // If we let go of space, we relinquish control over the current orb - it can't be blown any further
-            self.blowing_orb = None;
+            self.blowing_orb = Weak::new();
         }
 
         let resources = storage::get::<Resources>();
