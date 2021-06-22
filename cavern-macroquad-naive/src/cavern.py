@@ -116,8 +116,8 @@ from random import choice, randint, random, shuffle
 #         return False
 #
 class Orb(CollideActor):
-    MAX_TIMER = 250
-
+#     MAX_TIMER = 250
+#
 #     def __init__(self, pos, dir_x):
 #         super().__init__(pos)
 #
@@ -128,13 +128,13 @@ class Orb(CollideActor):
 #         self.timer = -1
 #         self.blown_frames = 6  # Number of frames during which we will be pushed horizontally
 #
-    def hit_test(self, bolt):
-        # Check for collision with a bolt
-        collided = self.collidepoint(bolt.pos)
-        if collided:
-            self.timer = Orb.MAX_TIMER - 1
-        return collided
-
+#     def hit_test(self, bolt):
+#         # Check for collision with a bolt
+#         collided = self.collidepoint(bolt.pos)
+#         if collided:
+#             self.timer = Orb.MAX_TIMER - 1
+#         return collided
+#
     def update(self):
         self.timer += 1
 

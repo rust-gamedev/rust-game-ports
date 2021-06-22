@@ -2,9 +2,12 @@ use macroquad::prelude::{collections::storage, Texture2D};
 
 use crate::{
     actor::{Actor, Anchor},
+    collide_actor::CollideActor,
     resources::Resources,
     robot::RobotType,
 };
+
+const MAX_TIMER: i32 = 250;
 
 #[derive(Clone, Copy)]
 pub struct Orb {
@@ -38,8 +41,13 @@ impl Orb {
         }
     }
 
-    pub fn update(&mut self) {
-        eprintln!("WRITEME: Orb#update");
+    pub fn hit_test(&self, bolt: &Orb) -> bool {
+        // Check for collision with a bolt
+        let collided = self.collidepoint((bolt.x, bolt.y));
+        if collided {
+            self.timer = MAX_TIMER - 1;
+        }
+        collided
     }
 }
 
@@ -68,3 +76,5 @@ impl Actor for Orb {
         self.anchor
     }
 }
+
+impl CollideActor for Orb {}
