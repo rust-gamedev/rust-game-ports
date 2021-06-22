@@ -115,7 +115,7 @@ from random import choice, randint, random, shuffle
 #         # Didn't collide with block or edge of level
 #         return False
 #
-class Orb(CollideActor):
+# class Orb(CollideActor):
 #     MAX_TIMER = 250
 #
 #     def __init__(self, pos, dir_x):
@@ -135,38 +135,38 @@ class Orb(CollideActor):
 #             self.timer = Orb.MAX_TIMER - 1
 #         return collided
 #
-    def update(self):
-        self.timer += 1
-
-        if self.floating:
-            # Float upwards
-            self.move(0, -1, randint(1, 2))
-        else:
-            # Move horizontally
-            if self.move(self.direction_x, 0, 4):
-                # If we hit a block, start floating
-                self.floating = True
-
-        if self.timer == self.blown_frames:
-            self.floating = True
-        elif self.timer >= Orb.MAX_TIMER or self.y <= -40:
-            # Pop if our lifetime has run out or if we have gone off the top of the screen
-            game.pops.append(Pop(self.pos, 1))
-            if self.trapped_enemy_type != None:
-                # trapped_enemy_type is either zero or one. A value of one means there's a chance of creating a
-                # powerup such as an extra life or extra health
-                game.fruits.append(Fruit(self.pos, self.trapped_enemy_type))
-            game.play_sound("pop", 4)
-
-        if self.timer < 9:
-            # Orb grows to full size over the course of 9 frames - the animation frame updating every 3 frames
-            self.image = "orb" + str(self.timer // 3)
-        else:
-            if self.trapped_enemy_type != None:
-                self.image = "trap" + str(self.trapped_enemy_type) + str((self.timer // 4) % 8)
-            else:
-                self.image = "orb" + str(3 + (((self.timer - 9) // 8) % 4))
-
+#     def update(self):
+#         self.timer += 1
+#
+#         if self.floating:
+#             # Float upwards
+#             self.move(0, -1, randint(1, 2))
+#         else:
+#             # Move horizontally
+#             if self.move(self.direction_x, 0, 4):
+#                 # If we hit a block, start floating
+#                 self.floating = True
+#
+#         if self.timer == self.blown_frames:
+#             self.floating = True
+#         elif self.timer >= Orb.MAX_TIMER or self.y <= -40:
+#             # Pop if our lifetime has run out or if we have gone off the top of the screen
+#             game.pops.append(Pop(self.pos, 1))
+#             if self.trapped_enemy_type != None:
+#                 # trapped_enemy_type is either zero or one. A value of one means there's a chance of creating a
+#                 # powerup such as an extra life or extra health
+#                 game.fruits.append(Fruit(self.pos, self.trapped_enemy_type))
+#             game.play_sound("pop", 4)
+#
+#         if self.timer < 9:
+#             # Orb grows to full size over the course of 9 frames - the animation frame updating every 3 frames
+#             self.image = "orb" + str(self.timer // 3)
+#         else:
+#             if self.trapped_enemy_type != None:
+#                 self.image = "trap" + str(self.trapped_enemy_type) + str((self.timer // 4) % 8)
+#             else:
+#                 self.image = "orb" + str(3 + (((self.timer - 9) // 8) % 4))
+#
 class Bolt(CollideActor):
     SPEED = 7
 

@@ -111,7 +111,9 @@ impl Game {
         if let Some(p) = &mut self.player {
             p.update(&mut self.orbs, &self.grid, self.timer);
         }
-        self.orbs.iter_mut().for_each(|o| o.update());
+        for orb in &mut self.orbs {
+            orb.update(&mut self.fruits, &mut self.pops, &self.grid)
+        }
 
         // Remove objects which are no longer wanted from the lists. For example, we recreate
         // self.fruits such that it contains all existing fruits except those whose time_to_live counter has reached zero

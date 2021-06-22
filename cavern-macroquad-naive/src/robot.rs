@@ -20,7 +20,7 @@ pub enum RobotType {
 }
 
 impl RobotType {
-    fn val(&self) -> i32 {
+    pub fn val(&self) -> i32 {
         match self {
             RobotType::Aggressive => 0,
             RobotType::Normal => 1,
