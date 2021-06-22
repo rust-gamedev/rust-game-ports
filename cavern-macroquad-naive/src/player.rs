@@ -2,6 +2,7 @@ use macroquad::prelude::{collections::storage, is_key_down, is_key_pressed, KeyC
 
 use crate::{
     actor::{Actor, Anchor},
+    bolt::Bolt,
     collide_actor::CollideActor,
     gravity_actor::{GravityActor, GRAVITY_ACTOR_DEFAULT_ANCHOR},
     orb::Orb,
@@ -59,6 +60,31 @@ impl Player {
         self.hurt_timer = 100; // Invulnerable for this many frames
         self.health = 3;
         self.blowing_orb = None;
+    }
+
+    #[allow(dead_code)]
+    pub fn hit_test(&mut self, other: &Bolt) -> bool {
+        // Check for collision between player and bolt - called from Bolt.update. Also check hurt_timer - after being hurt,
+        // there is a period during which the player cannot be hurt again
+        if self.collidepoint((other.x, other.y)) && self.hurt_timer < 0 {
+            // Player loses 1 health, is knocked in the direction the bolt had been moving, and can't be hurt again
+            // for a while
+            self.hurt_timer = 200;
+            self.health -= 1;
+            self.vel_y = -12;
+            self.landed = false;
+            self.direction_x = other.direction_x;
+            if self.health > 0 {
+                eprintln!("WRITEME: sound inside Player#hit_test");
+                // game.play_sound("ouch", 4);
+            } else {
+                eprintln!("WRITEME: sound inside Player#hit_test");
+                // game.play_sound("die");
+            }
+            true
+        } else {
+            false
+        }
     }
 
     pub fn update(&mut self, orbs: &mut Vec<Orb>, grid: &[&str], game_timer: i32) {

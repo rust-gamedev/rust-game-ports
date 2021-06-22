@@ -287,7 +287,7 @@ class Fruit(GravityActor):
         anim_frame = str([0, 1, 2, 1][(game.timer // 6) % 4])
         self.image = "fruit" + str(self.type) + anim_frame
 
-class Player(GravityActor):
+# class Player(GravityActor):
 #     def __init__(self):
 #         # Call constructor of parent class. Initial pos is 0,0 but reset is always called straight afterwards which
 #         # will set the actual starting position.
@@ -304,26 +304,26 @@ class Player(GravityActor):
     #     self.hurt_timer = 100   # Invulnerable for this many frames
     #     self.health = 3
     #     self.blowing_orb = None
-
-    def hit_test(self, other):
-        # Check for collision between player and bolt - called from Bolt.update. Also check hurt_timer - after being hurt,
-        # there is a period during which the player cannot be hurt again
-        if self.collidepoint(other.pos) and self.hurt_timer < 0:
-            # Player loses 1 health, is knocked in the direction the bolt had been moving, and can't be hurt again
-            # for a while
-            self.hurt_timer = 200
-            self.health -= 1
-            self.vel_y = -12
-            self.landed = False
-            self.direction_x = other.direction_x
-            if self.health > 0:
-                game.play_sound("ouch", 4)
-            else:
-                game.play_sound("die")
-            return True
-        else:
-            return False
-
+#
+#     def hit_test(self, other):
+#         # Check for collision between player and bolt - called from Bolt.update. Also check hurt_timer - after being hurt,
+#         # there is a period during which the player cannot be hurt again
+#         if self.collidepoint(other.pos) and self.hurt_timer < 0:
+#             # Player loses 1 health, is knocked in the direction the bolt had been moving, and can't be hurt again
+#             # for a while
+#             self.hurt_timer = 200
+#             self.health -= 1
+#             self.vel_y = -12
+#             self.landed = False
+#             self.direction_x = other.direction_x
+#             if self.health > 0:
+#                 game.play_sound("ouch", 4)
+#             else:
+#                 game.play_sound("die")
+#             return True
+#         else:
+#             return False
+#
 #     def update(self):
 #         # Call GravityActor.update - parameter is whether we want to perform collision detection as we fall. If health
 #         # is zero, we want the player to just fall out of the level
