@@ -29,7 +29,12 @@ impl Pop {
     }
 
     pub fn update(&mut self) {
-        eprintln!("WRITEME: Pop#update");
+        self.timer += 1;
+
+        let type_factor = self.type_ * 7;
+        let timer_factor = self.timer / 2;
+        let image_i = (type_factor + timer_factor) as usize;
+        self.image = storage::get::<Resources>().pop_textures[image_i];
     }
 }
 

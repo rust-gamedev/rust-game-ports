@@ -192,17 +192,17 @@ from random import choice, randint, random, shuffle
 #         anim_frame = str((game.timer // 4) % 2)
 #         self.image = "bolt" + direction_idx + anim_frame
 #
-class Pop(Actor):
+# class Pop(Actor):
 #     def __init__(self, pos, type):
 #         super().__init__("blank", pos)
 #
 #         self.type = type
 #         self.timer = -1
 #
-    def update(self):
-        self.timer += 1
-        self.image = "pop" + str(self.type) + str(self.timer // 2)
-
+#     def update(self):
+#         self.timer += 1
+#         self.image = "pop" + str(self.type) + str(self.timer // 2)
+#
 # class GravityActor(CollideActor):
 #     MAX_FALL_SPEED = 10
 #
