@@ -72,6 +72,9 @@ pub struct Resources {
     pub still_texture: Texture2D,
     /// Rust: Stored contiguously ("0..." -> "1...")
     pub run_textures: Vec<Texture2D>,
+    pub orb_textures: Vec<Texture2D>,
+    pub trap_textures: Vec<Texture2D>,
+    pub bolt_textures: Vec<Texture2D>,
 
     pub over_sound: Sound,
     pub level_sound: Sound,
@@ -95,6 +98,9 @@ impl Resources {
         let blow_textures = load_textures_list("blow", 2).await?;
         let still_texture: Texture2D = load_texture("resources/images/still.png").await?;
         let run_textures = load_multi_state_textures("run", &["0", "1"], 4).await?;
+        let orb_textures = load_textures_list("orb", 7).await?;
+        let trap_textures = load_multi_state_textures("trap", &["0", "1"], 8).await?;
+        let bolt_textures = load_multi_state_textures("bolt", &["0", "1"], 2).await?;
 
         let over_sound = audio::load_sound("resources/sounds/over0.ogg").await?;
         let level_sound = audio::load_sound("resources/sounds/level0.ogg").await?;
@@ -120,6 +126,9 @@ impl Resources {
             blow_textures,
             still_texture,
             run_textures,
+            orb_textures,
+            trap_textures,
+            bolt_textures,
 
             over_sound,
             level_sound,
