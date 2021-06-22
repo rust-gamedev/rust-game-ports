@@ -1,9 +1,13 @@
-use macroquad::prelude::Texture2D;
+use macroquad::prelude::{collections::storage, Texture2D};
 
-use crate::actor::{Actor, Anchor};
+use crate::{
+    actor::{Actor, Anchor},
+    resources::Resources,
+};
 
 pub struct Pop {
     pub timer: i32,
+    pub type_: i32,
 
     // Actor trait
     pub x: i32,
@@ -13,6 +17,17 @@ pub struct Pop {
 }
 
 impl Pop {
+    pub fn new(x: i32, y: i32, type_: i32) -> Self {
+        Self {
+            type_: type_,
+            timer: -1,
+            x,
+            y,
+            image: storage::get::<Resources>().blank_texture,
+            anchor: Anchor::Centre,
+        }
+    }
+
     pub fn update(&mut self) {
         eprintln!("WRITEME: Pop#update");
     }

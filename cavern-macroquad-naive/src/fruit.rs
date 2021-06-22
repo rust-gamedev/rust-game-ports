@@ -5,10 +5,12 @@ use crate::{
     collide_actor::CollideActor,
     gravity_actor::{GravityActor, GRAVITY_ACTOR_DEFAULT_ANCHOR},
     resources::Resources,
+    robot::RobotType,
 };
 
 pub struct Fruit {
     pub time_to_live: i32,
+    pub trapped_enemy_type: Option<RobotType>,
 
     // Actor trait
     pub x: i32,
@@ -22,9 +24,10 @@ pub struct Fruit {
 }
 
 impl Fruit {
-    pub fn new(x: i32, y: i32) -> Self {
+    pub fn new(x: i32, y: i32, trapped_enemy_type: Option<RobotType>) -> Self {
         Self {
             time_to_live: 500, // Counts down to zero
+            trapped_enemy_type,
 
             x,
             y,

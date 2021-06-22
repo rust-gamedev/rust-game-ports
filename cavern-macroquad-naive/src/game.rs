@@ -124,8 +124,11 @@ impl Game {
         // Every 100 frames, create a random fruit (unless there are no remaining enemies on this level)
         if self.timer % 100 == 0 && (self.pending_enemies.len() + self.enemies.len()) > 0 {
             // Create fruit at random position
-            self.fruits
-                .push(Fruit::new(gen_range(70, 730 + 1), gen_range(75, 400 + 1)));
+            self.fruits.push(Fruit::new(
+                gen_range(70, 730 + 1),
+                gen_range(75, 400 + 1),
+                None,
+            ));
         }
 
         // Every 81 frames, if there is at least 1 pending enemy, and the number of active enemies is below the current
