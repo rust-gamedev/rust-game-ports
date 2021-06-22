@@ -60,9 +60,11 @@ pub trait Actor {
         (center_x, center_y)
     }
 
-    fn collidepoint(&self, _pos: (i32, i32)) -> bool {
-        eprintln!("WRITEME: Actor#collidepoint(");
-        false
+    fn collidepoint(&self, pos: (i32, i32)) -> bool {
+        self.left() <= pos.0
+            && pos.0 <= self.right()
+            && self.top() <= pos.1
+            && pos.1 <= self.bottom()
     }
 
     fn draw(&self) {

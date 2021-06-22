@@ -7,6 +7,8 @@ use crate::{
     actor::{Actor, Anchor},
     collide_actor::CollideActor,
     gravity_actor::{GravityActor, GRAVITY_ACTOR_DEFAULT_ANCHOR},
+    player::Player,
+    pop::Pop,
     resources::Resources,
     robot::RobotType,
 };
@@ -18,6 +20,18 @@ pub enum FruitType {
     Lemon,
     ExtraHealth,
     ExtraLife,
+}
+
+impl FruitType {
+    fn val(&self) -> i32 {
+        match self {
+            FruitType::Apple => 0,
+            FruitType::Raspberry => 1,
+            FruitType::Lemon => 2,
+            FruitType::ExtraHealth => 3,
+            FruitType::ExtraLife => 4,
+        }
+    }
 }
 
 pub struct Fruit {
@@ -70,8 +84,53 @@ impl Fruit {
         }
     }
 
-    pub fn update(&mut self) {
-        eprintln!("WRITEME: Fruit#update");
+    pub fn update(
+        &mut self,
+        pops: &mut Vec<Pop>,
+        player: Option<&mut Player>,
+        game_timer: i32,
+        grid: &[&str],
+    ) {
+        GravityActor::update(self, true, grid);
+
+        // Does the player exist, and are they colliding with us?
+
+        match player {
+            Some(player) if player.collidepoint(self.center()) => {
+                match self.type_ {
+                    FruitType::ExtraHealth => {
+                        player.health = 3.min(player.health + 1);
+                        eprint!("WRITEME: play sound inside Fruit#update");
+                        // game.play_sound("bonus");
+                    }
+                    FruitType::ExtraLife => {
+                        player.lives += 1;
+                        eprint!("WRITEME: play sound inside Fruit#update");
+                        // game.play_sound("bonus");
+                    }
+                    _ => {
+                        player.score += (self.type_.val() + 1) * 100;
+                        eprint!("WRITEME: play sound inside Fruit#update");
+                        // game.play_sound("score");
+                    }
+                }
+
+                self.time_to_live = 0; // Disappear
+            }
+            _ => {
+                self.time_to_live -= 1;
+            }
+        }
+
+        if self.time_to_live <= 0 {
+            // Create 'pop' animation
+            pops.push(Pop::new(self.x, self.y - 27, 0));
+        }
+
+        let type_factor = self.type_.val() * 3;
+        let timer_factor = [0, 1, 2, 1][((game_timer / 6) % 4) as usize];
+        let image_i = (type_factor + timer_factor) as usize;
+        self.image = storage::get::<Resources>().fruit_textures[image_i];
     }
 }
 

@@ -95,7 +95,9 @@ impl Game {
         let fire_probability = self.fire_probability();
 
         // Update all objects
-        self.fruits.iter_mut().for_each(|f| f.update());
+        for fruit in &mut self.fruits {
+            fruit.update(&mut self.pops, self.player.as_mut(), self.timer, &self.grid)
+        }
         for bolt in &mut self.bolts {
             bolt.update(&mut self.orbs, self.player.as_mut(), self.timer, &self.grid)
         }
