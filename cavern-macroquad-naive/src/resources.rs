@@ -1,7 +1,10 @@
+// Rust: The data should be loaded from the on-disk list of files, rather than each type individually.
+// The file naming actually helps, since "map" textures don't have an index.
+
 use std::{collections::HashMap, error};
 
 use macroquad::{
-    audio::{self, Sound},
+    audio::{self, load_sound, Sound},
     prelude::{load_texture, Texture2D},
 };
 
@@ -56,6 +59,19 @@ async fn load_multi_state_textures(
     Ok(textures)
 }
 
+async fn load_sounds_list(
+    name_prefix: &str,
+    number: u8,
+) -> Result<Vec<Sound>, Box<dyn error::Error>> {
+    let mut sounds = vec![];
+
+    for i in 0..number {
+        sounds.push(load_sound(&format!("resources/sounds/{}{}.ogg", name_prefix, i)).await?);
+    }
+
+    Ok(sounds)
+}
+
 pub struct Resources {
     pub title_texture: Texture2D,
     pub over_texture: Texture2D,
@@ -80,6 +96,15 @@ pub struct Resources {
 
     pub over_sound: Sound,
     pub level_sound: Sound,
+    pub pop_sounds: Vec<Sound>,
+    pub ouch_sounds: Vec<Sound>,
+    pub die_sound: Sound,
+    pub laser_sounds: Vec<Sound>,
+    pub trap_sounds: Vec<Sound>,
+    pub blow_sounds: Vec<Sound>,
+    pub jump_sound: Sound,
+    pub bonus_sound: Sound,
+    pub score_sound: Sound,
 
     pub fonts: HashMap<u8, Texture2D>,
 }
@@ -109,6 +134,15 @@ impl Resources {
 
         let over_sound = audio::load_sound("resources/sounds/over0.ogg").await?;
         let level_sound = audio::load_sound("resources/sounds/level0.ogg").await?;
+        let pop_sounds = load_sounds_list("pop", 4).await?;
+        let ouch_sounds = load_sounds_list("ouch", 4).await?;
+        let die_sound = audio::load_sound("resources/sounds/die0.ogg").await?;
+        let laser_sounds = load_sounds_list("laser", 4).await?;
+        let trap_sounds = load_sounds_list("trap", 4).await?;
+        let blow_sounds = load_sounds_list("blow", 4).await?;
+        let jump_sound = audio::load_sound("resources/sounds/jump0.ogg").await?;
+        let bonus_sound = audio::load_sound("resources/sounds/bonus0.ogg").await?;
+        let score_sound = audio::load_sound("resources/sounds/score0.ogg").await?;
 
         let mut fonts = HashMap::new();
         for chr in AVAILABLE_FONTS {
@@ -139,6 +173,15 @@ impl Resources {
 
             over_sound,
             level_sound,
+            pop_sounds,
+            ouch_sounds,
+            die_sound,
+            laser_sounds,
+            trap_sounds,
+            blow_sounds,
+            jump_sound,
+            bonus_sound,
+            score_sound,
 
             fonts,
         })
