@@ -39,22 +39,19 @@ async fn load_textures_map(
     Ok(textures)
 }
 
-async fn load_robot_textures() -> Result<Vec<Texture2D>, Box<dyn error::Error>> {
+/// Rust: Load texture that have multiple states, e.g. Robots of two types, with two directions each.
+/// The textures are stored in a contiguous array, respecting the order of the states passed.
+async fn load_multi_state_textures(
+    name_prefix: &str,
+    states: &[&str],
+    state_number: u8,
+) -> Result<Vec<Texture2D>, Box<dyn error::Error>> {
     let mut textures = vec![];
 
-    textures.extend(load_textures_list("robot00", 8).await?);
-    textures.extend(load_textures_list("robot01", 8).await?);
-    textures.extend(load_textures_list("robot10", 8).await?);
-    textures.extend(load_textures_list("robot11", 8).await?);
-
-    Ok(textures)
-}
-
-async fn load_run_textures() -> Result<Vec<Texture2D>, Box<dyn error::Error>> {
-    let mut textures = vec![];
-
-    textures.extend(load_textures_list("run0", 4).await?);
-    textures.extend(load_textures_list("run1", 4).await?);
+    for state in states {
+        let prefix = &format!("{}{}", name_prefix, state);
+        textures.extend(load_textures_list(prefix, state_number).await?);
+    }
 
     Ok(textures)
 }
@@ -91,12 +88,13 @@ impl Resources {
         let background_textures = load_textures_list("bg", 4).await?;
         let block_textures = load_textures_list("block", 4).await?;
         let blank_texture = load_texture("resources/images/blank.png").await?;
-        let robot_textures = load_robot_textures().await?;
+        let robot_textures =
+            load_multi_state_textures("robot", &["00", "01", "10", "11"], 8).await?;
         let recoil_textures = load_textures_list("recoil", 2).await?;
         let fall_textures = load_textures_list("fall", 2).await?;
         let blow_textures = load_textures_list("blow", 2).await?;
         let still_texture: Texture2D = load_texture("resources/images/still.png").await?;
-        let run_textures = load_run_textures().await?;
+        let run_textures = load_multi_state_textures("run", &["0", "1"], 4).await?;
 
         let over_sound = audio::load_sound("resources/sounds/over0.ogg").await?;
         let level_sound = audio::load_sound("resources/sounds/level0.ogg").await?;
