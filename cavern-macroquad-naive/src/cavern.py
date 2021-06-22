@@ -237,30 +237,30 @@ from random import choice, randint, random, shuffle
 #
 # Class for pickups including fruit, extra health and extra life
 class Fruit(GravityActor):
-    APPLE = 0
-    RASPBERRY = 1
-    LEMON = 2
-    EXTRA_HEALTH = 3
-    EXTRA_LIFE = 4
-
-    def __init__(self, pos, trapped_enemy_type=0):
-        super().__init__(pos)
-
-        # Choose which type of fruit we're going to be.
-        if trapped_enemy_type == Robot.TYPE_NORMAL:
-            self.type = choice([Fruit.APPLE, Fruit.RASPBERRY, Fruit.LEMON])
-        else:
-            # If trapped_enemy_type is 1, it means this fruit came from bursting an orb containing the more dangerous type
-            # of enemy. In this case there is a chance of getting an extra help or extra life power up
-            # We create a list containing the possible types of fruit, in proportions based on the probability we want
-            # each type of fruit to be chosen
-            types = 10 * [Fruit.APPLE, Fruit.RASPBERRY, Fruit.LEMON]    # Each of these appear in the list 10 times
-            types += 9 * [Fruit.EXTRA_HEALTH]                           # This appears 9 times
-            types += [Fruit.EXTRA_LIFE]                                 # This only appears once
-            self.type = choice(types)                                   # Randomly choose one from the list
-
-        # self.time_to_live = 500 # Counts down to zero
-
+#     APPLE = 0
+#     RASPBERRY = 1
+#     LEMON = 2
+#     EXTRA_HEALTH = 3
+#     EXTRA_LIFE = 4
+#
+#     def __init__(self, pos, trapped_enemy_type=0):
+#         super().__init__(pos)
+#
+#         # Choose which type of fruit we're going to be.
+#         if trapped_enemy_type == Robot.TYPE_NORMAL:
+#             self.type = choice([Fruit.APPLE, Fruit.RASPBERRY, Fruit.LEMON])
+#         else:
+#             # If trapped_enemy_type is 1, it means this fruit came from bursting an orb containing the more dangerous type
+#             # of enemy. In this case there is a chance of getting an extra help or extra life power up
+#             # We create a list containing the possible types of fruit, in proportions based on the probability we want
+#             # each type of fruit to be chosen
+#             types = 10 * [Fruit.APPLE, Fruit.RASPBERRY, Fruit.LEMON]    # Each of these appear in the list 10 times
+#             types += 9 * [Fruit.EXTRA_HEALTH]                           # This appears 9 times
+#             types += [Fruit.EXTRA_LIFE]                                 # This only appears once
+#             self.type = choice(types)                                   # Randomly choose one from the list
+#
+#         self.time_to_live = 500 # Counts down to zero
+#
     def update(self):
         super().update()
 
