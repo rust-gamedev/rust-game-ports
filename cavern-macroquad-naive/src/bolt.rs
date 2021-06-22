@@ -3,8 +3,12 @@ use macroquad::prelude::{collections::storage, Texture2D};
 use crate::{
     actor::{Actor, Anchor},
     collide_actor::{CollideActor, COLLIDE_ACTOR_DEFAULT_ANCHOR},
+    orb::Orb,
+    player::Player,
     resources::Resources,
 };
+
+const BOLT_SPEED: i32 = 7;
 
 pub struct Bolt {
     pub direction_x: i32,
@@ -30,8 +34,39 @@ impl Bolt {
         }
     }
 
-    pub fn update(&mut self) {
-        eprintln!("WRITEME: Bolt#update");
+    pub fn update(
+        &mut self,
+        orbs: &mut Vec<Orb>,
+        player: Option<&mut Player>,
+        game_timer: i32,
+        grid: &[&str],
+    ) {
+        // Move horizontally and check to see if we've collided with a block
+        if self.move_(self.direction_x, 0, BOLT_SPEED, grid) {
+            // Collided
+            self.active = false;
+        } else {
+            // We didn't collide with a block - check to see if we collided with an orb or the player
+            for orb in orbs {
+                if orb.hit_test(self) {
+                    self.active = false;
+                    break;
+                }
+            }
+
+            if self.active {
+                if let Some(player) = player {
+                    if player.hit_test(self) {
+                        self.active = false;
+                    }
+                }
+            }
+        }
+
+        let direction_factor = if self.direction_x > 0 { 2 } else { 0 };
+        let timer_factor = (game_timer / 4) % 2;
+        let image_i = (direction_factor + timer_factor) as usize;
+        self.image = storage::get::<Resources>().bolt_textures[image_i];
     }
 }
 

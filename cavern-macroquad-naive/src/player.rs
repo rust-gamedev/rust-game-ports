@@ -62,7 +62,6 @@ impl Player {
         self.blowing_orb = None;
     }
 
-    #[allow(dead_code)]
     pub fn hit_test(&mut self, other: &Bolt) -> bool {
         // Check for collision between player and bolt - called from Bolt.update. Also check hurt_timer - after being hurt,
         // there is a period during which the player cannot be hurt again

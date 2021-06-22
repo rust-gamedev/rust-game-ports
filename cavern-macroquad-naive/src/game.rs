@@ -96,7 +96,9 @@ impl Game {
 
         // Update all objects
         self.fruits.iter_mut().for_each(|f| f.update());
-        self.bolts.iter_mut().for_each(|b| b.update());
+        for bolt in &mut self.bolts {
+            bolt.update(&mut self.orbs, self.player.as_mut(), self.timer, &self.grid)
+        }
         for enemy in &mut self.enemies {
             enemy.update(
                 &mut self.bolts,

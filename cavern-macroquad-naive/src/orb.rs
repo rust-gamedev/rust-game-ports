@@ -47,7 +47,6 @@ impl Orb {
         }
     }
 
-    #[allow(dead_code)]
     pub fn hit_test(&mut self, bolt: &Bolt) -> bool {
         // Check for collision with a bolt
         let collided = self.collidepoint((bolt.x, bolt.y));
