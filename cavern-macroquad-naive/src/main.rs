@@ -4,6 +4,7 @@ mod collide_actor;
 mod drawing;
 mod fruit;
 mod game;
+mod game_playback;
 mod global_state;
 mod gravity_actor;
 mod levels;

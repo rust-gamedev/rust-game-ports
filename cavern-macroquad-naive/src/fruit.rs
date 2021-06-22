@@ -6,6 +6,7 @@ use macroquad::{
 use crate::{
     actor::{Actor, Anchor},
     collide_actor::CollideActor,
+    game_playback::play_game_sound,
     gravity_actor::{GravityActor, GRAVITY_ACTOR_DEFAULT_ANCHOR},
     player::Player,
     pop::Pop,
@@ -97,21 +98,20 @@ impl Fruit {
 
         match player {
             Some(player) if player.collidepoint(self.center()) => {
+                let resources = storage::get::<Resources>();
+
                 match self.type_ {
                     FruitType::ExtraHealth => {
                         player.health = 3.min(player.health + 1);
-                        eprint!("WRITEME: play sound inside Fruit#update");
-                        // game.play_sound("bonus");
+                        play_game_sound(Some(player), &resources.bonus_sound);
                     }
                     FruitType::ExtraLife => {
                         player.lives += 1;
-                        eprint!("WRITEME: play sound inside Fruit#update");
-                        // game.play_sound("bonus");
+                        play_game_sound(Some(player), &resources.bonus_sound);
                     }
                     _ => {
                         player.score += (self.type_.val() + 1) * 100;
-                        eprint!("WRITEME: play sound inside Fruit#update");
-                        // game.play_sound("score");
+                        play_game_sound(Some(player), &resources.score_sound);
                     }
                 }
 

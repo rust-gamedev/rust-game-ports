@@ -1,6 +1,7 @@
 use crate::actor::Actor;
 use crate::bolt::Bolt;
 use crate::fruit::Fruit;
+use crate::game_playback::play_game_sound;
 use crate::orb::RcOrb;
 use crate::pop::Pop;
 use crate::resources::Resources;
@@ -10,11 +11,7 @@ use crate::{GRID_BLOCK_SIZE, LEVEL_X_OFFSET, NUM_COLUMNS, NUM_ROWS, WIDTH};
 
 use macroquad::prelude::{draw_texture, WHITE};
 use macroquad::rand::gen_range;
-use macroquad::{
-    audio::{self, Sound},
-    prelude::collections::storage,
-    rand::ChooseRandom,
-};
+use macroquad::{prelude::collections::storage, rand::ChooseRandom};
 
 #[derive(Default)]
 pub struct Game {
@@ -45,17 +42,6 @@ impl Game {
         game.next_level();
 
         game
-    }
-
-    pub fn play_sound(&self, sound: &Sound) {
-        if self.player.is_some() {
-            audio::play_sound_once(*sound);
-        }
-    }
-
-    #[allow(dead_code)]
-    pub fn play_random_sound(&self, sounds: Vec<Sound>) {
-        self.play_sound(sounds.choose().unwrap())
     }
 
     pub fn fire_probability(&self) -> f32 {
@@ -116,8 +102,12 @@ impl Game {
             p.update(&mut self.orbs, &self.grid, self.timer);
         }
         for orb in &mut self.orbs {
-            orb.borrow_mut()
-                .update(&mut self.fruits, &mut self.pops, &self.grid)
+            orb.borrow_mut().update(
+                &mut self.fruits,
+                &mut self.pops,
+                self.player.as_ref(),
+                &self.grid,
+            )
         }
 
         // Remove objects which are no longer wanted from the lists. For example, we recreate
@@ -253,6 +243,9 @@ impl Game {
         // Finally we shuffle the list so that the order is randomised
         self.pending_enemies.shuffle();
 
-        self.play_sound(&storage::get::<Resources>().level_sound);
+        play_game_sound(
+            self.player.as_ref(),
+            &storage::get::<Resources>().level_sound,
+        );
     }
 }

@@ -3,7 +3,6 @@ use macroquad::{
     rand::{gen_range, ChooseRandom},
 };
 
-use crate::bolt::Bolt;
 use crate::{
     actor::{Actor, Anchor},
     collide_actor::CollideActor,
@@ -12,6 +11,7 @@ use crate::{
     player::Player,
     resources::Resources,
 };
+use crate::{bolt::Bolt, game_playback::play_game_random_sound};
 
 #[derive(Clone, Copy)]
 pub enum RobotType {
@@ -110,6 +110,8 @@ impl Robot {
             }
         }
 
+        let resources = storage::get::<Resources>();
+
         // Check to see if we can fire at player
         if self.fire_timer >= 12 {
             // Random chance of firing each frame. Likelihood increases 10 times if player is at the same height as us
@@ -120,8 +122,7 @@ impl Robot {
             }
             if gen_range(0., 1.) < fire_probability {
                 self.fire_timer = 0;
-                eprint!("WRITEME: play_sound inside Robot#update()");
-                //game.play_sound("laser", 4);
+                play_game_random_sound(player, &resources.laser_sounds);
             }
         } else if self.fire_timer == 8 {
             //  Once the fire timer has been set to 0, it will count up - frame 8 of the animation is when the actual bolt is fired
@@ -139,8 +140,7 @@ impl Robot {
                 self.alive = false;
                 orb.floating = true;
                 orb.trapped_enemy_type = Some(self.type_);
-                eprint!("WRITEME: play_sound inside Robot#update()");
-                //game.play_sound("trap", 4);
+                play_game_random_sound(player, &resources.trap_sounds);
                 break;
             }
         }

@@ -3,6 +3,7 @@ use macroquad::prelude::{collections::storage, draw_texture, is_key_pressed, Key
 use crate::{
     drawing::{draw_game_text, CHAR_WIDTH, IMAGE_WIDTH},
     game::Game,
+    game_playback::play_game_sound,
     player::Player,
     resources::Resources,
     state::State,
@@ -36,8 +37,10 @@ impl GlobalState {
             }
             State::Play => {
                 if self.game.player.as_ref().unwrap().lives < 0 {
-                    self.game
-                        .play_sound(&storage::get::<Resources>().over_sound);
+                    play_game_sound(
+                        self.game.player.as_ref(),
+                        &storage::get::<Resources>().over_sound,
+                    );
                     self.state = State::GameOver;
                 } else {
                     self.game.update();

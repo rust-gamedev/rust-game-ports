@@ -9,6 +9,7 @@ use crate::{
     actor::{Actor, Anchor},
     bolt::Bolt,
     collide_actor::CollideActor,
+    game_playback::{play_game_random_sound, play_game_sound},
     gravity_actor::{GravityActor, GRAVITY_ACTOR_DEFAULT_ANCHOR},
     orb::{Orb, RcOrb, WkOrb},
     resources::Resources,
@@ -83,12 +84,11 @@ impl Player {
             self.vel_y = -12;
             self.landed = false;
             self.direction_x = other.direction_x;
+            let resources = storage::get::<Resources>();
             if self.health > 0 {
-                eprintln!("WRITEME: sound inside Player#hit_test");
-                // game.play_sound("ouch", 4);
+                play_game_random_sound(Some(self), &resources.ouch_sounds);
             } else {
-                eprintln!("WRITEME: sound inside Player#hit_test");
-                // game.play_sound("die");
+                play_game_sound(Some(self), &resources.die_sound);
             }
             true
         } else {
@@ -145,6 +145,8 @@ impl Player {
                 }
             }
 
+            let resources = storage::get::<Resources>();
+
             // Do we need to create a new orb? Space must have been pressed and released, the minimum time between
             // orbs must have passed, and there is a limit of 5 orbs.
             if is_key_pressed(KeyCode::Space) && self.fire_timer <= 0 && orbs.len() < 5 {
@@ -155,8 +157,7 @@ impl Player {
                 let new_orb = Rc::new(RefCell::new(Orb::new(x, y, self.direction_x)));
                 self.blowing_orb = Rc::downgrade(&new_orb);
                 orbs.push(new_orb);
-                eprint!("WRITEME: play_sound inside Player#update()");
-                // game.play_sound("blow", 4);
+                play_game_random_sound(Some(self), &resources.blow_sounds);
                 self.fire_timer = 20;
             }
 
@@ -164,8 +165,7 @@ impl Player {
                 // Jump
                 self.vel_y = -16;
                 self.landed = false;
-                eprint!("WRITEME: play_sound inside Player#update()");
-                // game.play_sound("jump");
+                play_game_sound(Some(self), &resources.jump_sound);
             }
         }
 

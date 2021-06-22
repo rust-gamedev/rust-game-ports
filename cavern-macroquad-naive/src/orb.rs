@@ -13,6 +13,8 @@ use crate::{
     bolt::Bolt,
     collide_actor::CollideActor,
     fruit::Fruit,
+    game_playback::play_game_random_sound,
+    player::Player,
     pop::Pop,
     resources::Resources,
     robot::RobotType,
@@ -65,7 +67,13 @@ impl Orb {
         collided
     }
 
-    pub fn update(&mut self, fruits: &mut Vec<Fruit>, pops: &mut Vec<Pop>, grid: &[&str]) {
+    pub fn update(
+        &mut self,
+        fruits: &mut Vec<Fruit>,
+        pops: &mut Vec<Pop>,
+        player: Option<&Player>,
+        grid: &[&str],
+    ) {
         self.timer += 1;
 
         if self.floating {
@@ -89,8 +97,7 @@ impl Orb {
                 // powerup such as an extra life or extra health
                 fruits.push(Fruit::new(self.x, self.y, Some(trapped_enemy_type)));
             }
-            eprintln!("WRITEME: play sound inside Orb#update");
-            // game.play_sound("pop", 4);
+            play_game_random_sound(player, &storage::get::<Resources>().pop_sounds);
         }
 
         let resources = storage::get::<Resources>();
