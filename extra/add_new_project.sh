@@ -9,6 +9,14 @@ shopt -s inherit_errexit
 c_reference_project=boing-ggez
 c_help="\
 Usage: $(basename "$0") <project_name-suffix>
+
+Actions performed:
+
+- creates a new rust project, using \`$c_reference_project\` as template;
+- moves the resources/original code to the shared resources dir;
+- adds (another) of the python source file into the project;
+- symlinks the game resources into the project.
+
 The suffix is for the new project, and it's optional; it supports dashes."
 
 v_original_project=
