@@ -7,14 +7,36 @@ set -o errtrace
 shopt -s inherit_errexit
 
 c_reference_project=boing-ggez
+c_help="\
+Usage: $(basename "$0") <project_name-suffix>
+The suffix is for the new project, and it's optional; it supports dashes."
+
 v_original_project=
 v_new_project=
 
 function decode_cmdline_args {
-  if [[ $# -ne 1 || $1 == "-h" || $1 == "--help" ]]; then
-    echo "Usage: $(basename "$0") <project_name-suffix>"
-    echo "The suffix is for the new project, and it's optional; it supports dashes."
-    exit 0
+  local params
+  params=$(getopt --options h --long help --name "$(basename "$0")" -- "$@")
+
+  eval set -- "$params"
+
+  # DON'T FORGET THE `shift` commands and the `--` case.
+  # Rigorously, one should add the '*' case (internal error), but it's not required.
+  #
+  while true; do
+    case $1 in
+      -h|--help)
+        echo "$c_help"
+        exit 0 ;;
+      --)
+        shift
+        break ;;
+    esac
+  done
+
+  if [[ $# -ne 1 ]]; then
+    echo "$c_help"
+    exit 1
   fi
 
   v_original_project=${1%%-*}
