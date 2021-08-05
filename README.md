@@ -13,11 +13,11 @@ Other ports will be slowly added. There may be a Bevy port of Boing, but general
 
 The project is composed of the clones of five classic games:
 
-- Pong
-- Bubble Bobble
-- Frogger
-- Centipede
-- Sensible Soccer
+- Pong ("Boing")
+- Bubble Bobble ("Cavern")
+- Frogger ("Bunner")
+- Centipede ("Myriapod")
+- Sensible Soccer ("Soccer")
 
 ## Original project
 
