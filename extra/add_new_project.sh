@@ -65,9 +65,15 @@ function check_project_name {
 function add_project {
   cargo new "$v_new_project"
 
-  rsync -av --relative "$c_reference_project/./Cargo.toml" "$c_reference_project/./rust-toolchain" "$c_reference_project/./.cargo" "$v_new_project/"
+  rsync -av --relative \
+    "$c_reference_project/./Cargo.toml" \
+    "$c_reference_project/./rust-toolchain" \
+    "$c_reference_project/./.cargo" \
+    "$v_new_project/"
 
-  perl -i -pe "s/$c_reference_project/$v_new_project/" "$v_new_project/Cargo.toml"
+  perl -i -pe \
+    "s/$c_reference_project/$v_new_project/" \
+    "$v_new_project/Cargo.toml"
 
   # At this stage, the file can be already under `resources/`, or not.
   # It could also be under previous ports of the same game, so we can't just glob the way.
