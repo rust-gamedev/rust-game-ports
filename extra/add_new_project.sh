@@ -6,7 +6,7 @@ set -o nounset
 set -o errtrace
 shopt -s inherit_errexit
 
-c_reference_project=boing-ggez
+c_reference_project=cavern-macroquad-naive
 c_help="\
 Usage: $(basename "$0") <project_name-suffix>
 
