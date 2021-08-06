@@ -22,24 +22,5 @@
       "args": [],
       "cwd": "${workspaceFolder}"
     },
-    {
-      "type": "lldb",
-      "request": "launch",
-      "name": "Debug unit tests in executable 'cavern-macroquad-naive'",
-      "cargo": {
-        "args": [
-          "test",
-          "--no-run",
-          "--bin=cavern-macroquad-naive",
-          "--package=cavern-macroquad-naive"
-        ],
-        "filter": {
-          "name": "cavern-macroquad-naive",
-          "kind": "bin"
-        }
-      },
-      "args": [],
-      "cwd": "${workspaceFolder}"
-    }
   ]
 }
