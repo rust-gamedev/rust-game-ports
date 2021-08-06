@@ -69,11 +69,13 @@ function add_project {
     "$c_reference_project/./Cargo.toml" \
     "$c_reference_project/./rust-toolchain" \
     "$c_reference_project/./.cargo" \
+    "$c_reference_project/./.vscode" \
     "$v_new_project/"
 
   perl -i -pe \
     "s/$c_reference_project/$v_new_project/" \
-    "$v_new_project/Cargo.toml"
+    "$v_new_project/Cargo.toml" \
+    "$v_new_project/.vscode/launch.json"
 
   # At this stage, the file can be already under `resources/`, or not.
   # It could also be under previous ports of the same game, so we can't just glob the way.
