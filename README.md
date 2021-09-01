@@ -4,10 +4,12 @@ Rust ports of [Code the Classics](https://wireframe.raspberrypi.org/books/code-t
 
 The current completed ports are:
 
-- Boing: ggez
-- Cavern: Macroquad (naive port)
+- Boing: [ggez](https://github.com/ggez/ggez)
+- Cavern: [Macroquad](https://github.com/not-fl3/macroquad) (without experimental crates)
 
-Other ports will be slowly added. There may be a Bevy port of Boing, but generally, Macroquad will be used (with idiomatically written ports).
+Currently, a [Tetra](https://github.com/17cupsofcoffee/Tetra) port is in progress, with [Legion](https://github.com/amethyst/legion) as storage. Subsequently (and separately), it will be integrated with [Tiled](https://github.com/mapeditor/tiled) or [LDtk](https://github.com/deepnight/ldtk).
+
+The next scheduled ports are [Bevy](https://github.com/bevyengine/bevy), and potentially, [RG3D](https://github.com/rg3dengine/rg3d).
 
 ## Games
 
