@@ -1,28 +1,28 @@
-# If the window is too tall to fit on the screen, check your operating system display settings and reduce display
-# scaling if it is enabled.
-import pgzero, pgzrun, pygame, sys
-from random import *
-from enum import Enum
-
-# Check Python version number. sys.version_info gives version as a tuple, e.g. if (3,7,2,'final',0) for version 3.7.2.
-# Unlike many languages, Python can compare two tuples in the same way that you can compare numbers.
-if sys.version_info < (3,5):
-    print("This game requires at least version 3.5 of Python. Please download it from www.python.org")
-    sys.exit()
-
-# Check Pygame Zero version. This is a bit trickier because Pygame Zero only lets us get its version number as a string.
-# So we have to split the string into a list, using '.' as the character to split on. We convert each element of the
-# version number into an integer - but only if the string contains numbers and nothing else, because it's possible for
-# a component of the version to contain letters as well as numbers (e.g. '2.0.dev0')
-# We're using a Python feature called list comprehension - this is explained in the Bubble Bobble/Cavern chapter.
-pgzero_version = [int(s) if s.isnumeric() else s for s in pgzero.__version__.split('.')]
-if pgzero_version < [1,2]:
-    print("This game requires at least version 1.2 of Pygame Zero. You have version {0}. Please upgrade using the command 'pip3 install --upgrade pgzero'".format(pgzero.__version__))
-    sys.exit()
-
-WIDTH = 480
-HEIGHT = 800
-TITLE = "Infinite Bunner"
+# # If the window is too tall to fit on the screen, check your operating system display settings and reduce display
+# # scaling if it is enabled.
+# import pgzero, pgzrun, pygame, sys
+# from random import *
+# from enum import Enum
+#
+# # Check Python version number. sys.version_info gives version as a tuple, e.g. if (3,7,2,'final',0) for version 3.7.2.
+# # Unlike many languages, Python can compare two tuples in the same way that you can compare numbers.
+# if sys.version_info < (3,5):
+#     print("This game requires at least version 3.5 of Python. Please download it from www.python.org")
+#     sys.exit()
+#
+# # Check Pygame Zero version. This is a bit trickier because Pygame Zero only lets us get its version number as a string.
+# # So we have to split the string into a list, using '.' as the character to split on. We convert each element of the
+# # version number into an integer - but only if the string contains numbers and nothing else, because it's possible for
+# # a component of the version to contain letters as well as numbers (e.g. '2.0.dev0')
+# # We're using a Python feature called list comprehension - this is explained in the Bubble Bobble/Cavern chapter.
+# pgzero_version = [int(s) if s.isnumeric() else s for s in pgzero.__version__.split('.')]
+# if pgzero_version < [1,2]:
+#     print("This game requires at least version 1.2 of Pygame Zero. You have version {0}. Please upgrade using the command 'pip3 install --upgrade pgzero'".format(pgzero.__version__))
+#     sys.exit()
+#
+# WIDTH = 480
+# HEIGHT = 800
+# TITLE = "Infinite Bunner"
 
 ROW_HEIGHT = 40
 
@@ -385,16 +385,16 @@ def classify_hedge_segment(mask, previous_mid_segment):
 
 class Grass(Row):
     def __init__(self, predecessor, index, y):
-        super().__init__("grass", index, y)
+        # super().__init__("grass", index, y)
 
-        # In computer graphics, a mask is a series of boolean (true or false) values indicating which parts of an image
-        # will be transparent. Grass rows may contain hedges which block the player's movement, and we use a similar
-        # mechanism here. In our hedge mask, values of False mean a hedge is present, while True means there is a gap
-        # in the hedges. Hedges are two rows high - once hedges have been created on a row, the pattern will be
-        # duplicated on the next row (although the sprites will be different - e.g. there are separate sprites
-        # for the top-left and bottom-left corners of a hedge). Note that the upper sprites overlap with the row above.
-        self.hedge_row_index = None     # 0 or 1, or None if no hedges on this row
-        self.hedge_mask = None
+        # # In computer graphics, a mask is a series of boolean (true or false) values indicating which parts of an image
+        # # will be transparent. Grass rows may contain hedges which block the player's movement, and we use a similar
+        # # mechanism here. In our hedge mask, values of False mean a hedge is present, while True means there is a gap
+        # # in the hedges. Hedges are two rows high - once hedges have been created on a row, the pattern will be
+        # # duplicated on the next row (although the sprites will be different - e.g. there are separate sprites
+        # # for the top-left and bottom-left corners of a hedge). Note that the upper sprites overlap with the row above.
+        # self.hedge_row_index = None     # 0 or 1, or None if no hedges on this row
+        # self.hedge_mask = None
 
         if not isinstance(predecessor, Grass) or predecessor.hedge_row_index == None:
             # Create a brand-new set of hedges? We will only create hedges if the previous row didn't have any.
@@ -637,7 +637,7 @@ class Rail(Row):
 
 class Game:
     def __init__(self, bunner=None):
-        self.bunner = bunner
+        # self.bunner = bunner
         self.looped_sounds = {}
 
         try:
@@ -649,13 +649,13 @@ class Game:
         except:
             pass
 
-        self.eagle = None
-        self.frame = 0
-
-        # First (bottom) row is always grass
-        self.rows = [Grass(None, 0, 0)]
-
-        self.scroll_pos = -HEIGHT
+#         self.eagle = None
+#         self.frame = 0
+#
+#         # First (bottom) row is always grass
+#         self.rows = [Grass(None, 0, 0)]
+#
+#         self.scroll_pos = -HEIGHT
 
     def update(self):
         if self.bunner:
@@ -817,10 +817,10 @@ def display_number(n, colour, x, align):
 
 # Pygame Zero calls the update and draw functions each frame
 
-class State(Enum):
-    MENU = 1
-    PLAY = 2
-    GAME_OVER = 3
+# class State(Enum):
+#     MENU = 1
+#     PLAY = 2
+#     GAME_OVER = 3
 
 def update():
     global state, game, high_score
@@ -857,21 +857,21 @@ def update():
             state = State.MENU
             game = Game()
 
-def draw():
-    game.draw()
+# def draw():
+#     game.draw()
+#
+    # if state == State.MENU:
+    #     screen.blit("title", (0, 0))
+    #     screen.blit("start" + str([0, 1, 2, 1][game.scroll_pos // 6 % 4]), ((WIDTH - 270) // 2, HEIGHT - 240))
 
-    if state == State.MENU:
-        screen.blit("title", (0, 0))
-        screen.blit("start" + str([0, 1, 2, 1][game.scroll_pos // 6 % 4]), ((WIDTH - 270) // 2, HEIGHT - 240))
+    # elif state == State.PLAY:
+    #     # Display score and high score
+    #     display_number(game.score(), 0, 0, 0)
+    #     display_number(high_score, 1, WIDTH - 10, 1)
 
-    elif state == State.PLAY:
-        # Display score and high score
-        display_number(game.score(), 0, 0, 0)
-        display_number(high_score, 1, WIDTH - 10, 1)
-
-    elif state == State.GAME_OVER:
-        # Display "Game Over" image
-        screen.blit("gameover", (0, 0))
+    # elif state == State.GAME_OVER:
+    #     # Display "Game Over" image
+    #     screen.blit("gameover", (0, 0))
 
 # Set up sound system
 try:
@@ -887,13 +887,13 @@ try:
     with open("high.txt", "r") as f:
         high_score = int(f.read())
 except:
-    # If opening the file fails (likely because it hasn't yet been created), set high score to 0
-    high_score = 0
+    # # If opening the file fails (likely because it hasn't yet been created), set high score to 0
+    # high_score = 0
 
-# Set the initial game state
-state = State.MENU
+# # Set the initial game state
+# state = State.MENU
 
-# Create a new Game object, without a Player object
-game = Game()
+# # Create a new Game object, without a Player object
+# game = Game()
 
-pgzrun.go()
+# pgzrun.go()
