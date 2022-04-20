@@ -1,26 +1,17 @@
-# Code the Classics: Rust port
+# Rust Game Ports
 
-Rust ports of [Code the Classics](https://wireframe.raspberrypi.org/books/code-the-classics1), using different engines and approaches.
+My ports of open source games to Rust, using different pure-Rust game engines.
 
 The current completed ports are:
 
-- Boing: [ggez](https://github.com/ggez/ggez)
-- Cavern: [Macroquad](https://github.com/not-fl3/macroquad) (without experimental crates)
+- Code the Classics Vol. 1/Boing: ported to [ggez](https://github.com/ggez/ggez)
+- Code the Classics Vol. 1/Cavern: ported to [Macroquad](https://github.com/not-fl3/macroquad) (without using experimental features)
 
-Currently, a [Tetra](https://github.com/17cupsofcoffee/Tetra) port is in progress, with [Legion](https://github.com/amethyst/legion) as storage. Subsequently (and separately), it will be integrated with [Tiled](https://github.com/mapeditor/tiled) or [LDtk](https://github.com/deepnight/ldtk).
+My current plans are to port:
 
-The next scheduled ports are [Bevy](https://github.com/bevyengine/bevy), and potentially, [RG3D](https://github.com/rg3dengine/rg3d).
+- [Rusty Roguelike](https://github.com/thebracket/HandsOnRust) to [Bevy](https://github.com/bevyengine/bevy)
+- Other Code the Classics Vol. 1 games to [Fyrox](https://github.com/FyroxEngine/Fyrox)
 
-## Games
+## Source Projects
 
-The project is composed of the clones of five classic games:
-
-- Pong ("Boing")
-- Bubble Bobble ("Cavern")
-- Frogger ("Bunner")
-- Centipede ("Myriapod")
-- Sensible Soccer ("Soccer")
-
-## Original project
-
-The original project is written in Python, with PyGame Zero. A beautiful [book](https://wireframe.raspberrypi.org/books/code-the-classics1) has been published, which can also be downloaded for free; of course, readers are strongly encouraged to buy a copy, which is very cheap (8£).
+- Code the Classics Vol. 1 ([repository](https://github.com/Wireframe-Magazine/Code-the-Classics) and [book](https://wireframe.raspberrypi.org/books/code-the-classics1)): A very beautiful book on beginning game programming, written in Python; the project comprises of several games of different genres, each with a surprising complexity under the hood
