@@ -1,8 +1,0 @@
-[package]
-authors = ["Saverio Miroddi <saverio.pub2@gmail.com>"]
-edition = "2018"
-name = "bunner-tetra"
-version = "0.1.0"
-
-[dependencies]
-tetra = "0.6.5"
