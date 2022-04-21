@@ -5,6 +5,6 @@ name = "boing-ggez"
 version = "0.1.0"
 
 [dependencies]
-fastrand = "1.4.1"
-ggez = {git = "https://github.com/ggez/ggez", rev = "63e246d68bb400509134f217bc565fcd17df31e8"}# 0.6.0-rc1 (no tag)
-glam = {version = "0.15.2", features = ["mint"]}
+fastrand = "1.7.0"
+ggez = "0.7.0"
+glam = {version = "0.20.5", features = ["mint"]}
