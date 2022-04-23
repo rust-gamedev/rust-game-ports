@@ -20,3 +20,10 @@ Planned:
 ## Source Projects
 
 - Code the Classics Vol. 1 ([repository](https://github.com/Wireframe-Magazine/Code-the-Classics) and [book](https://wireframe.raspberrypi.org/books/code-the-classics1)): A very beautiful book on beginning game programming, written in Python; the project comprises of several games of different genres, each with a surprising complexity under the hood
+
+## Projects structure/configuration
+
+- all the projects share a Cargo configuration (in the repository root), with tweaks to speedup the compilation
+- each project uses a `nightly` Rust toolchain, in order to take advantage of the Cargo configuration
+- each project has a dedicated Visual Studio Code configuration (`.vscode` directory)
+- the Rusty Roguelike project has one directory (workspace) for each step, but a shared `target` directory (in the parent directory of the projects)
