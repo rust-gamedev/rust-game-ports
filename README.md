@@ -2,14 +2,19 @@
 
 My ports of open source games to Rust, using different pure-Rust game engines.
 
-The current completed ports are:
+## Ports plan
+
+The completed ports are:
 
 - Code the Classics Vol. 1/Boing: ported to [ggez](https://github.com/ggez/ggez)
 - Code the Classics Vol. 1/Cavern: ported to [Macroquad](https://github.com/not-fl3/macroquad) (without using experimental features)
 
-My current plans are to port:
+Work in progress:
 
 - [Rusty Roguelike](https://github.com/thebracket/HandsOnRust) to [Bevy](https://github.com/bevyengine/bevy)
+
+Planned:
+
 - Other Code the Classics Vol. 1 games to [Fyrox](https://github.com/FyroxEngine/Fyrox)
 
 ## Source Projects
