@@ -2,7 +2,7 @@ use crate::prelude::*;
 
 pub fn player_input(
     mut query: Query<(&Player, &mut PointC)>, //(1) (2)
-    (map, key, mut camera): (Res<Map>, Option<Res<VirtualKeyCode>>, ResMut<crate::Camera>),
+    (map, key, mut camera): (Res<Map>, Option<Res<VirtualKeyCode>>, ResMut<Camera>),
 ) {
     if let Some(key) = key.as_deref() {
         let delta = match key {

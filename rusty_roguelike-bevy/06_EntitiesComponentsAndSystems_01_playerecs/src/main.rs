@@ -38,7 +38,7 @@ impl State {
         // start, in this case).
         ecs.add_startup_system(move |cmd: Commands| spawn_player(cmd, map_builder.player_start));
         ecs.insert_resource(map_builder.map);
-        ecs.insert_resource(crate::Camera::new(map_builder.player_start));
+        ecs.insert_resource(Camera::new(map_builder.player_start));
         ecs.add_system_set(build_system_set());
         // The following two statements simulate Bevy's App#run(), giving us ownership of App.
         ecs = std::mem::replace(&mut ecs, App::empty());
