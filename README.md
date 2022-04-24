@@ -11,7 +11,7 @@ The completed ports are:
 
 Work in progress:
 
-- [Rusty Roguelike](https://github.com/thebracket/HandsOnRust) to [Bevy](https://github.com/bevyengine/bevy)
+- Hands-on Rust: Effective Learning.../Rusty Roguelike: porting to [Bevy](https://github.com/bevyengine/bevy)
 
 Planned:
 
@@ -20,6 +20,7 @@ Planned:
 ## Source Projects
 
 - Code the Classics Vol. 1 ([repository](https://github.com/Wireframe-Magazine/Code-the-Classics) and [book](https://wireframe.raspberrypi.org/books/code-the-classics1)): A very beautiful book on beginning game programming, written in Python; the project comprises of several games of different genres, each with a surprising complexity under the hood
+- Rust Roguelike/Hands-on Rust: Effective Learning... ([repository](https://github.com/thebracket/HandsOnRust) and [book](https://pragprog.com/titles/hwrust/hands-on-rust)): Another great book, on writing games in Rust; the project is divided in clear and progressive steps, and it's, in my opinion, the most effective way to learn working with ECSs (in this case, [Legion](https://github.com/amethyst/legion))
 
 ## Projects structure/configuration
 
