@@ -4,7 +4,6 @@ mod camera;
 mod components;
 mod map;
 mod map_builder;
-mod resources;
 mod spawner;
 mod systems;
 
@@ -20,7 +19,6 @@ mod prelude {
     pub use crate::components::*;
     pub use crate::map::*;
     pub use crate::map_builder::*;
-    pub use crate::resources::*;
     pub use crate::spawner::*;
     pub use crate::systems::*;
 }
@@ -55,9 +53,13 @@ impl GameState for State {
         ctx.cls();
         ctx.set_active_console(1);
         ctx.cls();
-        // We cheat a bit here. Dynamic resources handling should be in a system; in fact, App doesn't
-        // support resources removal; we keep this structure for consistency with the source.
-        self.ecs.insert_resource(VirtualKeyCodeR(ctx.key));
+        if let Some(key) = ctx.key {
+            self.ecs.insert_resource(key);
+        } else {
+            // In order to keep consistency with the Legion version, we need to access Bevy's World
+            // directly, since App doesn't support removing resources.
+            self.ecs.world.remove_resource::<VirtualKeyCode>();
+        }
         self.ecs.update();
         render_draw_buffer(ctx).expect("Render error");
     }
