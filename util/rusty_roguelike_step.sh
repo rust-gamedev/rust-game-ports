@@ -6,15 +6,17 @@ set -o nounset
 set -o errtrace
 shopt -s inherit_errexit
 
-c_compare_mode=compare
+c_compare_curr_mode=compare_curr
+c_compare_source_prev_mode=compare_source_prev
 c_next_mode=next
 c_help="\
-Usage: $(basename "$0") [$c_compare_mode|$c_next_mode]
+Usage: $(basename "$0") [$c_compare_source_prev_mode|$c_next_mode]
 
-The script has two modes:
+The script has three modes:
 
-- $c_compare_mode: compares the source project current step (based on the latest port) with the previous one
-- $c_next_mode: create the next port step and updates the VS Code project
+- $c_compare_curr_mode        : compares the current step of the source vs port projects
+- $c_compare_source_prev_mode : compares the source project current step (based on the latest port) with the previous one
+- $c_next_mode                : create the next port step and updates the VS Code project
   - removes the old steps and adds the new ones
   - requires env variable RUST_GAME_PORTS_VSCODE_PROJECT pointing to the project file
 "
@@ -50,10 +52,7 @@ function decode_cmdline_args {
 }
 
 function check_params {
-  if [[ $v_mode != "$c_compare_mode" && $v_mode != "$c_next_mode" ]]; then
-    >&2 echo "Wrong mode!: $v_mode"
-    exit 1
-  fi
+  # $v_mode is tested in the main switch/case.
 
   if [[ $v_mode == "$c_next_mode" && -z "${RUST_GAME_PORTS_VSCODE_PROJECT:-}" ]]; then
     >&2 echo "Variable RUST_GAME_PORTS_VSCODE_PROJECT not set!"
@@ -101,6 +100,12 @@ function find_step {
   echo -n "$target_step"
 }
 
+function compare_current_steps {
+  local current_step=$1
+
+  "$c_compare_program" "$c_source_base_dir/$current_step" "$c_port_base_dir/$current_step"
+}
+
 function compare_source_steps {
   local previous_step=$1 current_step=$2
 
@@ -134,11 +139,21 @@ check_params
 
 current_step=$(find_current_step)
 
-if [[ $v_mode == "$c_compare_mode" ]]; then
+case $v_mode in
+"$c_compare_curr_mode")
+  compare_current_steps "$current_step"
+  ;;
+"$c_compare_source_prev_mode")
   previous_step=$(find_step preceding "$current_step")
   compare_source_steps "$previous_step" "$current_step"
-else
+  ;;
+"$c_next_mode")
   next_step=$(find_step following "$current_step")
   create_next_port_step "$current_step" "$next_step"
   replace_vsc_project_steps "$current_step" "$next_step"
-fi
+  ;;
+*)
+  >&2 echo "Invalid mode: $v_mode"
+  exit 1
+  ;;
+esac
