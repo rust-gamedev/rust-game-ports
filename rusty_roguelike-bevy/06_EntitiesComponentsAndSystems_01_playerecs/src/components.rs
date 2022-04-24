@@ -1,4 +1,4 @@
-pub use crate::prelude::*;
+use crate::prelude::*;
 
 #[derive(Component)]
 pub struct Render {

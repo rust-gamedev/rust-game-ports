@@ -1,7 +1,7 @@
 use crate::prelude::*;
 
-pub fn spawn_player(mut commands: Commands, pos: Point) {
-    commands.spawn_bundle((
+pub fn spawn_player(world: &mut World, pos: Point) {
+    world.spawn().insert_bundle((
         Player,
         PointC(pos),
         Render {
