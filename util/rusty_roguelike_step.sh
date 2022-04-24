@@ -6,15 +6,15 @@ set -o nounset
 set -o errtrace
 shopt -s inherit_errexit
 
-c_compare_mode=compare
+c_compare_source_prev_mode=compare_source_prev
 c_next_mode=next
 c_help="\
-Usage: $(basename "$0") [$c_compare_mode|$c_next_mode]
+Usage: $(basename "$0") [$c_compare_source_prev_mode|$c_next_mode]
 
 The script has two modes:
 
-- $c_compare_mode: compares the source project current step (based on the latest port) with the previous one
-- $c_next_mode: create the next port step and updates the VS Code project
+- $c_compare_source_prev_mode : compares the source project current step (based on the latest port) with the previous one
+- $c_next_mode                : create the next port step and updates the VS Code project
   - removes the old steps and adds the new ones
   - requires env variable RUST_GAME_PORTS_VSCODE_PROJECT pointing to the project file
 "
@@ -50,7 +50,7 @@ function decode_cmdline_args {
 }
 
 function check_params {
-  if [[ $v_mode != "$c_compare_mode" && $v_mode != "$c_next_mode" ]]; then
+  if [[ $v_mode != "$c_compare_source_prev_mode" && $v_mode != "$c_next_mode" ]]; then
     >&2 echo "Wrong mode!: $v_mode"
     exit 1
   fi
@@ -134,7 +134,7 @@ check_params
 
 current_step=$(find_current_step)
 
-if [[ $v_mode == "$c_compare_mode" ]]; then
+if [[ $v_mode == "$c_compare_source_prev_mode" ]]; then
   previous_step=$(find_step preceding "$current_step")
   compare_source_steps "$previous_step" "$current_step"
 else
