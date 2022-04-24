@@ -8,10 +8,9 @@ mod spawner;
 mod systems;
 
 mod prelude {
-    // Don't use the whole prelude, in order to avoid clashing with types with common names (e.g. Camera).
-    pub use bevy::prelude::{
-        App, Commands, Component, Plugin, Query, Res, ResMut, SystemSet, World,
-    };
+    pub use bracket_lib::prelude::*;
+    // Keep a space, in order to prevent IDEs to reorder imports, which causes clashing.
+    pub use bevy::prelude::*;
     pub use bracket_lib::prelude::*;
     pub const SCREEN_WIDTH: i32 = 80;
     pub const SCREEN_HEIGHT: i32 = 50;
