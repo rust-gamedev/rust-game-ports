@@ -9,7 +9,9 @@ mod systems;
 
 mod prelude {
     // Don't use the whole prelude, in order to avoid clashing with types with common names (e.g. Camera).
-    pub use bevy::prelude::{App, Commands, Component, Plugin, Query, Res, ResMut, SystemSet};
+    pub use bevy::prelude::{
+        App, Commands, Component, Plugin, Query, Res, ResMut, SystemSet, World,
+    };
     pub use bracket_lib::prelude::*;
     pub const SCREEN_WIDTH: i32 = 80;
     pub const SCREEN_HEIGHT: i32 = 50;
@@ -34,11 +36,12 @@ impl State {
         let mut ecs = App::new();
         let mut rng = RandomNumberGenerator::new();
         let map_builder = MapBuilder::new(&mut rng);
-        // This is the way to add a (startup) system by passing a preset local resource (the player
-        // start, in this case).
-        ecs.add_startup_system(move |cmd: Commands| spawn_player(cmd, map_builder.player_start));
+        // This is not a strict-ECS approach (a system would), but we mimick the source project design.
+        spawn_player(&mut ecs.world, map_builder.player_start);
         ecs.insert_resource(map_builder.map);
         ecs.insert_resource(Camera::new(map_builder.player_start));
+        // In the source project, set of actions (`Schedule`s) are owned by State (`systems: Schedule`);
+        // here, they're owned by the Bevy ECS, as `SystemSet`s.
         ecs.add_system_set(build_system_set());
         // The following two statements simulate Bevy's App#run(), giving us ownership of App.
         ecs = std::mem::replace(&mut ecs, App::empty());
