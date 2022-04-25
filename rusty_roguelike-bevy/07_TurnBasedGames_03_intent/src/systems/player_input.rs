@@ -3,7 +3,7 @@ use crate::prelude::*;
 pub fn player_input(
     mut commands: Commands,
     mut move_events: EventWriter<WantsToMove>,
-    mut query: Query<(Entity, &PointC)>, //(1) (2)
+    mut query: Query<(Entity, &PointC), With<Player>>, //(1) (2)
     (key, mut turn_state): (Option<Res<VirtualKeyCode>>, ResMut<State<TurnState>>),
 ) {
     use TurnState::PlayerTurn;
