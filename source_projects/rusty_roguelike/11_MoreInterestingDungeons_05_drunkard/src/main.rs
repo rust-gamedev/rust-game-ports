@@ -1,4 +1,5 @@
 #![warn(clippy::pedantic)]
+#![allow(dead_code)]
 
 mod camera;
 mod components;

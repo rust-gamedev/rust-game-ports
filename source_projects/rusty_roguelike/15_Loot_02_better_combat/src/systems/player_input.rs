@@ -87,7 +87,6 @@ pub fn player_input(
                 });
 
             if !hit_something {
-                did_something = true;
                 commands.push((
                     (),
                     WantsToMove {
