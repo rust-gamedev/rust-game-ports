@@ -1,7 +1,7 @@
 use crate::prelude::*;
 
 pub fn collisions(
-    mut cmd: Commands,
+    mut commands: Commands,
     // Note that we can use two independent queries both accessing PointC, because they have compatible
     // access type (immutable); if they were incompatible, we would have needed ParamSet.
     player_query: Query<&PointC, With<Player>>,
@@ -15,5 +15,5 @@ pub fn collisions(
     enemies_query
         .iter()
         .filter(|(_, pos)| pos.0 == player_pos)
-        .for_each(|(entity, _)| cmd.entity(entity).despawn());
+        .for_each(|(entity, _)| commands.entity(entity).despawn());
 }
