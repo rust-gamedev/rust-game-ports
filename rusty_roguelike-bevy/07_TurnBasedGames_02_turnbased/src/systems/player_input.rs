@@ -1,6 +1,7 @@
 use crate::prelude::*;
 
 pub fn player_input(
+    mut commands: Commands,
     mut query: Query<(&Player, &mut PointC)>, //(1) (2)
     (map, key, mut camera, mut turn_state): (
         Res<Map>,
@@ -31,5 +32,13 @@ pub fn player_input(
                 }
             }
         }
+
+        // WATCH OUT!! If they key resource is not removed, multiple keypresses will be detected over
+        // the same frame. This is because a system (set) may run multiple times over a frame, due to
+        // state circularity.
+        // By removing they key, once this system is run a second time, no keypress is detected, and
+        // the circle stops.
+        //
+        commands.remove_resource::<VirtualKeyCode>();
     }
 }
