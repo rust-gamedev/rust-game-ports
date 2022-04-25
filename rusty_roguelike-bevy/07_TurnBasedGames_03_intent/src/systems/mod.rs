@@ -11,12 +11,9 @@ mod random_move;
 #[derive(Debug, Clone, PartialEq, Eq, Hash, SystemLabel)]
 enum SystemSets {
     PlayerInput,
-    Render,
-    PlayerMovement,
+    Movement,
     Collision,
     RandomMove,
-    MonsterMovement,
-    RenderAndEndTurn,
 }
 
 pub fn build_system_sets(app: &mut App) {
@@ -24,11 +21,7 @@ pub fn build_system_sets(app: &mut App) {
     use TurnState::*;
 
     // In Bevy, we group the systems, label them, and establish the temporal associations; this is somewhat
-    // harder to visualize, but it's more structured.
-    // An advantage in this case is that a common group (RenderAndEndTurn) is deduplicated.
-    // A disadvantage is that we can't model complex associations.
-
-    // State: AwaitingInput
+    // harder to visualize, but it's more flexible.
 
     app.add_system_set(
         SystemSet::on_update(AwaitingInput)
@@ -36,27 +29,30 @@ pub fn build_system_sets(app: &mut App) {
             .with_system(player_input::player_input),
     )
     .add_system_set(
-        SystemSet::new()
-            .label(Render)
+        SystemSet::on_update(AwaitingInput)
             .after(PlayerInput)
             .with_system(map_render::map_render)
             .with_system(entity_render::entity_render),
     );
 
-    // State: PlayerTurn (without rendering)
-
     app.add_system_set(
         SystemSet::on_update(PlayerTurn)
-            .label(PlayerMovement)
+            .label(Movement)
             .with_system(movement::movement),
     )
     .add_system_set(
-        SystemSet::new()
+        SystemSet::on_update(PlayerTurn)
             .label(Collision)
+            .after(Movement)
             .with_system(collisions::collisions),
+    )
+    .add_system_set(
+        SystemSet::on_update(PlayerTurn)
+            .after(Collision)
+            .with_system(map_render::map_render)
+            .with_system(entity_render::entity_render)
+            .with_system(end_turn::end_turn),
     );
-
-    // State: MonsterTurn (without rendering)
 
     app.add_system_set(
         SystemSet::on_update(MonsterTurn)
@@ -64,19 +60,14 @@ pub fn build_system_sets(app: &mut App) {
             .with_system(random_move::random_move),
     )
     .add_system_set(
-        SystemSet::new()
-            .label(MonsterMovement)
+        SystemSet::on_update(MonsterTurn)
+            .label(Movement)
             .after(RandomMove)
             .with_system(movement::movement),
-    );
-
-    // Rendering (shared between PlayerTurn and MonsterTurn)
-
-    app.add_system_set(
-        SystemSet::new()
-            .label(RenderAndEndTurn)
-            .after(Collision)
-            .after(MonsterMovement)
+    )
+    .add_system_set(
+        SystemSet::on_update(MonsterTurn)
+            .after(Movement)
             .with_system(map_render::map_render)
             .with_system(entity_render::entity_render)
             .with_system(end_turn::end_turn),
