@@ -1,7 +1,7 @@
 use crate::prelude::*;
 
-pub fn random_move(mut query: Query<&mut PointC, With<MovingRandomly>>, map: Res<Map>) {
-    query.iter_mut().for_each(|mut pos| {
+pub fn random_move(mut movers: Query<&mut PointC, With<MovingRandomly>>, map: Res<Map>) {
+    movers.iter_mut().for_each(|mut pos| {
         let mut rng = RandomNumberGenerator::new();
         let destination = match rng.range(0, 4) {
             0 => Point::new(-1, 0),
