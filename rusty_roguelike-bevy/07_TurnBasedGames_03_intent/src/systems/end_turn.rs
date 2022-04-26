@@ -4,7 +4,9 @@ pub fn end_turn(mut turn_state: ResMut<State<TurnState>>) {
     use TurnState::*;
 
     let new_state = match turn_state.current() {
-        AwaitingInput => return,
+        // In the source project, AwaitingInput returns AwaitingInput, however, it's actually an unreachable
+        // case, because the change to the next state (PlayerTurn) is performed in the `player_input` system.
+        AwaitingInput => unreachable!(),
         PlayerTurn => MonsterTurn,
         MonsterTurn => AwaitingInput,
     };
