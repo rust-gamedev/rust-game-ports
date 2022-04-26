@@ -4,10 +4,8 @@ pub fn player_input(
     mut commands: Commands,
     mut move_events: EventWriter<WantsToMove>,
     mut query: Query<(Entity, &PointC), With<Player>>, //(1) (2)
-    (key, mut turn_state): (Option<Res<VirtualKeyCode>>, ResMut<State<TurnState>>),
+    key: Option<Res<VirtualKeyCode>>,
 ) {
-    use TurnState::PlayerTurn;
-
     if let Some(key) = key.as_deref() {
         let delta = match key {
             VirtualKeyCode::Left => Point::new(-1, 0),
@@ -27,7 +25,7 @@ pub fn player_input(
                 });
             }
         }
-        turn_state.set(PlayerTurn).unwrap();
+        commands.insert_resource(NextState(GameStep::MovePlayer));
 
         // WATCH OUT!! If they key resource is not removed, multiple keypresses will be detected over
         // the same frame. This is because a system (set) may run multiple times over a frame, due to
