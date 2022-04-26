@@ -70,7 +70,7 @@ impl GameState for State {
             // directly, since App doesn't support removing resources.
             self.ecs.world.remove_resource::<VirtualKeyCode>();
         }
-        // Bevy takes care of running the systems associate to the current state.
+        // Bevy takes care of running the systems associated to the current state.
         self.ecs.update();
         render_draw_buffer(ctx).expect("Render error");
     }
