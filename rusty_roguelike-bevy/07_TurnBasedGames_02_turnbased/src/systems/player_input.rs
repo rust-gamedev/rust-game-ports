@@ -3,15 +3,8 @@ use crate::prelude::*;
 pub fn player_input(
     mut commands: Commands,
     mut query: Query<(&Player, &mut PointC)>, //(1) (2)
-    (map, key, mut camera, mut turn_state): (
-        Res<Map>,
-        Option<Res<VirtualKeyCode>>,
-        ResMut<Camera>,
-        ResMut<State<TurnState>>,
-    ),
+    (map, key, mut camera): (Res<Map>, Option<Res<VirtualKeyCode>>, ResMut<Camera>),
 ) {
-    use TurnState::PlayerTurn;
-
     if let Some(key) = key.as_deref() {
         let delta = match key {
             VirtualKeyCode::Left => Point::new(-1, 0),
@@ -28,7 +21,7 @@ pub fn player_input(
                 if map.can_enter_tile(destination) {
                     pos.0 = destination;
                     camera.on_player_move(destination);
-                    turn_state.set(PlayerTurn).unwrap();
+                    commands.insert_resource(NextState(GameStep::PlayerCollisions));
                 }
             }
         }

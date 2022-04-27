@@ -7,3 +7,4 @@ version = "0.1.0"
 [dependencies]
 bevy = {version = "0.7.0", default-features = false, features = ["dynamic"]}
 bracket-lib = "~0.8.1"
+iyes_loopless = "0.5.1"

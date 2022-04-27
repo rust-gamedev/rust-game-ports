@@ -2,27 +2,28 @@
 
 mod camera;
 mod components;
+mod game_step;
 mod map;
 mod map_builder;
 mod spawner;
 mod systems;
-mod turn_state;
 
 mod prelude {
     pub use bracket_lib::prelude::*;
     // Keep a space, in order to prevent IDEs to reorder imports, which causes clashing.
     pub use bevy::prelude::*;
+    pub use iyes_loopless::prelude::*;
     pub const SCREEN_WIDTH: i32 = 80;
     pub const SCREEN_HEIGHT: i32 = 50;
     pub const DISPLAY_WIDTH: i32 = SCREEN_WIDTH / 2;
     pub const DISPLAY_HEIGHT: i32 = SCREEN_HEIGHT / 2;
     pub use crate::camera::*;
     pub use crate::components::*;
+    pub use crate::game_step::*;
     pub use crate::map::*;
     pub use crate::map_builder::*;
     pub use crate::spawner::*;
     pub use crate::systems::*;
-    pub use crate::turn_state::*;
 }
 
 use prelude::*;
@@ -46,7 +47,8 @@ impl State {
             .for_each(|pos| spawn_monster(&mut ecs.world, &mut rng, pos));
         ecs.insert_resource(map_builder.map);
         ecs.insert_resource(Camera::new(map_builder.player_start));
-        ecs.add_state(TurnState::AwaitingInput);
+        // Set the startup state.
+        ecs.add_loopless_state(GameStep::AwaitingInput);
         // In the source project, set of actions (`Schedule`s) are owned by State (`systems: Schedule`);
         // here, they're owned by the Bevy ECS, as `SystemSet`s.
         build_system_sets(&mut ecs);
@@ -70,7 +72,6 @@ impl GameState for State {
             // directly, since App doesn't support removing resources.
             self.ecs.world.remove_resource::<VirtualKeyCode>();
         }
-        // Bevy takes care of running the systems associated to the current state.
         self.ecs.update();
         render_draw_buffer(ctx).expect("Render error");
     }
