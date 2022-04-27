@@ -23,5 +23,15 @@ pub fn player_input(
                 }
             }
         }
+
+        // WATCH OUT!! If they key resource is not removed, multiple keypresses will be detected over
+        // the same frame. This is because a system (set) may run multiple times over a frame, due to
+        // state circularity.
+        // By removing they key, once this system is run a second time, no keypress is detected, and
+        // the circle stops.
+        // This may not be needed if there is one game step per frame, but it's good practice to keep
+        // in mind.
+        //
+        commands.remove_resource::<VirtualKeyCode>();
     }
 }
