@@ -3,8 +3,7 @@
 #[derive(Debug, Clone, Eq, PartialEq, Hash)]
 pub enum GameStep {
     AwaitingInput,
-    MovePlayer,
-    Collisions,
-    GenerateMonsterMoves,
-    MoveMonsters,
+    PlayerCollisions,
+    MonsterMoves,
+    MonsterCollisions,
 }

@@ -53,7 +53,7 @@ impl State {
         ecs.insert_resource(Camera::new(map_builder.player_start));
         // In Bevy, it's necessary to register the event types.
         ecs.add_event::<WantsToMove>();
-
+        // Set the startup state.
         ecs.add_loopless_state(AwaitingInput);
         // In the source project, set of actions (`Schedule`s) are owned by State (`systems: Schedule`);
         // here, they're owned by the Bevy ECS, as `SystemSet`s.
@@ -78,7 +78,6 @@ impl GameState for State {
             // directly, since App doesn't support removing resources.
             self.ecs.world.remove_resource::<VirtualKeyCode>();
         }
-        // Bevy takes care of running the systems associated to the current state.
         self.ecs.update();
         render_draw_buffer(ctx).expect("Render error");
     }
