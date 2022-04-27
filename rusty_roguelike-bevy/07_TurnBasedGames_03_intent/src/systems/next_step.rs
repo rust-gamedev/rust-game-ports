@@ -10,8 +10,8 @@ pub fn next_step(mut commands: Commands, turn_state: Res<CurrentState<GameStep>>
         // case, because the change to the next state (PlayerTurn) is performed in the `player_input` system.
         AwaitingInput => unreachable!(),
         MovePlayer => Collisions,
-        Collisions => GenerateMonstersMovements,
-        GenerateMonstersMovements => MoveMonsters,
+        Collisions => GenerateMonsterMoves,
+        GenerateMonsterMoves => MoveMonsters,
         MoveMonsters => AwaitingInput,
     };
 

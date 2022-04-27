@@ -5,6 +5,6 @@ pub enum GameStep {
     AwaitingInput,
     MovePlayer,
     Collisions,
-    GenerateMonstersMovements,
+    GenerateMonsterMoves,
     MoveMonsters,
 }
