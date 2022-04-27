@@ -40,10 +40,11 @@ pub fn build_system_sets(app: &mut App) {
     // the logic is straightforward.
     // The state change system is also be required by Legion, but the amount of states is smaller.
     //
-    // Finally, a side effect of iyes_loopless is that, since a state_change flushes the frame, and
-    // the library we use is set to run at a fixed amount of frames per second, the port is "slower",
-    // as it requires multiple frames for a full cycle. This is easy to improve, but this will be done
-    // separately.
+    // A side effect of iyes_loopless is that, since a state_change flushes the frame, and the library
+    // we use is set to run at a fixed amount of frames per second, the port is "slower", as it requires
+    // multiple frames for a full cycle. This is easy to improve, but this will be done separately.
+    // Also, events, which we currently use, persist two frames, so state transitions must be carefully
+    // considered.
 
     app.add_system_set(
         SystemSet::new()
