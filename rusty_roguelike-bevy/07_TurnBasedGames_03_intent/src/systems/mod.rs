@@ -1,50 +1,42 @@
 use crate::prelude::*;
 
 mod collisions;
+mod end_turn;
 mod entity_render;
 mod map_render;
 mod movement;
-mod next_step;
 mod player_input;
 mod random_move;
 
 pub fn build_system_sets(app: &mut App) {
-    use GameStep::*;
+    use GameStage::*;
+    use TurnState::*;
 
-    // As of v0.7, Bevy has two fundamental deficiencies - it lacks on-demand flushing (it flushes only
-    // at the end of the frame), and states and stages can't be mixed.
-    // Without on-demand flushing, a system in a serialized sequence won't detect changes requested
-    // by the previous ones. A workaround is to execute only the set of systems associated to a single
-    // state for each frame (via `SystemSet::on_update(state)` filter), however, the state can't be
-    // updated during the CoreStage::Update stage (the default), otherwise, the next system set will
-    // kick off immediately, without waiting for the flush; in turn, a workaround could be to perform
-    // the state change in a separate stage, but this requires mixing states and stages, which is currently
-    // unsupported (likely, it doesn't work even if state filtering is performed by if/then/else tests
-    // inside each system).
+    // As of v0.7, it's not possible to flush commands on-demand, like Legion does; Bevy flushes the
+    // commands only at the end of each stage. Although this approach is not so immediate, it still
+    // allows a cleanly structured model; we isolate each block of systems that performs a change, and
+    // put it inside a system set.
     //
-    // In order to model this design, the `iyes_loopless` crate is required.
+    // It's techically possible to write multiple schedulers like Legion, and update them on the fly
+    // (since we're in charge of the main loop), however, it's more complicated than Legion, and additionally,
+    // it doesn't offer any concrete advantage over system sets.
     //
-    // Bevy's translation of Legion's schedulers and flushes are (iyes_loopless) states; besides supporting
-    // mixing stages and states, on state change, the frame is flushed (note that this will, in turn,
-    // cause issues with the Bevy events system).
+    // A very serious limitation in the current Bevy version is that states/stages are essentially unusable
+    // together (and also in other conditions, e.g. with FixedTimeStep), therefore, it's necessary to
+    // use the crate `iyes_loopless`, which implements this functionality without limitations.
     //
-    // In order to translate the concept, we need to:
+    // The states modeled in the port are the same three as the source project, although technically,
+    // only two states are required, since PlayerTurn and MonsterTurn always execute together.
     //
-    // - divide the systems into groups
-    // - create an enum for each group
-    // - run each set of systems during the corresponding state
-    // - add a state change system
-    // - perform rendering independently from the system set
+    // There are a few concepts that are modeled differently here, which are all interrelated:
     //
-    // Compared to Legion, this is a non neglibile amount of boilerplate (and side effects), although
-    // the logic is straightforward.
-    // The state change system is also be required by Legion, but the amount of states is smaller.
-    //
-    // A side effect of iyes_loopless is that, since a state_change flushes the frame, and the library
-    // we use is set to run at a fixed amount of frames per second, the port is "slower", as it requires
-    // multiple frames for a full cycle. This is easy to improve, but this will be done separately.
-    // Also, events, which we currently use, persist two frames, so state transitions must be carefully
-    // considered.
+    // - instead of using a machine state that swaps schedulers (see the source project's `State#tick`),
+    //   we use filters on systems/sets
+    // - rendering is performed in the first stage (of each frame); it does not make a difference from
+    //   the user perspective, but it's clear from a design one; this is possible due to the single
+    //   scheduler model
+    // - the end_turn system is part of the last stage (of each frame); it's not necessary to keep it
+    //   separated in an indipendent stage, and it's not worth doing so.
 
     app.add_system_set(
         SystemSet::new()
@@ -52,40 +44,39 @@ pub fn build_system_sets(app: &mut App) {
             .with_system(entity_render::entity_render),
     );
 
-    app.add_system(
-        player_input::player_input.run_in_state(AwaitingInput),
-        // The next step is set inside AwaitingInput
-    );
+    app.add_system(player_input::player_input.run_in_state(AwaitingInput));
 
-    app.add_system_set(
+    app.add_system_set_to_stage(
+        MovePlayer,
         ConditionSet::new()
-            .run_in_state(MovePlayer)
+            .run_in_state(PlayerTurn)
             .with_system(movement::movement)
-            .with_system(next_step::next_step)
             .into(),
     );
 
-    app.add_system_set(
+    app.add_system_set_to_stage(
+        Collisions,
         ConditionSet::new()
-            .run_in_state(Collisions)
+            .run_in_state(PlayerTurn)
             .with_system(collisions::collisions)
-            .with_system(next_step::next_step)
+            .with_system(end_turn::end_turn)
             .into(),
     );
 
-    app.add_system_set(
+    app.add_system_set_to_stage(
+        GenerateMonsterMoves,
         ConditionSet::new()
-            .run_in_state(GenerateMonsterMoves)
+            .run_in_state(MonsterTurn)
             .with_system(random_move::random_move)
-            .with_system(next_step::next_step)
             .into(),
     );
 
-    app.add_system_set(
+    app.add_system_set_to_stage(
+        MoveMonsters,
         ConditionSet::new()
-            .run_in_state(MoveMonsters)
+            .run_in_state(MonsterTurn)
             .with_system(movement::movement)
-            .with_system(next_step::next_step)
+            .with_system(end_turn::end_turn)
             .into(),
     );
 }

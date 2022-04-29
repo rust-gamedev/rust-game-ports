@@ -1,10 +1,11 @@
 mod camera;
 mod components;
-mod game_step;
+mod game_stage;
 mod map;
 mod map_builder;
 mod spawner;
 mod systems;
+mod turn_state;
 
 mod prelude {
     pub use bracket_lib::prelude::*;
@@ -17,11 +18,12 @@ mod prelude {
     pub const DISPLAY_HEIGHT: i32 = SCREEN_HEIGHT / 2;
     pub use crate::camera::*;
     pub use crate::components::*;
-    pub use crate::game_step::*;
+    pub use crate::game_stage::*;
     pub use crate::map::*;
     pub use crate::map_builder::*;
     pub use crate::spawner::*;
     pub use crate::systems::*;
+    pub use crate::turn_state::*;
 }
 
 use prelude::*;
@@ -32,6 +34,8 @@ struct State {
 
 impl State {
     fn new() -> Self {
+        use game_stage::GameStage::*;
+
         let mut ecs = App::new();
         let mut rng = RandomNumberGenerator::new();
         let map_builder = MapBuilder::new(&mut rng);
@@ -45,8 +49,13 @@ impl State {
             .for_each(|pos| spawn_monster(&mut ecs.world, &mut rng, pos));
         ecs.insert_resource(map_builder.map);
         ecs.insert_resource(Camera::new(map_builder.player_start));
+        // Set the additional stages
+        ecs.add_stage_after(CoreStage::Update, MovePlayer, SystemStage::parallel())
+            .add_stage_after(MovePlayer, PlayerCollisions, SystemStage::parallel())
+            .add_stage_after(PlayerCollisions, MoveMonsters, SystemStage::parallel())
+            .add_stage_after(MoveMonsters, MonsterCollisions, SystemStage::parallel());
         // Set the startup state.
-        ecs.add_loopless_state(GameStep::AwaitingInput);
+        ecs.add_loopless_state(TurnState::AwaitingInput);
         // In the source project, set of actions (`Schedule`s) are owned by State (`systems: Schedule`);
         // here, they're owned by the Bevy ECS, as `SystemSet`s.
         build_system_sets(&mut ecs);

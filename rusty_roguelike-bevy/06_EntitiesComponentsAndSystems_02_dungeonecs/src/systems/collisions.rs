@@ -10,10 +10,9 @@ pub fn collisions(
     // We can use Query#single() when it's guaranteed that an entity exists.
     let player_pos = player_query.single().0;
 
-    // The source project often uses the pattern `filter().for_each()`; a direct iteration is simpler,
-    // but we'll keep this refactoring for later.
-    enemies_query
-        .iter()
-        .filter(|(_, pos)| pos.0 == player_pos)
-        .for_each(|(entity, _)| commands.entity(entity).despawn());
+    for (entity, pos) in enemies_query.iter() {
+        if pos.0 == player_pos {
+            commands.entity(entity).despawn()
+        }
+    }
 }

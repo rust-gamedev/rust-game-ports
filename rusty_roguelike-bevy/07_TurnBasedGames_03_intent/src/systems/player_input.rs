@@ -25,7 +25,7 @@ pub fn player_input(
                 });
             }
         }
-        commands.insert_resource(NextState(GameStep::MovePlayer));
+        commands.insert_resource(NextState(TurnState::PlayerTurn));
 
         // WATCH OUT!! If they key resource is not removed, multiple keypresses will be detected over
         // the same frame. This is because a system (set) may run multiple times over a frame, due to
