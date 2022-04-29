@@ -4,8 +4,8 @@ use crate::prelude::*;
 // messages.
 // In the context of this project, it's a bit more ergonomic, but in larger ones, there advantages are
 // more significant.
-// Watch out! Events persist for two frames, which is something critical especially when using
-// `iyes_loopless` state changes (which flush the frame).
+// Watch out! Events persist for two frames, which in this design is not a problem, but it's something
+// important to know.
 //
 pub struct WantsToMove {
     pub entity: Entity,
