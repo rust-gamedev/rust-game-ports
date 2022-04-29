@@ -3,7 +3,9 @@ use crate::prelude::*;
 pub fn player_input(
     mut commands: Commands,
     mut move_events: EventWriter<WantsToMove>,
-    player_query: Query<(Entity, &PointC), With<Player>>, //(1) (2)
+    mut attack_events: EventWriter<WantsToAttack>,
+    player_query: Query<(Entity, &PointC), With<Player>>,
+    enemies_query: Query<(Entity, &PointC), With<Enemy>>,
     key: Option<Res<VirtualKeyCode>>,
 ) {
     if let Some(key) = key.as_deref() {
@@ -15,18 +17,35 @@ pub fn player_input(
             _ => Point::new(0, 0),
         };
 
+        // From this iteration, the source project assumes that there is always a player entity, so
+        // we can use the single() API, which makes this assumption.
+        //
+        let (player_entity, player_pos) = player_query.single();
+        let destination = player_pos.0 + delta;
+
         if delta.x != 0 || delta.y != 0 {
-            // In the source project, the query assumes multiple query entities; here we use the single
-            // entity API, still allowing the possibility that there is no player.
-            if let Ok((entity, pos)) = player_query.get_single() {
-                //(3)
-                let destination = pos.0 + delta;
+            let mut hit_something = false;
+            // The Iterator#any API could also be conveniently used, although it's often assumed not
+            // to have side effects, which is not the case here.
+            for (entity, pos) in enemies_query.iter() {
+                if pos.0 == destination {
+                    hit_something = true;
+
+                    attack_events.send(WantsToAttack {
+                        attacker: player_entity,
+                        victim: entity,
+                    });
+                }
+            }
+
+            if !hit_something {
                 move_events.send(WantsToMove {
-                    entity,
-                    destination: destination,
+                    entity: player_entity,
+                    destination,
                 });
             }
         }
+
         commands.insert_resource(NextState(TurnState::PlayerTurn));
 
         // WATCH OUT!! If they key resource is not removed, multiple keypresses will be detected over
