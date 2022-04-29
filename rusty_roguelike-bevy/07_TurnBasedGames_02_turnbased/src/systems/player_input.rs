@@ -21,10 +21,10 @@ pub fn player_input(
                 if map.can_enter_tile(destination) {
                     pos.0 = destination;
                     camera.on_player_move(destination);
-                    commands.insert_resource(NextState(GameStep::PlayerCollisions));
                 }
             }
         }
+        commands.insert_resource(NextState(TurnState::PlayerTurn));
 
         // WATCH OUT!! If they key resource is not removed, multiple keypresses will be detected over
         // the same frame. This is because a system (set) may run multiple times over a frame, due to
@@ -33,6 +33,7 @@ pub fn player_input(
         // the circle stops.
         // This may not be needed if there is one game step per frame, but it's good practice to keep
         // in mind.
+        //
         commands.remove_resource::<VirtualKeyCode>();
     }
 }
