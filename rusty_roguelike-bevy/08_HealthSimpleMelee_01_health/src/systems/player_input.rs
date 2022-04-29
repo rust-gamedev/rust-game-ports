@@ -3,7 +3,7 @@ use crate::prelude::*;
 pub fn player_input(
     mut commands: Commands,
     mut move_events: EventWriter<WantsToMove>,
-    players: Query<(Entity, &PointC), With<Player>>, //(1) (2)
+    player_query: Query<(Entity, &mut PointC), With<Player>>, //(1) (2)
     key: Option<Res<VirtualKeyCode>>,
 ) {
     if let Some(key) = key.as_deref() {
@@ -16,7 +16,9 @@ pub fn player_input(
         };
 
         if delta.x != 0 || delta.y != 0 {
-            for (entity, pos) in players.iter() {
+            // In the source project, the query assumes multiple query entities; here we use the single
+            // entity API, still allowing the possibility that there is no player.
+            if let Ok((entity, pos)) = player_query.get_single() {
                 //(3)
                 let destination = pos.0 + delta;
                 move_events.send(WantsToMove {

@@ -2,7 +2,7 @@ use crate::prelude::*;
 
 pub fn player_input(
     mut commands: Commands,
-    players: Query<(&Player, &mut PointC)>, //(1) (2)
+    mut player_query: Query<&mut PointC, With<Player>>, //(1) (2)
     (map, key, mut camera): (Res<Map>, Option<Res<VirtualKeyCode>>, ResMut<Camera>),
 ) {
     if let Some(key) = key.as_deref() {
@@ -15,7 +15,9 @@ pub fn player_input(
         };
 
         if delta.x != 0 || delta.y != 0 {
-            for (_player, mut pos) in players.iter() {
+            // In the source project, the query assumes multiple query entities; here we use the single
+            // entity API, still allowing the possibility that there is no player.
+            if let Ok(mut pos) = player_query.get_single_mut() {
                 //(3)
                 let destination = pos.0 + delta;
                 if map.can_enter_tile(destination) {
