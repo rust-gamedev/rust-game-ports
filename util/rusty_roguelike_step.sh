@@ -63,7 +63,7 @@ function check_params {
 function find_current_step {
   local target_step
 
-  target_step=$(find "$c_port_base_dir" -mindepth 1 -maxdepth 1 -printf '%P\n' | grep -v '^target$' | sort | tail -n 1)
+  target_step=$(find "$c_port_base_dir" -mindepth 1 -maxdepth 1 -printf '%P\n' | grep -vP '^(target|\.cargo)$' | sort | tail -n 1)
 
   if [[ -z $target_step ]]; then
     >&2 echo "Couldn't find current step"
@@ -90,7 +90,7 @@ function find_step {
     >&2 echo "Wrong step location: $location"
   esac
 
-  target_step=$(find "$c_source_base_dir" -mindepth 1 -maxdepth 1 -printf '%P\n' | sort | awk "$awk_script")
+  target_step=$(find "$c_source_base_dir" -mindepth 1 -maxdepth 1 -printf '%P\n' | grep -vP '^(target|\.cargo)$' | sort | awk "$awk_script")
 
   if [[ -z $target_step ]]; then
     >&2 echo "Couldn't find step $location $current_step"
