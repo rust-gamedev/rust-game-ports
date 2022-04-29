@@ -130,6 +130,10 @@ function replace_vsc_project_steps {
   perl -i -pe 's/$ENV{current_step}/$ENV{next_step}/' "$RUST_GAME_PORTS_VSCODE_PROJECT"
 }
 
+function add_to_git_index {
+  git add :/
+}
+
 ################################################################################
 # MAIN
 ################################################################################
@@ -151,6 +155,7 @@ case $v_mode in
   next_step=$(find_step following "$current_step")
   create_next_port_step "$current_step" "$next_step"
   replace_vsc_project_steps "$current_step" "$next_step"
+  add_to_git_index
   ;;
 *)
   >&2 echo "Invalid mode: $v_mode"
