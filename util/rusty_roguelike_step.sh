@@ -9,8 +9,10 @@ shopt -s inherit_errexit
 c_compare_curr_mode=compare_curr
 c_compare_source_prev_mode=compare_source_prev
 c_next_mode=next
+c_reset_mode=reset
+
 c_help="\
-Usage: $(basename "$0") [$c_compare_source_prev_mode|$c_next_mode]
+Usage: $(basename "$0") [$c_compare_source_prev_mode|$c_next_mode|$c_reset_mode <step>]
 
 The script has three modes:
 
@@ -19,12 +21,48 @@ The script has three modes:
 - $c_next_mode                : create the next port step and updates the VS Code project
   - removes the old steps and adds the new ones
   - requires env variable RUST_GAME_PORTS_VSCODE_PROJECT pointing to the project file
+- $c_reset_mode               : reset the VSC project to the given step (port path)
+  - requires env variable RUST_GAME_PORTS_VSCODE_PROJECT pointing to the project file
 "
 c_port_base_dir=$(readlink -f "$(dirname "$0")/../rusty_roguelike-bevy")
 c_source_base_dir=$(readlink -f "$(dirname "$0")/../source_projects/rusty_roguelike")
+c_util_dir=$(readlink -f "$(dirname "$0")")
 c_compare_program=meld
+c_vsc_project_template='{
+  "folders": [
+    {
+      "name": "util",
+      "path": "%s"
+    },
+    {
+      "name": "%s",
+      "path": "%s"
+    },
+    {
+      "name": "%s",
+      "path": "%s"
+    }
+  ],
+  "settings": {
+    "files.exclude": {
+      "**/.vscode": true,
+      "**/.cargo": true,
+      "**/target": true,
+      "**/Cargo.lock": true,
+    },
+    "search.exclude": {
+      "**/resources/images": true,
+      "**/resources/music": true,
+      "**/resources/sounds": true
+    },
+    "rust-analyzer.diagnostics.disabled": [
+      "unlinked-file"
+    ],
+  }
+}'
 
 v_mode=
+v_reset_step_path=
 
 function decode_cmdline_args {
   local params
@@ -43,9 +81,10 @@ function decode_cmdline_args {
     esac
   done
 
-  if [[ $# -ne 1 ]]; then
-    echo "$c_help"
-    exit 1
+  check_params "$@"
+
+  if [[ $1 == "$c_reset_mode" ]]; then
+    v_reset_step_path=$2
   fi
 
   v_mode=$1
@@ -54,9 +93,25 @@ function decode_cmdline_args {
 function check_params {
   # $v_mode is tested in the main switch/case.
 
-  if [[ $v_mode == "$c_next_mode" && -z "${RUST_GAME_PORTS_VSCODE_PROJECT:-}" ]]; then
-    >&2 echo "Variable RUST_GAME_PORTS_VSCODE_PROJECT not set!"
-    exit 1
+  if [[ $1 == "$c_reset_mode" ]]; then
+    if [[ $# -ne 2 ]]; then
+      echo "$c_help"
+      exit 1
+    elif [[ -z "${RUST_GAME_PORTS_VSCODE_PROJECT:-}" ]]; then
+      >&2 echo "Variable RUST_GAME_PORTS_VSCODE_PROJECT not set!"
+      exit 1
+    elif [[ ! -d $2 ]]; then
+      >&2 echo "Port step path not found!"
+      exit 1
+    fi
+  else
+    if [[ $# -ne 1 ]]; then
+      echo "$c_help"
+      exit 1
+    elif [[ $1 == "$c_next_mode" && -z "${RUST_GAME_PORTS_VSCODE_PROJECT:-}" ]]; then
+      >&2 echo "Variable RUST_GAME_PORTS_VSCODE_PROJECT not set!"
+      exit 1
+    fi
   fi
 }
 
@@ -134,12 +189,26 @@ function add_to_git_index {
   git add :/
 }
 
+function recreate_vsc_project {
+  local step_basename
+
+  step_basename=$(basename "$v_reset_step_path")
+
+  # shellcheck disable=2059 # printf template should totally be a variable!!
+  printf "$c_vsc_project_template" \
+    "$c_util_dir" \
+    "${step_basename}_port" \
+    "$c_port_base_dir/$step_basename" \
+    "${step_basename}_source" \
+    "$c_source_base_dir/$step_basename" \
+    > "$RUST_GAME_PORTS_VSCODE_PROJECT"
+}
+
 ################################################################################
 # MAIN
 ################################################################################
 
 decode_cmdline_args "$@"
-check_params
 
 current_step=$(find_current_step)
 
@@ -156,6 +225,9 @@ case $v_mode in
   create_next_port_step "$current_step" "$next_step"
   replace_vsc_project_steps "$current_step" "$next_step"
   add_to_git_index
+  ;;
+"$c_reset_mode")
+  recreate_vsc_project
   ;;
 *)
   >&2 echo "Invalid mode: $v_mode"
