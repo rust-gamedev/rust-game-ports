@@ -18,8 +18,13 @@ The script has three modes:
 
 - $c_compare_curr_mode        : compares the current step of the source vs port projects
 - $c_compare_source_prev_mode : compares the source project current step (based on the latest port) with the previous one
-- $c_next_mode                : create the next port step and updates the VS Code project
-  - removes the old steps and adds the new ones
+- $c_next_mode                :
+  - create the next port step:
+    - creates a repository branch
+    - updates the VS Code project
+    - removes the old steps and adds the new ones
+    - commits with a prepared title
+    - executes $c_compare_source_prev_mode mode
   - requires env variable RUST_GAME_PORTS_VSCODE_PROJECT pointing to the project file
 - $c_reset_mode               : reset the VSC project to the given step (port path)
   - requires env variable RUST_GAME_PORTS_VSCODE_PROJECT pointing to the project file
@@ -167,6 +172,12 @@ function compare_source_steps {
   "$c_compare_program" "$c_source_base_dir/$previous_step" "$c_source_base_dir/$current_step"
 }
 
+function create_git_branch {
+  local next_step=$1
+
+  git checkout -b "rusty_roguelike_port_$1"
+}
+
 function create_next_port_step {
   local current_step=$1 next_step=$2
 
@@ -185,8 +196,11 @@ function replace_vsc_project_steps {
   perl -i -pe 's/$ENV{current_step}/$ENV{next_step}/' "$RUST_GAME_PORTS_VSCODE_PROJECT"
 }
 
-function add_to_git_index {
+function create_commit {
+  local next_step=$1
+
   git add :/
+  git commit --verbose --message "Rusty Roguelike: Port $next_step"
 }
 
 function recreate_vsc_project {
@@ -222,9 +236,12 @@ case $v_mode in
   ;;
 "$c_next_mode")
   next_step=$(find_step following "$current_step")
+  create_git_branch "$next_step"
   create_next_port_step "$current_step" "$next_step"
   replace_vsc_project_steps "$current_step" "$next_step"
-  add_to_git_index
+  create_commit "$next_step"
+
+  "$0" "$c_compare_source_prev_mode"
   ;;
 "$c_reset_mode")
   recreate_vsc_project
