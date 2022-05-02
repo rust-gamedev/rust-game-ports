@@ -43,6 +43,7 @@ impl State {
         let map_builder = MapBuilder::new(&mut rng);
         // This is not a strict-ECS approach (a system would), but we mimick the source project design.
         spawn_player(&mut ecs.world, map_builder.player_start);
+        spawn_amulet_of_yala(&mut ecs.world, map_builder.amulet_start);
         map_builder
             .rooms
             .iter()
@@ -68,6 +69,34 @@ impl State {
         // This is the way used by App#run to get ownership of the App instance.
         ecs = std::mem::replace(&mut ecs, App::empty());
         Self { ecs }
+    }
+
+    fn reset_game_state(&mut self) {
+        // We can't reset the world like Legion, because it's not supported by iyes_loopless.
+        // Resources clearing is actually tricky, because Bevy/plugins may have their own resources,
+        // whose deletion may not be exposed. One example is events; we get away without clearing
+        // them, because by the time GameOver is reached, the events are all consumed.
+        // Regarding `iyes_loopless`, we don't need to take care of it; we just set the next state.
+        // Finally, the resources directly known to us, we just overwrite them.
+        // Note that we can also just replace the current app with a new one.
+        self.ecs.world.clear_entities();
+        let mut rng = RandomNumberGenerator::new();
+        let map_builder = MapBuilder::new(&mut rng);
+        spawn_player(&mut self.ecs.world, map_builder.player_start);
+        spawn_amulet_of_yala(&mut self.ecs.world, map_builder.amulet_start);
+        map_builder
+            .rooms
+            .iter()
+            .skip(1)
+            .map(bracket_lib::prelude::Rect::center)
+            .for_each(|pos| spawn_monster(&mut self.ecs.world, &mut rng, pos));
+        self.ecs.insert_resource(map_builder.map);
+        self.ecs
+            .insert_resource(Camera::new(map_builder.player_start));
+        self.ecs
+            .insert_resource(NextState(TurnState::AwaitingInput));
+        // Don't forget! :)
+        self.ecs.world.remove_resource::<VirtualKeyCode>();
     }
 
     fn game_over(&mut self, ctx: &mut BTerm) {
@@ -96,30 +125,35 @@ impl State {
         ctx.print_color_centered(9, GREEN, BLACK, "Press 1 to play again.");
 
         if let Some(VirtualKeyCode::Key1) = ctx.key {
-            // We can't reset the world like Legion, because it's not supported by iyes_loopless.
-            // Resources clearing is actually tricky, because Bevy/plugins may have their own resources,
-            // whose deletion may not be exposed. One example is events; we get away without clearing
-            // them, because by the time GameOver is reached, the events are all consumed.
-            // Regarding `iyes_loopless`, we don't need to take care of it; we just set the next state.
-            // Finally, the resources directly known to us, we just overwrite them.
-            // Note that we can also just replace the current app with a new one.
-            self.ecs.world.clear_entities();
-            let mut rng = RandomNumberGenerator::new();
-            let map_builder = MapBuilder::new(&mut rng);
-            spawn_player(&mut self.ecs.world, map_builder.player_start);
-            map_builder
-                .rooms
-                .iter()
-                .skip(1)
-                .map(bracket_lib::prelude::Rect::center)
-                .for_each(|pos| spawn_monster(&mut self.ecs.world, &mut rng, pos));
-            self.ecs.insert_resource(map_builder.map);
-            self.ecs
-                .insert_resource(Camera::new(map_builder.player_start));
-            self.ecs
-                .insert_resource(NextState(TurnState::AwaitingInput));
-            // Don't forget! :)
-            self.ecs.world.remove_resource::<VirtualKeyCode>();
+            self.reset_game_state();
+        }
+    }
+
+    fn victory(&mut self, ctx: &mut BTerm) {
+        ctx.set_active_console(2);
+        ctx.print_color_centered(2, GREEN, BLACK, "You have won!");
+        ctx.print_color_centered(
+            4,
+            WHITE,
+            BLACK,
+            "You put on the Amulet of Yala and feel its power course through \
+            your veins.",
+        );
+        ctx.print_color_centered(
+            5,
+            WHITE,
+            BLACK,
+            "Your town is saved, and you can return to your normal life.",
+        );
+        ctx.print_color_centered(
+            7,
+            GREEN,
+            BLACK,
+            "Press 1 to \
+            play again.",
+        );
+        if let Some(VirtualKeyCode::Key1) = ctx.key {
+            self.reset_game_state();
         }
     }
 }
@@ -143,11 +177,10 @@ impl GameState for State {
         self.ecs.insert_resource(Point::from_tuple(ctx.mouse_pos()));
         // Unfortunately, with the current source project's design, without refactoring the world init
         // code into systems, we must leak the state into this abstraction.
-        if matches!(
-            self.ecs.world.get_resource::<CurrentState<TurnState>>(),
-            Some(CurrentState(TurnState::GameOver))
-        ) {
-            self.game_over(ctx);
+        match self.ecs.world.get_resource::<CurrentState<TurnState>>() {
+            Some(CurrentState(TurnState::GameOver)) => self.game_over(ctx),
+            Some(CurrentState(TurnState::Victory)) => self.victory(ctx),
+            _ => {}
         }
         self.ecs.update();
         render_draw_buffer(ctx).expect("Render error");
