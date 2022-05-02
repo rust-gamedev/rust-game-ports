@@ -102,6 +102,7 @@ impl State {
             // them, because by the time GameOver is reached, the events are all consumed.
             // Regarding `iyes_loopless`, we don't need to take care of it; we just set the next state.
             // Finally, the resources directly known to us, we just overwrite them.
+            // Note that we can also just replace the current app with a new one.
             self.ecs.world.clear_entities();
             let mut rng = RandomNumberGenerator::new();
             let map_builder = MapBuilder::new(&mut rng);
