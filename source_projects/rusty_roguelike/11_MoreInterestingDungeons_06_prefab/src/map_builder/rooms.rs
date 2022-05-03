@@ -1,5 +1,5 @@
-use super::MapArchitect;
 use crate::prelude::*;
+use super::MapArchitect;
 
 pub struct RoomsArchitect {}
 

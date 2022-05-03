@@ -1,4 +1,3 @@
-#![warn(clippy::pedantic)]
 #![allow(dead_code)]
 
 mod camera;
