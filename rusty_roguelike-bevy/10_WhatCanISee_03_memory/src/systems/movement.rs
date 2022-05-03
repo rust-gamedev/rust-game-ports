@@ -4,7 +4,7 @@ pub fn movement(
     mut commands: Commands,
     mut move_events: EventReader<WantsToMove>,
     query: Query<(Entity, &FieldOfView, Option<&Player>)>,
-    (map, mut camera): (Res<Map>, ResMut<Camera>),
+    (mut map, mut camera): (ResMut<Map>, ResMut<Camera>),
 ) {
     for &WantsToMove {
         entity,
@@ -21,6 +21,9 @@ pub fn movement(
 
                 if player.is_some() {
                     camera.on_player_move(destination);
+                    fov.visible_tiles.iter().for_each(|pos| {
+                        map.revealed_tiles[map_idx(pos.x, pos.y)] = true;
+                    });
                 }
             }
         }
