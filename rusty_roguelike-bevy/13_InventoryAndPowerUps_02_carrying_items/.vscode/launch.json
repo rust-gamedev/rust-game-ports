@@ -1,0 +1,29 @@
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "Debug 13_InventoryAndPowerUps_02_carrying_items",
+      "cargo": {
+        "args": [
+          "build",
+          "--bin=rusty_roguelike-bevy",
+          "--package=rusty_roguelike-bevy"
+        ],
+        "filter": {
+          "name": "rusty_roguelike-bevy",
+          "kind": "bin"
+        }
+      },
+      "args": [],
+      "cwd": "${workspaceFolder}",
+      "env": {
+        "LD_LIBRARY_PATH": "${workspaceFolder}/../target/debug/deps:${env:HOME}/.rustup/toolchains/nightly-x86_64-unknown-linux-gnu/lib",
+      },
+    },
+  ]
+}
