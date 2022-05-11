@@ -115,7 +115,6 @@ impl State {
                 entities_to_keep.insert(e);
             }
         }
-        // let mut cb = CommandBuffer::new(&mut self.ecs);
         let mut entities_query = self.ecs.world.query::<Entity>();
         // In Bevy, we can't query the world and write to it at the same time, so we need an intermediate
         // collection.

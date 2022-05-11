@@ -1,14 +1,9 @@
 use crate::prelude::*;
+use legion::systems::CommandBuffer;
 use ron::de::from_reader;
 use serde::Deserialize;
 use std::collections::HashSet;
 use std::fs::File;
-
-#[derive(Clone, Deserialize, Debug, PartialEq)]
-pub enum EntityType {
-    Enemy,
-    Item,
-}
 
 #[derive(Clone, Deserialize, Debug)]
 pub struct Template {
@@ -20,6 +15,12 @@ pub struct Template {
     pub provides: Option<Vec<(String, i32)>>,
     pub hp: Option<i32>,
     pub base_damage: Option<i32>,
+}
+
+#[derive(Clone, Deserialize, Debug, PartialEq)]
+pub enum EntityType {
+    Enemy,
+    Item,
 }
 
 #[derive(Clone, Deserialize, Debug)]
@@ -50,7 +51,7 @@ impl Templates {
                 }
             });
 
-        let mut commands = legion::systems::CommandBuffer::new(ecs);
+        let mut commands = CommandBuffer::new(ecs);
         for pt in spawn_points.iter() {
             if let Some(entity) = rng.random_slice_entry(&available_entities) {
                 self.spawn_entity(pt, entity, &mut commands);
@@ -59,12 +60,7 @@ impl Templates {
         commands.flush(ecs);
     }
 
-    fn spawn_entity(
-        &self,
-        pt: &Point,
-        template: &Template,
-        commands: &mut legion::systems::CommandBuffer,
-    ) {
+    fn spawn_entity(&self, pt: &Point, template: &Template, commands: &mut CommandBuffer) {
         let entity = commands.push((
             *pt,
             Render {
