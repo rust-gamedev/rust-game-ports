@@ -98,7 +98,7 @@ function decode_cmdline_args {
 function check_params {
   # $v_mode is tested in the main switch/case.
 
-  if [[ $1 == "$c_reset_mode" ]]; then
+  if [[ ${1:-} == "$c_reset_mode" ]]; then
     if [[ $# -ne 2 ]]; then
       echo "$c_help"
       exit 1
