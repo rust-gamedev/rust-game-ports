@@ -8,14 +8,11 @@ The completed ports are:
 
 - Code the Classics Vol. 1/Boing: ported to [ggez](https://github.com/ggez/ggez)
 - Code the Classics Vol. 1/Cavern: ported to [Macroquad](https://github.com/not-fl3/macroquad) (without using experimental features)
+- Hands-on Rust: Effective Learning.../Rusty Roguelike: ported to [Bevy](https://github.com/bevyengine/bevy)
 
 Work in progress:
 
-- Hands-on Rust: Effective Learning.../Rusty Roguelike: porting to [Bevy](https://github.com/bevyengine/bevy)
-
-Planned:
-
-- Other Code the Classics Vol. 1 games to [Fyrox](https://github.com/FyroxEngine/Fyrox)
+- Code the Classics Vol. 1/TBD: porting to [Fyrox](https://github.com/FyroxEngine/Fyrox)
 
 ## Source Projects
 
