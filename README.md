@@ -14,6 +14,10 @@ Work in progress:
 
 - Code the Classics Vol. 1/TBD: porting to [Fyrox](https://github.com/FyroxEngine/Fyrox)
 
+## Book!
+
+The Rusty Roguelike port is now the subject of my work-in-progress mini book ["Learn Bevy's ECS by ripping off someone else's project"](https://saveriomiroddi.github.io/learn_bevy_ecs_by_ripping_off)!
+
 ## Source Projects
 
 - Code the Classics Vol. 1 ([repository](https://github.com/Wireframe-Magazine/Code-the-Classics) and [book](https://wireframe.raspberrypi.org/books/code-the-classics1)): A very beautiful book on beginning game programming, written in Python; the project comprises of several games of different genres, each with a surprising complexity under the hood
