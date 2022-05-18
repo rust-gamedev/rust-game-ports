@@ -65,8 +65,6 @@ impl State {
         // In the source project, set of actions (`Schedule`s) are owned by State (`systems: Schedule`);
         // here, they're owned by the Bevy ECS, as `SystemSet`s.
         build_system_sets(&mut ecs);
-        // This is the way used by App#run to get ownership of the App instance.
-        ecs = std::mem::replace(&mut ecs, App::empty());
         Self { ecs }
     }
 }
