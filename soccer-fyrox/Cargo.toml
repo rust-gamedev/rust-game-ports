@@ -1,0 +1,8 @@
+[package]
+edition = "2021"
+name = "soccer-fyrox"
+version = "0.1.0"
+
+[dependencies]
+
+fyrox = "0.25.0"
