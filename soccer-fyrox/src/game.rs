@@ -11,6 +11,7 @@ use fyrox::{
     scene::{
         base::BaseBuilder,
         camera::{CameraBuilder, OrthographicProjection, Projection},
+        dim2::rectangle::RectangleBuilder,
         node::Node,
         Scene,
     },
@@ -28,6 +29,8 @@ pub struct Game {
     resources: Resources,
     scene: Handle<Scene>,
     camera: Handle<Node>,
+    // Root of all the object nodes; on start, this is a phony node.
+    background: Handle<Node>,
     state: State,
     menu_state: MenuState,
     menu_num_players: u8,
@@ -37,21 +40,6 @@ pub struct Game {
 impl ImageNodesBuilder for Game {
     fn resources(&self) -> &Resources {
         &self.resources
-    }
-}
-
-impl Game {
-    // Clear the scene and (just for convenience) returns it.
-    //
-    fn clear_scene<'a>(&mut self, engine: &'a mut Engine) -> &'a mut Scene {
-        let scene = &mut engine.scenes[self.scene];
-        let camera = &scene.graph[self.camera];
-
-        for child in camera.children().to_vec() {
-            scene.graph.remove_node(child);
-        }
-
-        scene
     }
 }
 
@@ -66,7 +54,9 @@ fn preset_window(engine: &Engine) {
     window.set_resizable(false);
 }
 
-fn build_initial_scene(engine: &mut Engine) -> (Handle<Scene>, Handle<Node>) {
+// Returns (scene, camera, (phony) backgroud node)
+//
+fn build_initial_scene(engine: &mut Engine) -> (Handle<Scene>, Handle<Node>, Handle<Node>) {
     let mut scene = Scene::new();
 
     let camera = CameraBuilder::new(BaseBuilder::new())
@@ -77,9 +67,11 @@ fn build_initial_scene(engine: &mut Engine) -> (Handle<Scene>, Handle<Node>) {
         }))
         .build(&mut scene.graph);
 
+    let background_node = RectangleBuilder::new(BaseBuilder::new()).build(&mut scene.graph);
+
     let scene = engine.scenes.add(scene);
 
-    (scene, camera)
+    (scene, camera, background_node)
 }
 
 impl GameState for Game {
@@ -88,7 +80,7 @@ impl GameState for Game {
 
         let resources = Resources::load(&engine.resource_manager);
 
-        let (scene, camera) = build_initial_scene(engine);
+        let (scene, camera, background) = build_initial_scene(engine);
 
         let state = State::Menu;
         let menu_state = MenuState::NumPlayers;
@@ -97,6 +89,7 @@ impl GameState for Game {
             resources,
             scene,
             camera,
+            background,
             state,
             menu_state,
             menu_num_players: 1,
@@ -107,22 +100,30 @@ impl GameState for Game {
     fn on_tick(&mut self, engine: &mut Engine, _dt: f32, _control_flow: &mut ControlFlow) {
         use {MenuState::*, State::*};
 
+        let scene = &mut engine.scenes[self.scene];
+
         // The simplest way to model a design that is as close a possible to a convenentional 2d game
-        // library, is to use the camera as root node, and to dynamically add each sprite to draw as
-        // node.
+        // library, is to use the background as root node, and to dynamically add each sprite to draw
+        // as node.
         //
-        let scene = self.clear_scene(engine);
+        scene.graph.remove_node(self.background);
 
         match &self.state {
-            Menu => match &self.menu_state {
-                NumPlayers => {
-                    let menu =
-                        self.build_image_node(&mut scene.graph, "menu", 0, self.menu_num_players);
-                    scene.graph.link_nodes(menu, self.camera);
-                }
-                Difficulty => {}
-            },
-            _ => {}
+            Menu => {
+                let (image_i1, image_i2) = match &self.menu_state {
+                    NumPlayers => (0, self.menu_num_players),
+                    Difficulty => (1, self.menu_difficulty),
+                };
+
+                self.background =
+                    self.build_image_node(&mut scene.graph, "menu", image_i1, image_i2);
+            }
+            Play => {
+                //
+            }
+            GameOver => {
+                //
+            }
         }
     }
 
