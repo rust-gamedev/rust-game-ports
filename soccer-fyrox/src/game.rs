@@ -3,10 +3,7 @@ use fyrox::{
     dpi::PhysicalSize,
     engine::framework::prelude::*,
     engine::Engine,
-    event::{
-        ElementState, VirtualKeyCode,
-        WindowEvent::{self, KeyboardInput},
-    },
+    event::{ElementState, VirtualKeyCode, WindowEvent},
     event_loop::ControlFlow,
     scene::{
         base::BaseBuilder,
@@ -17,6 +14,7 @@ use fyrox::{
     },
 };
 
+use crate::input_controller::InputController;
 use crate::menu_state::MenuState;
 use crate::resources::Resources;
 use crate::state::State;
@@ -31,6 +29,7 @@ pub struct Game {
     camera: Handle<Node>,
     // Root of all the object nodes; on start, this is a phony node.
     background: Handle<Node>,
+    input: InputController,
     state: State,
     menu_state: MenuState,
     menu_num_players: u8,
@@ -82,6 +81,8 @@ impl GameState for Game {
 
         let (scene, camera, background) = build_initial_scene(engine);
 
+        let input = InputController::new();
+
         let state = State::Menu;
         let menu_state = MenuState::NumPlayers;
 
@@ -90,6 +91,7 @@ impl GameState for Game {
             scene,
             camera,
             background,
+            input,
             state,
             menu_state,
             menu_num_players: 1,
@@ -125,26 +127,32 @@ impl GameState for Game {
                 //
             }
         }
+
+        use VirtualKeyCode::*;
+
+        match &self.state {
+            Menu => match &self.menu_state {
+                NumPlayers => {
+                    if self.input.is_key_just_pressed(Up) || self.input.is_key_just_pressed(Down) {
+                        self.menu_num_players = 1 + self.menu_num_players % 2;
+                    }
+                }
+                _ => {}
+            },
+            _ => {}
+        }
+
+        self.input.flush_event_received_state();
     }
 
     fn on_window_event(&mut self, _engine: &mut Engine, event: WindowEvent) {
-        use {MenuState::*, State::*};
-
-        if let KeyboardInput { input, .. } = event {
+        if let WindowEvent::KeyboardInput { input, .. } = event {
             if let Some(key_code) = input.virtual_keycode {
-                match &self.state {
-                    Menu => match &self.menu_state {
-                        NumPlayers => match key_code {
-                            VirtualKeyCode::Up | VirtualKeyCode::Down => {
-                                if input.state == ElementState::Pressed {
-                                    self.menu_num_players = 1 + self.menu_num_players % 2;
-                                }
-                            }
-                            _ => (),
-                        },
-                        _ => {}
-                    },
-                    _ => {}
+                use ElementState::*;
+
+                match input.state {
+                    Pressed => self.input.key_down(key_code),
+                    Released => self.input.key_up(key_code),
                 }
             }
         }

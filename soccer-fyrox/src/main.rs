@@ -3,6 +3,7 @@
 #![allow(dead_code)]
 
 mod game;
+mod input_controller;
 mod menu_state;
 mod resources;
 mod state;
