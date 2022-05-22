@@ -1062,19 +1062,19 @@ def update():
             game = Game()
 
 def draw():
-    game.draw()
-
-    if state == State.MENU:
-        # Draw title screen and menu
-        # There are 5 menu images numbered 01, 02, 10, 11 and 12.
-        # 01 and 02 are the images for indicating whether 1 or 2 player mode
-        # is selected; 10, 11 and 12 are for the difficulty selection screen -
-        # easy, medium or hard
-        if menu_state == MenuState.NUM_PLAYERS:
-            image = "menu0" + str(menu_num_players)
-        else:
-            image = "menu1" + str(menu_difficulty)
-        screen.blit(image, (0, 0))
+#     game.draw()
+#
+#     if state == State.MENU:
+#         # Draw title screen and menu
+#         # There are 5 menu images numbered 01, 02, 10, 11 and 12.
+#         # 01 and 02 are the images for indicating whether 1 or 2 player mode
+#         # is selected; 10, 11 and 12 are for the difficulty selection screen -
+#         # easy, medium or hard
+#         if menu_state == MenuState.NUM_PLAYERS:
+#             image = "menu0" + str(menu_num_players)
+#         else:
+#             image = "menu1" + str(menu_difficulty)
+#         screen.blit(image, (0, 0))
 
     elif state == State.PLAY:
         # Display score bar at top

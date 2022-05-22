@@ -109,14 +109,21 @@ impl GameState for Game {
         scene.graph.remove_node(self.background);
 
         match &self.state {
-            Menu => match &self.menu_state {
-                NumPlayers => {
-                    self.background =
-                        self.build_image_node(&mut scene.graph, "menu", 0, self.menu_num_players);
-                }
-                Difficulty => {}
-            },
-            _ => {}
+            Menu => {
+                let (image_i1, image_i2) = match &self.menu_state {
+                    NumPlayers => (0, self.menu_num_players),
+                    Difficulty => (1, self.menu_difficulty),
+                };
+
+                self.background =
+                    self.build_image_node(&mut scene.graph, "menu", image_i1, image_i2);
+            }
+            Play => {
+                //
+            }
+            GameOver => {
+                //
+            }
         }
     }
 
