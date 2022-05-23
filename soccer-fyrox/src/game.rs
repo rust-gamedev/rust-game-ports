@@ -104,7 +104,7 @@ impl GameState for Game {
 
         let scene = &mut engine.scenes[self.scene];
 
-        // The simplest way to model a design that is as close a possible to a convenentional 2d game
+        // The simplest way to model a design that is as close a possible to a conventional 2d game
         // library, is to use the background as root node, and to dynamically add each sprite to draw
         // as node.
         //
