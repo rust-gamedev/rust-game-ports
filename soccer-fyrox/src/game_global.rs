@@ -14,13 +14,12 @@ use fyrox::{
     },
 };
 
-use crate::game::Game;
 use crate::input_controller::InputController;
 use crate::menu_state::MenuState;
 use crate::resources::Resources;
 use crate::state::State;
-use crate::texture_node_builder::ImageNodesBuilder;
 use crate::{controls::Controls, game};
+use crate::{game::Game, texture_node_builder::build_image_node};
 
 const WIDTH: f32 = 800.0;
 const HEIGHT: f32 = 480.0;
@@ -37,12 +36,6 @@ pub struct GameGlobal {
     menu_state: Option<MenuState>,
     menu_num_players: u8,
     menu_difficulty: u8,
-}
-
-impl ImageNodesBuilder for GameGlobal {
-    fn resources(&self) -> &Resources {
-        &self.resources
-    }
 }
 
 fn preset_window(engine: &Engine) {
@@ -221,8 +214,8 @@ impl GameGlobal {
                     Difficulty => (1, self.menu_difficulty),
                 };
 
-                self.background =
-                    self.build_image_node(&mut scene.graph, "menu", image_i1, image_i2);
+                let image_data = self.resources.image("menu", &[image_i1, image_i2]);
+                self.background = build_image_node(&mut scene.graph, image_data, 0, 0, 0);
             }
             Play => {
                 //
