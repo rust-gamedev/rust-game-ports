@@ -5,10 +5,7 @@ use fyrox::{
     resource::texture::Texture,
 };
 
-const IMAGE_PATHS: [(&str, u16, u16); 2] = [
-    ("resources/images/menu01.png", 800, 480),
-    ("resources/images/menu02.png", 800, 480),
-];
+const IMAGE_PATHS: [&str; 2] = ["resources/images/menu01.png", "resources/images/menu02.png"];
 
 pub struct Resources {
     images: HashMap<String, (Texture, f32, f32)>,
@@ -18,9 +15,14 @@ impl Resources {
     pub fn load(resource_manager: &ResourceManager) -> Self {
         let mut images = HashMap::new();
 
-        for (path, width, height) in IMAGE_PATHS {
+        for path in IMAGE_PATHS {
             let texture = block_on(resource_manager.request_texture(path)).unwrap();
-            images.insert(path.to_string(), (texture, width as f32, height as f32));
+            let image_size = imagesize::size(path).unwrap();
+
+            images.insert(
+                path.to_string(),
+                (texture, image_size.width as f32, image_size.height as f32),
+            );
         }
 
         Self { images }
