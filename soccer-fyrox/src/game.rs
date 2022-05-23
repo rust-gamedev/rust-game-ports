@@ -100,8 +100,6 @@ impl GameState for Game {
     }
 
     fn on_tick(&mut self, engine: &mut Engine, _dt: f32, _control_flow: &mut ControlFlow) {
-        use {MenuState::*, State::*};
-
         let scene = &mut engine.scenes[self.scene];
 
         // The simplest way to model a design that is as close a possible to a conventional 2d game
@@ -109,6 +107,36 @@ impl GameState for Game {
         // as node.
         //
         scene.graph.remove_node(self.background);
+
+        self.update(engine);
+
+        self.draw(engine);
+
+        self.input.flush_event_received_state();
+    }
+
+    fn on_window_event(&mut self, _engine: &mut Engine, event: WindowEvent) {
+        if let WindowEvent::KeyboardInput { input, .. } = event {
+            if let Some(key_code) = input.virtual_keycode {
+                use ElementState::*;
+
+                match input.state {
+                    Pressed => self.input.key_down(key_code),
+                    Released => self.input.key_up(key_code),
+                }
+            }
+        }
+    }
+}
+
+// update() and game() don't have the Fyrox semantics, but they're added to make the comparison with
+// the source code simpler.
+//
+impl Game {
+    fn update(&mut self, engine: &mut Engine) {
+        let scene = &mut engine.scenes[self.scene];
+
+        use {MenuState::*, State::*};
 
         match &self.state {
             Menu => {
@@ -127,8 +155,11 @@ impl GameState for Game {
                 //
             }
         }
+    }
 
+    fn draw(&mut self, _engine: &mut Engine) {
         use VirtualKeyCode::*;
+        use {MenuState::*, State::*};
 
         match &self.state {
             Menu => match &self.menu_state {
@@ -140,21 +171,6 @@ impl GameState for Game {
                 _ => {}
             },
             _ => {}
-        }
-
-        self.input.flush_event_received_state();
-    }
-
-    fn on_window_event(&mut self, _engine: &mut Engine, event: WindowEvent) {
-        if let WindowEvent::KeyboardInput { input, .. } = event {
-            if let Some(key_code) = input.virtual_keycode {
-                use ElementState::*;
-
-                match input.state {
-                    Pressed => self.input.key_down(key_code),
-                    Released => self.input.key_up(key_code),
-                }
-            }
         }
     }
 }
