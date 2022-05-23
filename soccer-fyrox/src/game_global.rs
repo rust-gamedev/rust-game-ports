@@ -186,7 +186,24 @@ impl GameGlobal {
 
                 self.game.update()
             }
-            _ => {}
+            Play => {
+                // First player to 9 wins
+                let max_score = self.game.teams.iter().map(|t| t.score).max().unwrap();
+
+                if max_score == 9 && self.game.score_timer == 1 {
+                    self.state = State::GameOver;
+                } else {
+                    self.game.update();
+                }
+            }
+            GameOver => {
+                if self.input.is_key_just_pressed(Space) {
+                    // Switch to menu state, and create a new game object without a player
+                    self.state = State::Menu;
+                    self.menu_state = Some(MenuState::NumPlayers);
+                    self.game = Game::new(None, None, game::DEFAULT_DIFFICULTY);
+                }
+            }
         }
     }
 

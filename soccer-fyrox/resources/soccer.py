@@ -685,9 +685,9 @@ class Player(MyActor):
 
 class Team:
     def __init__(self, controls):
-        self.controls = controls
+#         self.controls = controls
         self.active_control_player = None
-        self.score = 0
+#         self.score = 0
 
     def human(self):
         return self.controls != None
@@ -711,7 +711,7 @@ class Game:
         except:
             pass
 
-        self.score_timer = 0
+#         self.score_timer = 0
         self.scoring_team = 1   # Which team has just scored - also governs who kicks off next
 
         self.reset()
@@ -1046,20 +1046,20 @@ def update():
 #                     menu_difficulty = (menu_difficulty + selection_change) % 3
 #
 #         game.update()
-
-    elif state == State.PLAY:
-        # First player to 9 wins
-        if max([team.score for team in game.teams]) == 9 and game.score_timer == 1:
-            state = State.GAME_OVER
-        else:
-            game.update()
-
-    elif state == State.GAME_OVER:
-        if key_just_pressed(keys.SPACE):
-            # Switch to menu state, and create a new game object without a player
-            state = State.MENU
-            menu_state = MenuState.NUM_PLAYERS
-            game = Game()
+#
+#     elif state == State.PLAY:
+#         # First player to 9 wins
+#         if max([team.score for team in game.teams]) == 9 and game.score_timer == 1:
+#             state = State.GAME_OVER
+#         else:
+#             game.update()
+#
+#     elif state == State.GAME_OVER:
+#         if key_just_pressed(keys.SPACE):
+#             # Switch to menu state, and create a new game object without a player
+#             state = State.MENU
+#             menu_state = MenuState.NUM_PLAYERS
+#             game = Game()
 
 def draw():
 #     game.draw()
