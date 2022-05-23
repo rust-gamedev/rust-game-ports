@@ -1015,37 +1015,37 @@ class Controls:
 def update():
     global state, game, menu_state, menu_num_players, menu_difficulty
 
-    if state == State.MENU:
-        if key_just_pressed(keys.SPACE):
-            if menu_state == MenuState.NUM_PLAYERS:
-                # If we're doing a 2 player game, skip difficulty selection
-                if menu_num_players == 1:
-                    menu_state = MenuState.DIFFICULTY
-                else:
-                    # Start 2P game
-                    state = State.PLAY
-                    menu_state = None
-                    game = Game(Controls(0), Controls(1))
-            else:
-                # Start 1P game
-                state = State.PLAY
-                menu_state = None
-                game = Game(Controls(0), None, menu_difficulty)
-        else:
-            # Detect + act on up/down arrow keys
-            selection_change = 0
-            if key_just_pressed(keys.DOWN):
-                selection_change = 1
-            elif key_just_pressed(keys.UP):
-                selection_change = -1
-            if selection_change != 0:
-                sounds.move.play()
-                if menu_state == MenuState.NUM_PLAYERS:
-                    menu_num_players = 2 if menu_num_players == 1 else 1
-                else:
-                    menu_difficulty = (menu_difficulty + selection_change) % 3
-
-        game.update()
+#     if state == State.MENU:
+#         if key_just_pressed(keys.SPACE):
+#             if menu_state == MenuState.NUM_PLAYERS:
+#                 # If we're doing a 2 player game, skip difficulty selection
+#                 if menu_num_players == 1:
+#                     menu_state = MenuState.DIFFICULTY
+#                 else:
+#                     # Start 2P game
+#                     state = State.PLAY
+#                     menu_state = None
+#                     game = Game(Controls(0), Controls(1))
+#             else:
+#                 # Start 1P game
+#                 state = State.PLAY
+#                 menu_state = None
+#                 game = Game(Controls(0), None, menu_difficulty)
+#         else:
+#             # Detect + act on up/down arrow keys
+#             selection_change = 0
+#             if key_just_pressed(keys.DOWN):
+#                 selection_change = 1
+#             elif key_just_pressed(keys.UP):
+#                 selection_change = -1
+#             if selection_change != 0:
+#                 sounds.move.play()
+#                 if menu_state == MenuState.NUM_PLAYERS:
+#                     menu_num_players = 2 if menu_num_players == 1 else 1
+#                 else:
+#                     menu_difficulty = (menu_difficulty + selection_change) % 3
+#
+#         game.update()
 
     elif state == State.PLAY:
         # First player to 9 wins

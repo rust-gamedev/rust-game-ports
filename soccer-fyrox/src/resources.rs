@@ -6,7 +6,13 @@ use fyrox::{
 };
 use imagesize::ImageSize;
 
-const IMAGE_PATHS: [&str; 2] = ["resources/images/menu01.png", "resources/images/menu02.png"];
+const IMAGE_PATHS: &'static [&'static str] = &[
+    "resources/images/menu01.png",
+    "resources/images/menu02.png",
+    "resources/images/menu10.png",
+    "resources/images/menu11.png",
+    "resources/images/menu12.png",
+];
 
 pub struct Resources {
     images: HashMap<String, (Texture, f32, f32)>,
