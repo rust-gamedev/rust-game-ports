@@ -195,9 +195,7 @@ impl GameGlobal {
                     Difficulty => (1, self.menu_difficulty),
                 };
 
-                let texture = self.resources.image("menu", &[image_i1, image_i2]);
-                let background = build_image_node(&mut scene.graph, texture, 0, 0, 0);
-                scene.graph.link_nodes(background, self.root_node);
+                self.draw_image(scene, "menu", &[image_i1, image_i2], 0, 0, 0);
             }
             Play => {
                 //
@@ -239,5 +237,22 @@ impl GameGlobal {
         for child in scene.graph[self.root_node].children().to_vec() {
             scene.graph.remove_node(child);
         }
+    }
+
+    // Draws the image (loads the texture, adds the node to the scene, and links it to the root).
+    // This is difficult to name, since the semantics of bevy and a 2d game are different.
+    //
+    fn draw_image(
+        &mut self,
+        scene: &mut Scene,
+        base: &str,
+        indexes: &[u8],
+        x: i16,
+        y: i16,
+        z: i16,
+    ) {
+        let texture = self.resources.image(base, indexes);
+        let background = build_image_node(&mut scene.graph, texture, x, y, z);
+        scene.graph.link_nodes(background, self.root_node);
     }
 }
