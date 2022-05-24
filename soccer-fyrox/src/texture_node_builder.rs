@@ -15,13 +15,11 @@ use fyrox::{
 //
 pub fn build_image_node(
     graph: &mut Graph,
-    image_data: (Texture, f32, f32),
+    texture: Texture,
     x: i16,
     y: i16,
     z: i16,
 ) -> Handle<Node> {
-    let (texture, _width, _height) = image_data;
-
     RectangleBuilder::new(
         BaseBuilder::new().with_local_transform(
             TransformBuilder::new()

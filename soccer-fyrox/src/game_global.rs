@@ -195,8 +195,8 @@ impl GameGlobal {
                     Difficulty => (1, self.menu_difficulty),
                 };
 
-                let image_data = self.resources.image("menu", &[image_i1, image_i2]);
-                let background = build_image_node(&mut scene.graph, image_data, 0, 0, 0);
+                let texture = self.resources.image("menu", &[image_i1, image_i2]);
+                let background = build_image_node(&mut scene.graph, texture, 0, 0, 0);
                 scene.graph.link_nodes(background, self.root_node);
             }
             Play => {
