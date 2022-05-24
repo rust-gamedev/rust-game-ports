@@ -38,44 +38,13 @@ pub struct GameGlobal {
     menu_difficulty: u8,
 }
 
-fn preset_window(engine: &Engine) {
-    let window = engine.get_window();
-
-    window.set_inner_size(PhysicalSize {
-        width: WIDTH,
-        height: HEIGHT,
-    });
-
-    window.set_resizable(false);
-}
-
-// Returns (scene, camera, (phony) backgroud node)
-//
-fn build_initial_scene(engine: &mut Engine) -> (Handle<Scene>, Handle<Node>, Handle<Node>) {
-    let mut scene = Scene::new();
-
-    let camera = CameraBuilder::new(BaseBuilder::new())
-        .with_projection(Projection::Orthographic(OrthographicProjection {
-            z_near: -0.1,
-            z_far: 16.0,
-            vertical_size: HEIGHT / 2.0,
-        }))
-        .build(&mut scene.graph);
-
-    let background_node = RectangleBuilder::new(BaseBuilder::new()).build(&mut scene.graph);
-
-    let scene = engine.scenes.add(scene);
-
-    (scene, camera, background_node)
-}
-
 impl GameState for GameGlobal {
     fn init(engine: &mut Engine) -> Self {
-        preset_window(engine);
+        Self::preset_window(engine);
 
         let resources = Resources::load(&engine.resource_manager);
 
-        let (scene, camera, background) = build_initial_scene(engine);
+        let (scene, camera, background) = Self::build_initial_scene(engine);
 
         let input = InputController::new();
 
@@ -131,6 +100,17 @@ impl GameState for GameGlobal {
 // the source code simpler.
 //
 impl GameGlobal {
+    fn preset_window(engine: &Engine) {
+        let window = engine.get_window();
+
+        window.set_inner_size(PhysicalSize {
+            width: WIDTH,
+            height: HEIGHT,
+        });
+
+        window.set_resizable(false);
+    }
+
     fn update(&mut self, _engine: &mut Engine) {
         use VirtualKeyCode::*;
         use {MenuState::*, State::*};
@@ -224,5 +204,25 @@ impl GameGlobal {
                 //
             }
         }
+    }
+
+    // Returns (scene, camera, (phony) backgroud node)
+    //
+    fn build_initial_scene(engine: &mut Engine) -> (Handle<Scene>, Handle<Node>, Handle<Node>) {
+        let mut scene = Scene::new();
+
+        let camera = CameraBuilder::new(BaseBuilder::new())
+            .with_projection(Projection::Orthographic(OrthographicProjection {
+                z_near: -0.1,
+                z_far: 16.0,
+                vertical_size: HEIGHT / 2.0,
+            }))
+            .build(&mut scene.graph);
+
+        let background_node = RectangleBuilder::new(BaseBuilder::new()).build(&mut scene.graph);
+
+        let scene = engine.scenes.add(scene);
+
+        (scene, camera, background_node)
     }
 }
