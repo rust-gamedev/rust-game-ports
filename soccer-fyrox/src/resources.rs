@@ -1,7 +1,8 @@
 use std::collections::HashMap;
 
 use fyrox::{
-    core::futures::executor::block_on, engine::resource_manager::ResourceManager,
+    core::futures::{executor::block_on, future::join_all},
+    engine::resource_manager::ResourceManager,
     resource::texture::Texture,
 };
 
@@ -21,23 +22,20 @@ pub struct Resources {
 
 impl Resources {
     pub fn load(resource_manager: &ResourceManager) -> Self {
-        let mut images = HashMap::new();
-
         // As of Fyrox v0.25, loading textures in debug mode is extremely slow (1.4" for each PNG file,
         // even if small), so we need to load them asynchronously.
-        // Note that if we don't `collect()`, the compiler merges mapping and iteration, causing the
-        // textures to be loaded serially.
         //
-        let texture_requests = IMAGE_PATHS
+        let texture_requests = join_all(
+            IMAGE_PATHS
+                .iter()
+                .map(|path| resource_manager.request_texture(path)),
+        );
+
+        let images = IMAGE_PATHS
             .iter()
-            .map(|path| (path, resource_manager.request_texture(path)))
-            .collect::<Vec<_>>();
-
-        for (path, texture_request) in texture_requests {
-            let texture = block_on(texture_request).unwrap();
-
-            images.insert(path.to_string(), texture);
-        }
+            .zip(block_on(texture_requests))
+            .map(|(path, texture)| (path.to_string(), texture.unwrap()))
+            .collect::<HashMap<_, _>>();
 
         Self { images }
     }
