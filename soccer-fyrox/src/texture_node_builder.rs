@@ -20,12 +20,11 @@ pub fn build_image_node(
     y: i16,
     z: i16,
 ) -> Handle<Node> {
-    let (texture, width, height) = image_data;
+    let (texture, _width, _height) = image_data;
 
     RectangleBuilder::new(
         BaseBuilder::new().with_local_transform(
             TransformBuilder::new()
-                .with_local_scale(Vector3::new(width, height, f32::EPSILON))
                 .with_local_position(Vector3::new(x as f32, y as f32, z as f32))
                 .build(),
         ),

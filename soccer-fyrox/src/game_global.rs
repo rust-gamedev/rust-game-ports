@@ -1,5 +1,5 @@
 use fyrox::{
-    core::pool::Handle,
+    core::{algebra::Vector3, pool::Handle},
     dpi::PhysicalSize,
     engine::framework::prelude::*,
     engine::Engine,
@@ -8,8 +8,9 @@ use fyrox::{
     scene::{
         base::BaseBuilder,
         camera::{CameraBuilder, OrthographicProjection, Projection},
-        dim2::rectangle::RectangleBuilder,
         node::Node,
+        pivot::PivotBuilder,
+        transform::TransformBuilder,
         Scene,
     },
 };
@@ -28,8 +29,8 @@ pub struct GameGlobal {
     resources: Resources,
     scene: Handle<Scene>,
     camera: Handle<Node>,
-    // Root of all the object nodes; on start, this is a phony node.
-    background: Handle<Node>,
+    // Root of all nodes (excluding camera)
+    root_node: Handle<Node>,
     input: InputController,
     game: Game,
     state: State,
@@ -44,7 +45,7 @@ impl GameState for GameGlobal {
 
         let resources = Resources::load(&engine.resource_manager);
 
-        let (scene, camera, background) = Self::build_initial_scene(engine);
+        let (scene, camera, root_node) = Self::build_initial_scene(engine);
 
         let input = InputController::new();
 
@@ -56,7 +57,7 @@ impl GameState for GameGlobal {
             resources,
             scene,
             camera,
-            background,
+            root_node,
             input,
             game,
             state,
@@ -67,13 +68,13 @@ impl GameState for GameGlobal {
     }
 
     fn on_tick(&mut self, engine: &mut Engine, _dt: f32, _control_flow: &mut ControlFlow) {
-        let scene = &mut engine.scenes[self.scene];
+        let mut scene = &mut engine.scenes[self.scene];
 
         // The simplest way to model a design that is as close a possible to a conventional 2d game
-        // library, is to use the background as root node, and to dynamically add each sprite to draw
-        // as node.
+        // library, is to a pivot node as root node, and to dynamically add each sprite to draw as node.
+        // By scaling the pivot node to the screen size, we don't need to scale the sprites.
         //
-        scene.graph.remove_node(self.background);
+        self.clear_scene(&mut scene);
 
         self.update(engine);
 
@@ -195,7 +196,8 @@ impl GameGlobal {
                 };
 
                 let image_data = self.resources.image("menu", &[image_i1, image_i2]);
-                self.background = build_image_node(&mut scene.graph, image_data, 0, 0, 0);
+                let background = build_image_node(&mut scene.graph, image_data, 0, 0, 0);
+                scene.graph.link_nodes(background, self.root_node);
             }
             Play => {
                 //
@@ -206,7 +208,7 @@ impl GameGlobal {
         }
     }
 
-    // Returns (scene, camera, (phony) backgroud node)
+    // Returns (scene, camera, root node)
     //
     fn build_initial_scene(engine: &mut Engine) -> (Handle<Scene>, Handle<Node>, Handle<Node>) {
         let mut scene = Scene::new();
@@ -219,10 +221,23 @@ impl GameGlobal {
             }))
             .build(&mut scene.graph);
 
-        let background_node = RectangleBuilder::new(BaseBuilder::new()).build(&mut scene.graph);
+        let root_node = PivotBuilder::new(
+            BaseBuilder::new().with_local_transform(
+                TransformBuilder::new()
+                    .with_local_scale(Vector3::new(WIDTH, HEIGHT, f32::EPSILON))
+                    .build(),
+            ),
+        )
+        .build(&mut scene.graph);
 
         let scene = engine.scenes.add(scene);
 
-        (scene, camera, background_node)
+        (scene, camera, root_node)
+    }
+
+    fn clear_scene(&mut self, scene: &mut Scene) {
+        for child in scene.graph[self.root_node].children().to_vec() {
+            scene.graph.remove_node(child);
+        }
     }
 }
