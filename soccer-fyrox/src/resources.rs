@@ -4,7 +4,6 @@ use fyrox::{
     core::futures::executor::block_on, engine::resource_manager::ResourceManager,
     resource::texture::Texture,
 };
-use imagesize::ImageSize;
 
 const ZERO_ORD: u8 = '0' as u8;
 
@@ -17,7 +16,7 @@ const IMAGE_PATHS: &'static [&'static str] = &[
 ];
 
 pub struct Resources {
-    images: HashMap<String, (Texture, f32, f32)>,
+    images: HashMap<String, Texture>,
 }
 
 impl Resources {
@@ -36,15 +35,14 @@ impl Resources {
 
         for (path, texture_request) in texture_requests {
             let texture = block_on(texture_request).unwrap();
-            let ImageSize { width, height } = imagesize::size(path).unwrap();
 
-            images.insert(path.to_string(), (texture, width as f32, height as f32));
+            images.insert(path.to_string(), texture);
         }
 
         Self { images }
     }
 
-    pub fn image(&self, base: &str, indexes: &[u8]) -> (Texture, f32, f32) {
+    pub fn image(&self, base: &str, indexes: &[u8]) -> Texture {
         if indexes.len() > 2 {
             panic!();
         }
