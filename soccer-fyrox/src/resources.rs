@@ -24,8 +24,18 @@ impl Resources {
     pub fn load(resource_manager: &ResourceManager) -> Self {
         let mut images = HashMap::new();
 
-        for path in IMAGE_PATHS {
-            let texture = block_on(resource_manager.request_texture(path)).unwrap();
+        // As of Fyrox v0.25, loading textures in debug mode is extremely slow (1.4" for each PNG file,
+        // even if small), so we need to load them asynchronously.
+        // Note that if we don't `collect()`, the compiler merges mapping and iteration, causing the
+        // textures to be loaded serially.
+        //
+        let texture_requests = IMAGE_PATHS
+            .iter()
+            .map(|path| (path, resource_manager.request_texture(path)))
+            .collect::<Vec<_>>();
+
+        for (path, texture_request) in texture_requests {
+            let texture = block_on(texture_request).unwrap();
             let ImageSize { width, height } = imagesize::size(path).unwrap();
 
             images.insert(path.to_string(), (texture, width as f32, height as f32));
