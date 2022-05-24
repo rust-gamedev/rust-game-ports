@@ -4,6 +4,7 @@ use fyrox::{
     core::futures::{executor::block_on, future::join_all},
     engine::resource_manager::ResourceManager,
     resource::texture::Texture,
+    scene::sound::SoundBufferResource,
 };
 
 const ZERO_ORD: u8 = '0' as u8;
@@ -16,8 +17,11 @@ const IMAGE_PATHS: &'static [&'static str] = &[
     "resources/images/menu12.png",
 ];
 
+const SOUND_PATHS: &'static [&'static str] = &["resources/sounds/move.ogg"];
+
 pub struct Resources {
     images: HashMap<String, Texture>,
+    sounds: HashMap<String, SoundBufferResource>,
 }
 
 impl Resources {
@@ -31,13 +35,25 @@ impl Resources {
                 .map(|path| resource_manager.request_texture(path)),
         );
 
+        let sound_requests = join_all(
+            SOUND_PATHS
+                .iter()
+                .map(|path| resource_manager.request_sound_buffer(path)),
+        );
+
         let images = IMAGE_PATHS
             .iter()
             .zip(block_on(texture_requests))
             .map(|(path, texture)| (path.to_string(), texture.unwrap()))
             .collect::<HashMap<_, _>>();
 
-        Self { images }
+        let sounds = SOUND_PATHS
+            .iter()
+            .zip(block_on(sound_requests))
+            .map(|(path, texture)| (path.to_string(), texture.unwrap()))
+            .collect::<HashMap<_, _>>();
+
+        Self { images, sounds }
     }
 
     pub fn image(&self, base: &str, indexes: &[u8]) -> Texture {
@@ -54,5 +70,23 @@ impl Resources {
         full_path.push_str(".png");
 
         self.images[&full_path].clone()
+    }
+
+    // Substantially common with the above. May optionally base both on a shared API.
+    //
+    pub fn sound(&self, base: &str, indexes: &[u8]) -> SoundBufferResource {
+        if indexes.len() > 1 {
+            panic!();
+        }
+
+        let mut full_path = format!("resources/sounds/{}", base);
+
+        for index in indexes {
+            full_path.push((ZERO_ORD + index) as char);
+        }
+
+        full_path.push_str(".ogg");
+
+        self.sounds[&full_path].clone()
     }
 }

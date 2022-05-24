@@ -10,6 +10,7 @@ use fyrox::{
         camera::{CameraBuilder, OrthographicProjection, Projection},
         node::Node,
         pivot::PivotBuilder,
+        sound::{SoundBuilder, Status::Playing},
         transform::TransformBuilder,
         Scene,
     },
@@ -112,9 +113,11 @@ impl GameGlobal {
         window.set_resizable(false);
     }
 
-    fn update(&mut self, _engine: &mut Engine) {
+    fn update(&mut self, engine: &mut Engine) {
         use VirtualKeyCode::*;
         use {MenuState::*, State::*};
+
+        let mut scene = &mut engine.scenes[self.scene];
 
         match &self.state {
             Menu => {
@@ -148,7 +151,7 @@ impl GameGlobal {
                         selection_change = -1;
                     }
                     if selection_change != 0 {
-                        // sounds.move.play() // WRITEME
+                        self.play_sound(&mut scene, "move", &[]);
                         if let Some(MenuState::NumPlayers) = self.menu_state {
                             self.menu_num_players = if self.menu_num_players == 1 { 2 } else { 1 };
                         } else {
@@ -254,5 +257,14 @@ impl GameGlobal {
         let texture = self.resources.image(base, indexes);
         let background = build_image_node(&mut scene.graph, texture, x, y, z);
         scene.graph.link_nodes(background, self.root_node);
+    }
+
+    fn play_sound(&mut self, scene: &mut Scene, base: &str, indexes: &[u8]) {
+        let sound = self.resources.sound(base, indexes);
+
+        SoundBuilder::new(BaseBuilder::new())
+            .with_buffer(Some(sound))
+            .with_status(Playing)
+            .build(&mut scene.graph);
     }
 }
