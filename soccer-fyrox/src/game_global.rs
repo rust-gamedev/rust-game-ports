@@ -1,5 +1,5 @@
 use fyrox::{
-    core::{algebra::Vector3, pool::Handle},
+    core::pool::Handle,
     dpi::PhysicalSize,
     engine::framework::prelude::*,
     engine::Engine,
@@ -9,29 +9,24 @@ use fyrox::{
         base::BaseBuilder,
         camera::{CameraBuilder, OrthographicProjection, Projection},
         node::Node,
-        pivot::PivotBuilder,
-        sound::{SoundBuilder, Status::Playing},
-        transform::TransformBuilder,
         Scene,
     },
 };
 
+use crate::game::Game;
 use crate::input_controller::InputController;
 use crate::media::Media;
 use crate::menu_state::MenuState;
 use crate::state::State;
 use crate::{controls::Controls, game};
-use crate::{game::Game, texture_node_builder::build_image_node};
 
-const WIDTH: f32 = 800.0;
-const HEIGHT: f32 = 480.0;
+pub const WIDTH: f32 = 800.0;
+pub const HEIGHT: f32 = 480.0;
 
 pub struct GameGlobal {
     resources: Media,
     scene: Handle<Scene>,
     camera: Handle<Node>,
-    images_root: Handle<Node>,
-    music: Option<Handle<Node>>,
     input: InputController,
     game: Game,
     state: State,
@@ -44,11 +39,11 @@ impl GameState for GameGlobal {
     fn init(engine: &mut Engine) -> Self {
         Self::preset_window(engine);
 
-        let resources = Media::load(&engine.resource_manager);
+        let mut scene = Scene::new();
 
-        let (scene, camera, root_node) = Self::build_initial_scene(engine);
+        let camera = Self::build_camera(&mut scene);
 
-        let music = None;
+        let resources = Media::new(&engine.resource_manager, &mut scene);
 
         let input = InputController::new();
 
@@ -56,12 +51,12 @@ impl GameState for GameGlobal {
         let state = State::Menu;
         let menu_state = Some(MenuState::NumPlayers);
 
+        let scene_h = engine.scenes.add(scene);
+
         Self {
             resources,
-            scene,
+            scene: scene_h,
             camera,
-            images_root: root_node,
-            music,
             input,
             game,
             state,
@@ -74,11 +69,7 @@ impl GameState for GameGlobal {
     fn on_tick(&mut self, engine: &mut Engine, _dt: f32, _control_flow: &mut ControlFlow) {
         let mut scene = &mut engine.scenes[self.scene];
 
-        // The simplest way to model a design that is as close a possible to a conventional 2d game
-        // library, is to a pivot node as root node, and to dynamically add each sprite to draw as node.
-        // By scaling the pivot node to the screen size, we don't need to scale the sprites.
-        //
-        self.clear_scene(&mut scene);
+        self.resources.clear_images(&mut scene);
 
         self.update(engine);
 
@@ -154,7 +145,7 @@ impl GameGlobal {
                         selection_change = -1;
                     }
                     if selection_change != 0 {
-                        self.play_sound(&mut scene, "move", &[]);
+                        self.resources.play_sound(&mut scene, "move", &[]);
                         if let Some(MenuState::NumPlayers) = self.menu_state {
                             self.menu_num_players = if self.menu_num_players == 1 { 2 } else { 1 };
                         } else {
@@ -201,7 +192,8 @@ impl GameGlobal {
                     Difficulty => (1, self.menu_difficulty),
                 };
 
-                self.draw_image(scene, "menu", &[image_i1, image_i2], 0, 0, 0);
+                self.resources
+                    .draw_image(scene, "menu", &[image_i1, image_i2], 0, 0, 0);
             }
             Play => {
                 //
@@ -214,88 +206,13 @@ impl GameGlobal {
 
     // Returns (scene, camera, root node)
     //
-    fn build_initial_scene(engine: &mut Engine) -> (Handle<Scene>, Handle<Node>, Handle<Node>) {
-        let mut scene = Scene::new();
-
-        let camera = CameraBuilder::new(BaseBuilder::new())
+    fn build_camera(scene: &mut Scene) -> Handle<Node> {
+        CameraBuilder::new(BaseBuilder::new())
             .with_projection(Projection::Orthographic(OrthographicProjection {
                 z_near: -0.1,
                 z_far: 16.0,
                 vertical_size: HEIGHT / 2.0,
             }))
-            .build(&mut scene.graph);
-
-        let root_node = PivotBuilder::new(
-            BaseBuilder::new().with_local_transform(
-                TransformBuilder::new()
-                    .with_local_scale(Vector3::new(WIDTH, HEIGHT, f32::EPSILON))
-                    .build(),
-            ),
-        )
-        .build(&mut scene.graph);
-
-        let scene = engine.scenes.add(scene);
-
-        (scene, camera, root_node)
-    }
-
-    fn clear_scene(&mut self, scene: &mut Scene) {
-        for child in scene.graph[self.images_root].children().to_vec() {
-            scene.graph.remove_node(child);
-        }
-    }
-
-    // Draws the image (loads the texture, adds the node to the scene, and links it to the root).
-    // This is difficult to name, since the semantics of bevy and a 2d game are different.
-    //
-    fn draw_image(
-        &mut self,
-        scene: &mut Scene,
-        base: &str,
-        indexes: &[u8],
-        x: i16,
-        y: i16,
-        z: i16,
-    ) {
-        let texture = self.resources.image(base, indexes);
-        let background = build_image_node(&mut scene.graph, texture, x, y, z);
-        scene.graph.link_nodes(background, self.images_root);
-    }
-
-    fn play_sound(&self, scene: &mut Scene, base: &str, indexes: &[u8]) {
-        let base = "sounds/".to_string() + base;
-        let sound = self.resources.sound(base, indexes);
-
-        SoundBuilder::new(BaseBuilder::new())
-            .with_buffer(Some(sound))
-            .with_status(Playing)
-            .with_play_once(true)
-            .build(&mut scene.graph);
-    }
-
-    fn play_music(&mut self, scene: &mut Scene, base: &str) {
-        if self.music.is_some() {
-            panic!("There must be no music references, to play_music()");
-        }
-
-        let base = "music/".to_string() + base;
-        let sound = self.resources.sound(base, &[]);
-
-        self.music = Some(
-            SoundBuilder::new(BaseBuilder::new())
-                .with_buffer(Some(sound))
-                .with_looping(true)
-                .with_status(Playing)
-                .build(&mut scene.graph),
-        );
-    }
-
-    fn stop_music(&mut self, scene: &mut Scene) {
-        let music_h = self
-            .music
-            .expect("A music reference must exist, to stop_music()!");
-
-        scene.remove_node(music_h);
-        self.music = None;
+            .build(&mut scene.graph)
     }
 }
