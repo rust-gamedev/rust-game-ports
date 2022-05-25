@@ -20,12 +20,12 @@ const IMAGE_PATHS: &'static [&'static str] = &[
 const SOUND_PATHS: &'static [&'static str] =
     &["resources/sounds/move.ogg", "resources/music/theme.ogg"];
 
-pub struct Resources {
+pub struct Media {
     images: HashMap<String, Texture>,
     sounds: HashMap<String, SoundBufferResource>,
 }
 
-impl Resources {
+impl Media {
     pub fn load(resource_manager: &ResourceManager) -> Self {
         // As of Fyrox v0.25, loading textures in debug mode is extremely slow (1.4" for each PNG file,
         // even if small), so we need to load them asynchronously.

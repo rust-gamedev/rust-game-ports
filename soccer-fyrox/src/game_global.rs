@@ -17,8 +17,8 @@ use fyrox::{
 };
 
 use crate::input_controller::InputController;
+use crate::media::Media;
 use crate::menu_state::MenuState;
-use crate::resources::Resources;
 use crate::state::State;
 use crate::{controls::Controls, game};
 use crate::{game::Game, texture_node_builder::build_image_node};
@@ -27,7 +27,7 @@ const WIDTH: f32 = 800.0;
 const HEIGHT: f32 = 480.0;
 
 pub struct GameGlobal {
-    resources: Resources,
+    resources: Media,
     scene: Handle<Scene>,
     camera: Handle<Node>,
     images_root: Handle<Node>,
@@ -44,7 +44,7 @@ impl GameState for GameGlobal {
     fn init(engine: &mut Engine) -> Self {
         Self::preset_window(engine);
 
-        let resources = Resources::load(&engine.resource_manager);
+        let resources = Media::load(&engine.resource_manager);
 
         let (scene, camera, root_node) = Self::build_initial_scene(engine);
 
