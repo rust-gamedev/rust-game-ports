@@ -10,10 +10,7 @@ use fyrox::{
         camera::{CameraBuilder, OrthographicProjection, Projection},
         node::Node,
         pivot::PivotBuilder,
-        sound::{
-            SoundBuilder,
-            Status::{self, Playing},
-        },
+        sound::{SoundBuilder, Status::Playing},
         transform::TransformBuilder,
         Scene,
     },
@@ -33,9 +30,8 @@ pub struct GameGlobal {
     resources: Resources,
     scene: Handle<Scene>,
     camera: Handle<Node>,
-    images_root: Handle<Node>,
-    sounds_root: Handle<Node>,
-    // There's only one music, so we use an Option; using a root node is an equally valid approach.
+    // Root of all nodes (excluding camera)
+    root_node: Handle<Node>,
     music: Option<Handle<Node>>,
     input: InputController,
     game: Game,
@@ -51,7 +47,7 @@ impl GameState for GameGlobal {
 
         let resources = Resources::load(&engine.resource_manager);
 
-        let (scene, camera, images_root, sounds_root) = Self::build_initial_scene(engine);
+        let (scene, camera, root_node) = Self::build_initial_scene(engine);
 
         let music = None;
 
@@ -65,8 +61,7 @@ impl GameState for GameGlobal {
             resources,
             scene,
             camera,
-            images_root,
-            sounds_root,
+            root_node,
             music,
             input,
             game,
@@ -220,9 +215,7 @@ impl GameGlobal {
 
     // Returns (scene, camera, root node)
     //
-    fn build_initial_scene(
-        engine: &mut Engine,
-    ) -> (Handle<Scene>, Handle<Node>, Handle<Node>, Handle<Node>) {
+    fn build_initial_scene(engine: &mut Engine) -> (Handle<Scene>, Handle<Node>, Handle<Node>) {
         let mut scene = Scene::new();
 
         let camera = CameraBuilder::new(BaseBuilder::new())
@@ -233,7 +226,7 @@ impl GameGlobal {
             }))
             .build(&mut scene.graph);
 
-        let images_root = PivotBuilder::new(
+        let root_node = PivotBuilder::new(
             BaseBuilder::new().with_local_transform(
                 TransformBuilder::new()
                     .with_local_scale(Vector3::new(WIDTH, HEIGHT, f32::EPSILON))
@@ -242,26 +235,14 @@ impl GameGlobal {
         )
         .build(&mut scene.graph);
 
-        let sounds_root = PivotBuilder::new(BaseBuilder::new()).build(&mut scene.graph);
-
         let scene = engine.scenes.add(scene);
 
-        (scene, camera, images_root, sounds_root)
+        (scene, camera, root_node)
     }
 
     fn clear_scene(&mut self, scene: &mut Scene) {
-        for child in scene.graph[self.images_root].children().to_vec() {
+        for child in scene.graph[self.root_node].children().to_vec() {
             scene.graph.remove_node(child);
-        }
-
-        // Sounds still work if they're quickly (on the next frame) removed, but this is a cleaner approach.
-        //
-        for child in scene.graph[self.sounds_root].children().to_vec() {
-            let sound = scene.graph[child].as_sound();
-
-            if sound.status() == Status::Stopped {
-                scene.graph.remove_node(child)
-            }
         }
     }
 
@@ -279,19 +260,17 @@ impl GameGlobal {
     ) {
         let texture = self.resources.image(base, indexes);
         let background = build_image_node(&mut scene.graph, texture, x, y, z);
-        scene.graph.link_nodes(background, self.images_root);
+        scene.graph.link_nodes(background, self.root_node);
     }
 
     fn play_sound(&self, scene: &mut Scene, base: &str, indexes: &[u8]) {
         let base = "sounds/".to_string() + base;
         let sound = self.resources.sound(base, indexes);
 
-        let sound_h = SoundBuilder::new(BaseBuilder::new())
+        SoundBuilder::new(BaseBuilder::new())
             .with_buffer(Some(sound))
             .with_status(Playing)
             .build(&mut scene.graph);
-
-        scene.graph.link_nodes(sound_h, self.sounds_root);
     }
 
     fn play_music(&mut self, scene: &mut Scene, base: &str) {
