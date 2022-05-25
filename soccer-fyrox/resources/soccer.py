@@ -76,23 +76,23 @@ DEBUG_SHOW_PEERS = False
 DEBUG_SHOW_SHOOT_TARGET = False
 DEBUG_SHOW_COSTS = False
 
-class Difficulty:
-    def __init__(self, goalie_enabled, second_lead_enabled, speed_boost, holdoff_timer):
-        self.goalie_enabled = goalie_enabled
-
-        # When a player has the ball, either one or two players will be chosen from the other team to try to intercept
-        # the ball owner. Those players will have their 'lead' attributes set to a number indicating how far ahead of the
-        # ball they should try to run. (If they tried to go to where the ball is currently, they'd always trail behind)
-        # This attribute determines whether there should be one or two lead players
-        self.second_lead_enabled = second_lead_enabled
-
-        # Speed boost to apply to CPU-team players in certain circumstances
-        self.speed_boost = speed_boost
-
-        # Hold-off timer limits rate at which computer-controlled players can pass the ball
-        self.holdoff_timer = holdoff_timer
-
-DIFFICULTY = [Difficulty(False, False, 0, 120), Difficulty(False, True, 0.1, 90), Difficulty(True, True, 0.2, 60)]
+# class Difficulty:
+#     def __init__(self, goalie_enabled, second_lead_enabled, speed_boost, holdoff_timer):
+#         self.goalie_enabled = goalie_enabled
+#
+#         # When a player has the ball, either one or two players will be chosen from the other team to try to intercept
+#         # the ball owner. Those players will have their 'lead' attributes set to a number indicating how far ahead of the
+#         # ball they should try to run. (If they tried to go to where the ball is currently, they'd always trail behind)
+#         # This attribute determines whether there should be one or two lead players
+#         self.second_lead_enabled = second_lead_enabled
+#
+#         # Speed boost to apply to CPU-team players in certain circumstances
+#         self.speed_boost = speed_boost
+#
+#         # Hold-off timer limits rate at which computer-controlled players can pass the ball
+#         self.holdoff_timer = holdoff_timer
+#
+# DIFFICULTY = [Difficulty(False, False, 0, 120), Difficulty(False, True, 0.1, 90), Difficulty(True, True, 0.2, 60)]
 
 # Custom sine/cosine functions for angles of 0 to 7, where 0 is up,
 # 1 is up+right, 2 is right, etc.
@@ -695,8 +695,8 @@ class Team:
 
 class Game:
     def __init__(self, p1_controls=None, p2_controls=None, difficulty=2):
-        self.teams = [Team(p1_controls), Team(p2_controls)]
-        self.difficulty = DIFFICULTY[difficulty]
+#         self.teams = [Team(p1_controls), Team(p2_controls)]
+#         self.difficulty = DIFFICULTY[difficulty]
 
         try:
             if self.teams[0].human():
