@@ -32,6 +32,7 @@ pub struct GameGlobal {
     camera: Handle<Node>,
     // Root of all nodes (excluding camera)
     root_node: Handle<Node>,
+    music: Option<Handle<Node>>,
     input: InputController,
     game: Game,
     state: State,
@@ -48,6 +49,8 @@ impl GameState for GameGlobal {
 
         let (scene, camera, root_node) = Self::build_initial_scene(engine);
 
+        let music = None;
+
         let input = InputController::new();
 
         let game = Game::new(None, None, game::DEFAULT_DIFFICULTY);
@@ -59,6 +62,7 @@ impl GameState for GameGlobal {
             scene,
             camera,
             root_node,
+            music,
             input,
             game,
             state,
@@ -259,12 +263,39 @@ impl GameGlobal {
         scene.graph.link_nodes(background, self.root_node);
     }
 
-    fn play_sound(&mut self, scene: &mut Scene, base: &str, indexes: &[u8]) {
+    fn play_sound(&self, scene: &mut Scene, base: &str, indexes: &[u8]) {
+        let base = "sounds/".to_string() + base;
         let sound = self.resources.sound(base, indexes);
 
         SoundBuilder::new(BaseBuilder::new())
             .with_buffer(Some(sound))
             .with_status(Playing)
             .build(&mut scene.graph);
+    }
+
+    fn play_music(&mut self, scene: &mut Scene, base: &str) {
+        if self.music.is_some() {
+            panic!("There must be no music references, to play_music()");
+        }
+
+        let base = "music/".to_string() + base;
+        let sound = self.resources.sound(base, &[]);
+
+        self.music = Some(
+            SoundBuilder::new(BaseBuilder::new())
+                .with_buffer(Some(sound))
+                .with_looping(true)
+                .with_status(Playing)
+                .build(&mut scene.graph),
+        );
+    }
+
+    fn stop_music(&mut self, scene: &mut Scene) {
+        let music_h = self
+            .music
+            .expect("A music reference must exist, to stop_music()!");
+
+        scene.remove_node(music_h);
+        self.music = None;
     }
 }
