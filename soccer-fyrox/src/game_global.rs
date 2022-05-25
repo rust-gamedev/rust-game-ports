@@ -259,7 +259,7 @@ impl GameGlobal {
         scene.graph.link_nodes(background, self.root_node);
     }
 
-    fn play_sound(&mut self, scene: &mut Scene, base: &str, indexes: &[u8]) {
+    fn play_sound(&self, scene: &mut Scene, base: &str, indexes: &[u8]) {
         let sound = self.resources.sound(base, indexes);
 
         SoundBuilder::new(BaseBuilder::new())
