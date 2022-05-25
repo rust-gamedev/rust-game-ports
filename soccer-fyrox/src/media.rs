@@ -32,8 +32,11 @@ const IMAGE_PATHS: &'static [&'static str] = &[
     "resources/images/menu12.png",
 ];
 
-const SOUND_PATHS: &'static [&'static str] =
-    &["resources/sounds/move.ogg", "resources/music/theme.ogg"];
+const SOUND_PATHS: &'static [&'static str] = &[
+    "resources/sounds/move.ogg",
+    "resources/sounds/start.ogg",
+    "resources/music/theme.ogg",
+];
 
 // It's not easy to make the overall design of the program simple, since Fyrox requires several elements
 // to be carried around (scene, handles, resources...).

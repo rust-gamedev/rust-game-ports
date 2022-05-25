@@ -43,11 +43,11 @@ impl GameState for GameGlobal {
 
         let camera = Self::build_camera(&mut scene);
 
-        let media = Media::new(&engine.resource_manager, &mut scene);
+        let mut media = Media::new(&engine.resource_manager, &mut scene);
 
         let input = InputController::new();
 
-        let game = Game::new(None, None, game::DEFAULT_DIFFICULTY);
+        let game = Game::new(None, None, game::DEFAULT_DIFFICULTY, &mut scene, &mut media);
         let state = State::Menu;
         let menu_state = Some(MenuState::NumPlayers);
 
@@ -128,13 +128,21 @@ impl GameGlobal {
                                 Some(Controls::new(0)),
                                 Some(Controls::new(1)),
                                 game::DEFAULT_DIFFICULTY,
+                                &mut scene,
+                                &mut self.media,
                             )
                         }
                     } else {
                         // Start 1P game
                         self.state = State::Play;
                         self.menu_state = None;
-                        self.game = Game::new(Some(Controls::new(0)), None, self.menu_difficulty);
+                        self.game = Game::new(
+                            Some(Controls::new(0)),
+                            None,
+                            self.menu_difficulty,
+                            &mut scene,
+                            &mut self.media,
+                        );
                     }
                 } else {
                     // Detect + act on up/down arrow keys
@@ -172,7 +180,13 @@ impl GameGlobal {
                     // Switch to menu state, and create a new game object without a player
                     self.state = State::Menu;
                     self.menu_state = Some(MenuState::NumPlayers);
-                    self.game = Game::new(None, None, game::DEFAULT_DIFFICULTY);
+                    self.game = Game::new(
+                        None,
+                        None,
+                        game::DEFAULT_DIFFICULTY,
+                        &mut scene,
+                        &mut self.media,
+                    );
                 }
             }
         }
