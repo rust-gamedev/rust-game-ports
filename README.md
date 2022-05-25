@@ -12,7 +12,7 @@ The completed ports are:
 
 Work in progress:
 
-- Code the Classics Vol. 1/TBD: porting to [Fyrox](https://github.com/FyroxEngine/Fyrox)
+- Code the Classics Vol. 1/Soccer: porting to [Fyrox](https://github.com/FyroxEngine/Fyrox)
 
 ## Book!
 
