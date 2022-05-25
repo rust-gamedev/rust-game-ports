@@ -17,7 +17,8 @@ const IMAGE_PATHS: &'static [&'static str] = &[
     "resources/images/menu12.png",
 ];
 
-const SOUND_PATHS: &'static [&'static str] = &["resources/sounds/move.ogg"];
+const SOUND_PATHS: &'static [&'static str] =
+    &["resources/sounds/move.ogg", "resources/music/theme.ogg"];
 
 pub struct Resources {
     images: HashMap<String, Texture>,
