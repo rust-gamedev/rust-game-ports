@@ -70,7 +70,10 @@ impl Resources {
 
         full_path.push_str(".png");
 
-        self.images[&full_path].clone()
+        self.images
+            .get(&full_path)
+            .expect(&format!("Image '{}' not found!", &full_path))
+            .clone()
     }
 
     // Substantially common with the above. May optionally base both on a shared API.
@@ -88,6 +91,9 @@ impl Resources {
 
         full_path.push_str(".ogg");
 
-        self.sounds[&full_path].clone()
+        self.sounds
+            .get(&full_path)
+            .expect(&format!("Sound '{}' not found!", &full_path))
+            .clone()
     }
 }
