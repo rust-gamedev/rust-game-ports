@@ -145,7 +145,7 @@ impl GameGlobal {
                         selection_change = -1;
                     }
                     if selection_change != 0 {
-                        self.media.play_sound(&mut scene, "move", &[]);
+                        self.media.play_sound(&mut scene, "sounds/move", &[]);
                         if let Some(MenuState::NumPlayers) = self.menu_state {
                             self.menu_num_players = if self.menu_num_players == 1 { 2 } else { 1 };
                         } else {
