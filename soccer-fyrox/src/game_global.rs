@@ -24,7 +24,7 @@ pub const WIDTH: f32 = 800.0;
 pub const HEIGHT: f32 = 480.0;
 
 pub struct GameGlobal {
-    resources: Media,
+    media: Media,
     scene: Handle<Scene>,
     camera: Handle<Node>,
     input: InputController,
@@ -43,7 +43,7 @@ impl GameState for GameGlobal {
 
         let camera = Self::build_camera(&mut scene);
 
-        let resources = Media::new(&engine.resource_manager, &mut scene);
+        let media = Media::new(&engine.resource_manager, &mut scene);
 
         let input = InputController::new();
 
@@ -54,7 +54,7 @@ impl GameState for GameGlobal {
         let scene_h = engine.scenes.add(scene);
 
         Self {
-            resources,
+            media,
             scene: scene_h,
             camera,
             input,
@@ -69,7 +69,7 @@ impl GameState for GameGlobal {
     fn on_tick(&mut self, engine: &mut Engine, _dt: f32, _control_flow: &mut ControlFlow) {
         let mut scene = &mut engine.scenes[self.scene];
 
-        self.resources.clear_images(&mut scene);
+        self.media.clear_images(&mut scene);
 
         self.update(engine);
 
@@ -145,7 +145,7 @@ impl GameGlobal {
                         selection_change = -1;
                     }
                     if selection_change != 0 {
-                        self.resources.play_sound(&mut scene, "move", &[]);
+                        self.media.play_sound(&mut scene, "move", &[]);
                         if let Some(MenuState::NumPlayers) = self.menu_state {
                             self.menu_num_players = if self.menu_num_players == 1 { 2 } else { 1 };
                         } else {
@@ -192,7 +192,7 @@ impl GameGlobal {
                     Difficulty => (1, self.menu_difficulty),
                 };
 
-                self.resources
+                self.media
                     .draw_image(scene, "menu", &[image_i1, image_i2], 0, 0, 0);
             }
             Play => {
