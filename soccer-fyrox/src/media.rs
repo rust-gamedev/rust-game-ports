@@ -32,8 +32,11 @@ const IMAGE_PATHS: &'static [&'static str] = &[
     "resources/images/menu12.png",
 ];
 
-const SOUND_PATHS: &'static [&'static str] =
-    &["resources/sounds/move.ogg", "resources/music/theme.ogg"];
+const SOUND_PATHS: &'static [&'static str] = &[
+    "resources/sounds/move.ogg",
+    "resources/sounds/start.ogg",
+    "resources/music/theme.ogg",
+];
 
 // It's not easy to make the overall design of the program simple, since Fyrox requires several elements
 // to be carried around (scene, handles, resources...).
@@ -42,7 +45,7 @@ pub struct Media {
     image_textures: HashMap<String, Texture>,
     sound_resources: HashMap<String, SoundBufferResource>,
     images_root: Handle<Node>,
-    music: Option<Handle<Node>>,
+    looping_sounds: HashMap<String, Handle<Node>>,
 }
 
 impl Media {
@@ -87,13 +90,13 @@ impl Media {
         )
         .build(&mut scene.graph);
 
-        let music = None;
+        let looping_sounds = HashMap::new();
 
         Self {
             image_textures,
             sound_resources,
             images_root,
-            music,
+            looping_sounds,
         }
     }
 
@@ -125,8 +128,7 @@ impl Media {
     }
 
     pub fn play_sound(&self, scene: &mut Scene, base: &str, indexes: &[u8]) {
-        let base = "sounds/".to_string() + base;
-        let sound = self.sound(base, indexes);
+        let sound = self.sound(&base, indexes);
 
         SoundBuilder::new(BaseBuilder::new())
             .with_buffer(Some(sound))
@@ -135,30 +137,38 @@ impl Media {
             .build(&mut scene.graph);
     }
 
-    pub fn play_music(&mut self, scene: &mut Scene, base: &str) {
-        if self.music.is_some() {
-            panic!("There must be no music references, in order to play_music()");
-        }
+    // In PyGame, music is a streamed (and repeated) sound; in Fyrox, there isn't the streaming concept.
+    // In the source project, looping sounds don't have an index.
+    //
+    // We could merge this and the play_sound(), but it's simpler (API-wise) to separate them, taking
+    // advantage of the two points above.
+    //
+    pub fn play_looping_sound(&mut self, scene: &mut Scene, name: &str) {
+        let sound = self.sound(name, &[]);
 
-        let base = "music/".to_string() + base;
-        let sound = self.sound(base, &[]);
+        let node = SoundBuilder::new(BaseBuilder::new())
+            .with_buffer(Some(sound))
+            .with_looping(true)
+            .with_status(Status::Playing)
+            .build(&mut scene.graph);
 
-        self.music = Some(
-            SoundBuilder::new(BaseBuilder::new())
-                .with_buffer(Some(sound))
-                .with_looping(true)
-                .with_status(Status::Playing)
-                .build(&mut scene.graph),
-        );
+        self.looping_sounds.insert(name.to_string(), node);
     }
 
-    fn stop_music(&mut self, scene: &mut Scene) {
-        let music_h = self
-            .music
-            .expect("A music reference must exist, in order to stop_music()!");
+    // The source project allows attempting to stop a sound that hasn't been started.
+    //
+    // Looping sounds don't have an index (see play_sound()).
+    //
+    pub fn stop_looping_sound(&mut self, scene: &mut Scene, base: &str) {
+        if let Some(sound_h) = self.looping_sounds.remove(base) {
+            let sound = &mut scene.graph[sound_h];
 
-        scene.remove_node(music_h);
-        self.music = None;
+            // Removing the node also stops the sound, so this is technically redundant.
+            //
+            sound.as_sound_mut().stop();
+
+            scene.remove_node(sound_h);
+        }
     }
 
     fn image<S: AsRef<str> + Display>(&self, base: S, indexes: &[u8]) -> Texture {

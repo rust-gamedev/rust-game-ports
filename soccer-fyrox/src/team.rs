@@ -11,4 +11,8 @@ impl Team {
 
         Self { controls, score }
     }
+
+    pub fn human(&self) -> bool {
+        self.controls.is_some()
+    }
 }

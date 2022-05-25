@@ -3,6 +3,7 @@
 #![allow(dead_code)]
 
 mod controls;
+mod difficulty;
 mod game;
 mod game_global;
 mod input_controller;
