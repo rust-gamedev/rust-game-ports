@@ -79,7 +79,7 @@ impl Resources {
             panic!();
         }
 
-        let mut full_path = format!("resources/sounds/{}", base);
+        let mut full_path = format!("resources/{}", base);
 
         for index in indexes {
             full_path.push((ZERO_ORD + index) as char);

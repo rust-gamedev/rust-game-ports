@@ -260,6 +260,7 @@ impl GameGlobal {
     }
 
     fn play_sound(&self, scene: &mut Scene, base: &str, indexes: &[u8]) {
+        let base = "sounds/".to_string() + base;
         let sound = self.resources.sound(base, indexes);
 
         SoundBuilder::new(BaseBuilder::new())
