@@ -30,8 +30,7 @@ pub struct GameGlobal {
     resources: Resources,
     scene: Handle<Scene>,
     camera: Handle<Node>,
-    // Root of all nodes (excluding camera)
-    root_node: Handle<Node>,
+    images_root: Handle<Node>,
     music: Option<Handle<Node>>,
     input: InputController,
     game: Game,
@@ -61,7 +60,7 @@ impl GameState for GameGlobal {
             resources,
             scene,
             camera,
-            root_node,
+            images_root: root_node,
             music,
             input,
             game,
@@ -241,7 +240,7 @@ impl GameGlobal {
     }
 
     fn clear_scene(&mut self, scene: &mut Scene) {
-        for child in scene.graph[self.root_node].children().to_vec() {
+        for child in scene.graph[self.images_root].children().to_vec() {
             scene.graph.remove_node(child);
         }
     }
@@ -260,7 +259,7 @@ impl GameGlobal {
     ) {
         let texture = self.resources.image(base, indexes);
         let background = build_image_node(&mut scene.graph, texture, x, y, z);
-        scene.graph.link_nodes(background, self.root_node);
+        scene.graph.link_nodes(background, self.images_root);
     }
 
     fn play_sound(&self, scene: &mut Scene, base: &str, indexes: &[u8]) {
