@@ -270,6 +270,7 @@ impl GameGlobal {
         SoundBuilder::new(BaseBuilder::new())
             .with_buffer(Some(sound))
             .with_status(Playing)
+            .with_play_once(true)
             .build(&mut scene.graph);
     }
 
