@@ -11,7 +11,6 @@ use fyrox::{
     scene::{
         base::BaseBuilder,
         dim2::rectangle::RectangleBuilder,
-        graph::Graph,
         node::Node,
         pivot::PivotBuilder,
         sound::{SoundBufferResource, SoundBuilder, Status},
@@ -111,18 +110,7 @@ impl Media {
             .map(|(path, texture)| (path.to_string(), texture.unwrap()))
             .collect::<HashMap<_, _>>();
 
-        let images_root = PivotBuilder::new(
-            BaseBuilder::new().with_local_transform(
-                TransformBuilder::new()
-                    .with_local_scale(Vector3::new(
-                        game_global::WIDTH as f32,
-                        game_global::HEIGHT as f32,
-                        f32::EPSILON,
-                    ))
-                    .build(),
-            ),
-        )
-        .build(&mut scene.graph);
+        let images_root = PivotBuilder::new(BaseBuilder::new()).build(&mut scene.graph);
 
         let looping_sounds = HashMap::new();
 
@@ -173,8 +161,22 @@ impl Media {
             let fyrox_y =
                 game_global::HEIGHT as f32 / 2.0 - texture_height as f32 / 2.0 - std_y as f32;
 
-            let background = Self::build_image_node(&mut scene.graph, texture, fyrox_x, fyrox_y, z);
-            scene.graph.link_nodes(background, self.images_root);
+            let node = RectangleBuilder::new(
+                BaseBuilder::new().with_local_transform(
+                    TransformBuilder::new()
+                        .with_local_position(Vector3::new(fyrox_x, fyrox_y, z as f32))
+                        .with_local_scale(Vector3::new(
+                            texture_width as f32,
+                            texture_height as f32,
+                            f32::EPSILON,
+                        ))
+                        .build(),
+                ),
+            )
+            .with_texture(texture)
+            .build(&mut scene.graph);
+
+            scene.graph.link_nodes(node, self.images_root);
         } else {
             panic!("Texture is not a rectangle!")
         }
@@ -262,23 +264,5 @@ impl Media {
             .get(&full_path)
             .expect(&format!("Sound '{}' not found!", &full_path))
             .clone()
-    }
-
-    fn build_image_node(
-        graph: &mut Graph,
-        texture: Texture,
-        x: f32,
-        y: f32,
-        z: i16,
-    ) -> Handle<Node> {
-        RectangleBuilder::new(
-            BaseBuilder::new().with_local_transform(
-                TransformBuilder::new()
-                    .with_local_position(Vector3::new(x, y, z as f32))
-                    .build(),
-            ),
-        )
-        .with_texture(texture)
-        .build(graph)
     }
 }
