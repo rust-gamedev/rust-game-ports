@@ -20,8 +20,8 @@ use crate::menu_state::MenuState;
 use crate::state::State;
 use crate::{controls::Controls, game};
 
-pub const WIDTH: f32 = 800.0;
-pub const HEIGHT: f32 = 480.0;
+pub const WIDTH: i16 = 800;
+pub const HEIGHT: i16 = 480;
 
 pub struct GameGlobal {
     media: Media,
@@ -225,7 +225,7 @@ impl GameGlobal {
             .with_projection(Projection::Orthographic(OrthographicProjection {
                 z_near: -0.1,
                 z_far: 16.0,
-                vertical_size: HEIGHT / 2.0,
+                vertical_size: (HEIGHT / 2) as f32,
             }))
             .build(&mut scene.graph)
     }

@@ -7,7 +7,7 @@ use fyrox::{
         pool::Handle,
     },
     engine::resource_manager::ResourceManager,
-    resource::texture::Texture,
+    resource::texture::{Texture, TextureKind},
     scene::{
         base::BaseBuilder,
         dim2::rectangle::RectangleBuilder,
@@ -81,8 +81,8 @@ impl Media {
             BaseBuilder::new().with_local_transform(
                 TransformBuilder::new()
                     .with_local_scale(Vector3::new(
-                        game_global::WIDTH,
-                        game_global::HEIGHT,
+                        game_global::WIDTH as f32,
+                        game_global::HEIGHT as f32,
                         f32::EPSILON,
                     ))
                     .build(),
@@ -111,20 +111,39 @@ impl Media {
     }
 
     // Draws the image (loads the texture, adds the node to the scene, and links it to the root).
-    // This is difficult to name, since the semantics of bevy and a 2d game are different.
+    //
+    // The coordinates ("std" = "standard") are the typical orientation used for 2d libraries (center
+    // at top left, x -> right, y -> down).
+    //
+    // This is difficult to name, since the semantics of Fyrox and (simple) 2d games are different.
     //
     pub fn draw_image(
         &mut self,
         scene: &mut Scene,
         base: &str,
         indexes: &[u8],
-        x: i16,
-        y: i16,
+        std_x: i16,
+        std_y: i16,
         z: i16,
     ) {
         let texture = self.image(base, indexes);
-        let background = Self::build_image_node(&mut scene.graph, texture, x, y, z);
-        scene.graph.link_nodes(background, self.images_root);
+        let texture_kind = texture.data_ref().kind();
+
+        if let TextureKind::Rectangle {
+            width: texture_width,
+            height: texture_height,
+        } = texture_kind
+        {
+            let fyrox_x =
+                game_global::WIDTH as f32 / 2.0 - texture_width as f32 / 2.0 - std_x as f32;
+            let fyrox_y =
+                game_global::HEIGHT as f32 / 2.0 - texture_height as f32 / 2.0 - std_y as f32;
+
+            let background = Self::build_image_node(&mut scene.graph, texture, fyrox_x, fyrox_y, z);
+            scene.graph.link_nodes(background, self.images_root);
+        } else {
+            panic!("Texture is not a rectangle!")
+        }
     }
 
     pub fn play_sound(&self, scene: &mut Scene, base: &str, indexes: &[u8]) {
@@ -214,14 +233,14 @@ impl Media {
     fn build_image_node(
         graph: &mut Graph,
         texture: Texture,
-        x: i16,
-        y: i16,
+        x: f32,
+        y: f32,
         z: i16,
     ) -> Handle<Node> {
         RectangleBuilder::new(
             BaseBuilder::new().with_local_transform(
                 TransformBuilder::new()
-                    .with_local_position(Vector3::new(x as f32, y as f32, z as f32))
+                    .with_local_position(Vector3::new(x, y, z as f32))
                     .build(),
             ),
         )
