@@ -22,6 +22,7 @@ use crate::{controls::Controls, game};
 
 pub const WIDTH: i16 = 800;
 pub const HEIGHT: i16 = 480;
+pub const HALF_WINDOW_W: i16 = WIDTH / 2;
 
 pub struct GameGlobal {
     media: Media,
@@ -210,7 +211,32 @@ impl GameGlobal {
                     .draw_image(scene, "menu", &[image_i1, image_i2], 0, 0, 0);
             }
             Play => {
-                //
+                // Display score bar at top
+                self.media
+                    .draw_image(scene, "bar", &[], HALF_WINDOW_W - 176, 0, 0);
+                // Show score for each team
+                for i in 0..2 {
+                    self.media.draw_image(
+                        scene,
+                        "s",
+                        &[self.game.teams[i].score],
+                        HALF_WINDOW_W + 7 - 39 * (i as i16),
+                        6,
+                        0,
+                    );
+                }
+
+                // Show GOAL image if a goal has recently been scored
+                if self.game.score_timer > 0 {
+                    self.media.draw_image(
+                        scene,
+                        "goal",
+                        &[],
+                        HALF_WINDOW_W - 300,
+                        HEIGHT / 2 - 88,
+                        0,
+                    );
+                }
             }
             GameOver => {
                 //
