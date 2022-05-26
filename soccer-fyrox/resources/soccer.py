@@ -1075,18 +1075,18 @@ def draw():
 #         else:
 #             image = "menu1" + str(menu_difficulty)
 #         screen.blit(image, (0, 0))
-
-    elif state == State.PLAY:
-        # Display score bar at top
-        screen.blit("bar", (HALF_WINDOW_W - 176, 0))
-
-        # Show score for each team
-        for i in range(2):
-            screen.blit("s" + str(game.teams[i].score), (HALF_WINDOW_W + 7 - 39 * i, 6))
-
-        # Show GOAL image if a goal has recently been scored
-        if game.score_timer > 0:
-            screen.blit("goal", (HALF_WINDOW_W - 300, HEIGHT / 2 - 88))
+#
+#     elif state == State.PLAY:
+#         # Display score bar at top
+#         screen.blit("bar", (HALF_WINDOW_W - 176, 0))
+#
+#         # Show score for each team
+#         for i in range(2):
+#             screen.blit("s" + str(game.teams[i].score), (HALF_WINDOW_W + 7 - 39 * i, 6))
+#
+#         # Show GOAL image if a goal has recently been scored
+#         if game.score_timer > 0:
+#             screen.blit("goal", (HALF_WINDOW_W - 300, HEIGHT / 2 - 88))
 
     elif state == State.GAME_OVER:
         # Display "Game Over" image

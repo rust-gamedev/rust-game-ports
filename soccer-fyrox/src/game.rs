@@ -32,7 +32,7 @@ impl Game {
             // music.fadeout(1); // WRITEME: Fyrox doesn't currently support fading out
             media.stop_looping_sound(scene, "music/theme"); // ^^ remove once fadeout is implemented
             media.play_looping_sound(scene, "sounds/crowd");
-            media.play_sound(scene, "start", &[]);
+            media.play_sound(scene, "sounds/start", &[]);
         } else {
             // No players - we must be on the menu. Play title music.
             media.play_looping_sound(scene, "music/theme");
