@@ -5,4 +5,4 @@ version = "0.1.0"
 
 [dependencies]
 
-fyrox = "0.25.0"
+fyrox = "0.26.0"
