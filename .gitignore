@@ -1,5 +1,10 @@
-**/Cargo.lock
-**/target/
-**/target-ra/
+# Rust
+#
+Cargo.lock
+target/
+target-ra/
 
-**/fyrox.log
+# Fyrox
+#
+fyrox.log
+history.bin
