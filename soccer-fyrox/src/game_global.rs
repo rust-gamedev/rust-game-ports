@@ -38,7 +38,14 @@ pub struct GameGlobal {
 
 impl GameState for GameGlobal {
     fn init(engine: &mut Engine) -> Self {
-        Self::preset_window(engine);
+        // It's not possible to disable resizing immediately; the requests will go into a race condition,
+        // and the disable can go first, voiding set_inner_size(); in order to work this around, the
+        // resizing disable is set on on_window_event().
+        //
+        engine.get_window().set_inner_size(PhysicalSize {
+            width: WIDTH,
+            height: HEIGHT,
+        });
 
         let mut scene = Scene::new();
 
@@ -79,16 +86,22 @@ impl GameState for GameGlobal {
         self.input.flush_event_received_state();
     }
 
-    fn on_window_event(&mut self, _engine: &mut Engine, event: WindowEvent) {
-        if let WindowEvent::KeyboardInput { input, .. } = event {
-            if let Some(key_code) = input.virtual_keycode {
-                use ElementState::*;
+    fn on_window_event(&mut self, engine: &mut Engine, event: WindowEvent) {
+        match event {
+            WindowEvent::KeyboardInput { input, .. } => {
+                if let Some(key_code) = input.virtual_keycode {
+                    use ElementState::*;
 
-                match input.state {
-                    Pressed => self.input.key_down(key_code),
-                    Released => self.input.key_up(key_code),
+                    match input.state {
+                        Pressed => self.input.key_down(key_code),
+                        Released => self.input.key_up(key_code),
+                    }
                 }
             }
+            WindowEvent::Resized(..) => {
+                engine.get_window().set_resizable(false);
+            }
+            _ => {}
         }
     }
 }
@@ -97,17 +110,6 @@ impl GameState for GameGlobal {
 // the source code simpler.
 //
 impl GameGlobal {
-    fn preset_window(engine: &Engine) {
-        let window = engine.get_window();
-
-        window.set_inner_size(PhysicalSize {
-            width: WIDTH,
-            height: HEIGHT,
-        });
-
-        window.set_resizable(false);
-    }
-
     fn update(&mut self, engine: &mut Engine) {
         use VirtualKeyCode::*;
         use {MenuState::*, State::*};
