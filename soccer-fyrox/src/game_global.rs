@@ -242,7 +242,21 @@ impl GameGlobal {
                 }
             }
             GameOver => {
-                //
+                // Display "Game Over" image
+                let index = (self.game.teams[1].score > self.game.teams[0].score) as u8;
+                self.media.draw_image(scene, "over", &[index], 0, 0, 0);
+
+                // Show score for each team
+                for i in 0..2 {
+                    self.media.draw_image(
+                        scene,
+                        "l",
+                        &[i as u8, self.game.teams[i as usize].score],
+                        HALF_WINDOW_W + 25 - 125 * i,
+                        144,
+                        0,
+                    );
+                }
             }
         }
     }
