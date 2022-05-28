@@ -41,6 +41,7 @@ impl GameState for GameGlobal {
         // It's not possible to disable resizing immediately; the requests will go into a race condition,
         // and the disable can go first, voiding set_inner_size(); in order to work this around, the
         // resizing disable is set on on_window_event().
+        // See https://github.com/rust-windowing/winit/issues/2306.
         //
         engine.get_window().set_inner_size(PhysicalSize {
             width: WIDTH,
