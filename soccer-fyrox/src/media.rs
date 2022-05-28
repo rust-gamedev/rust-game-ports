@@ -26,6 +26,7 @@ const ZERO_ORD: u8 = '0' as u8;
 const IMAGE_PATHS: &'static [&'static str] = &[
     "resources/images/bar.png",
     "resources/images/goal.png",
+    "resources/images/l00.png",
     "resources/images/l01.png",
     "resources/images/l02.png",
     "resources/images/l03.png",
@@ -51,6 +52,8 @@ const IMAGE_PATHS: &'static [&'static str] = &[
     "resources/images/menu11.png",
     "resources/images/menu12.png",
     "resources/images/over0.png",
+    "resources/images/over0.png",
+    "resources/images/over1.png",
     "resources/images/over1.png",
     "resources/images/s0.png",
     "resources/images/s1.png",

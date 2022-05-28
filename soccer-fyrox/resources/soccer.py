@@ -1061,7 +1061,7 @@ def update():
 #             menu_state = MenuState.NUM_PLAYERS
 #             game = Game()
 
-def draw():
+# def draw():
 #     game.draw()
 #
 #     if state == State.MENU:
@@ -1087,17 +1087,17 @@ def draw():
 #         # Show GOAL image if a goal has recently been scored
 #         if game.score_timer > 0:
 #             screen.blit("goal", (HALF_WINDOW_W - 300, HEIGHT / 2 - 88))
-
-    elif state == State.GAME_OVER:
-        # Display "Game Over" image
-        img = "over" + str(int(game.teams[1].score > game.teams[0].score))
-        screen.blit(img, (0, 0))
-
-        # Show score for each team
-        for i in range(2):
-            img = "l" + str(i) + str(game.teams[i].score)
-            screen.blit(img, (HALF_WINDOW_W + 25 - 125 * i, 144))
-
+#
+#     elif state == State.GAME_OVER:
+#         # Display "Game Over" image
+#         img = "over" + str(int(game.teams[1].score > game.teams[0].score))
+#         screen.blit(img, (0, 0))
+#
+#         # Show score for each team
+#         for i in range(2):
+#             img = "l" + str(i) + str(game.teams[i].score)
+#             screen.blit(img, (HALF_WINDOW_W + 25 - 125 * i, 144))
+#
 # # Set up sound
 # try:
 #     pygame.mixer.quit()
