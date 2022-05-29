@@ -6,3 +6,8 @@ version = "0.1.0"
 [dependencies]
 
 fyrox = "0.26.0"
+
+# Fixes window resizing (see https://github.com/rust-windowing/winit/issues/2306).
+#
+[patch.crates-io]
+winit = {git = "https://github.com/rust-windowing/winit.git", rev = "5d85c10a2ccdb5254fc0143247f95cc8e5847c03"}
