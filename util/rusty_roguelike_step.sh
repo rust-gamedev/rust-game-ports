@@ -12,11 +12,13 @@ c_next_mode=next
 c_reset_mode=reset
 
 c_help="\
-Usage: $(basename "$0") [$c_compare_source_prev_mode|$c_next_mode|$c_reset_mode <step>]
+Usage: $(basename "$0") [$c_compare_source_prev_mode <step_pattern>|$c_next_mode|$c_reset_mode <step_path>]
 
 The script has three modes:
 
 - $c_compare_curr_mode        : compares the current step of the source vs port projects
+  - if <step_pattern> is specified (example: '6*1'), it's used in the search as path basename substring match
+    - WATCH OUT! If multiple steps are found, the last is selected
 - $c_compare_source_prev_mode : compares the source project current step (based on the latest port) with the previous one
 - $c_next_mode                :
   - create the next port step:
@@ -68,6 +70,7 @@ c_vsc_project_template='{
 
 v_mode=
 v_reset_step_path=
+v_current_step_pattern=
 
 function decode_cmdline_args {
   local params
@@ -88,9 +91,14 @@ function decode_cmdline_args {
 
   check_params "$@"
 
-  if [[ $1 == "$c_reset_mode" ]]; then
+  case $1 in
+  "$c_reset_mode")
     v_reset_step_path=$2
-  fi
+    ;;
+  "$c_compare_curr_mode")
+    v_current_step_pattern=${2:-}
+    ;;
+  esac
 
   v_mode=$1
 }
@@ -98,7 +106,8 @@ function decode_cmdline_args {
 function check_params {
   # $v_mode is tested in the main switch/case.
 
-  if [[ ${1:-} == "$c_reset_mode" ]]; then
+  case ${1:-} in
+  "$c_reset_mode")
     if [[ $# -ne 2 ]]; then
       echo "$c_help"
       exit 1
@@ -109,7 +118,14 @@ function check_params {
       >&2 echo "Port step path not found!"
       exit 1
     fi
-  else
+    ;;
+  "$c_compare_curr_mode")
+    if [[ $# -gt 2 ]]; then
+      echo "$c_help"
+      exit 1
+    fi
+    ;;
+  *)
     if [[ $# -ne 1 ]]; then
       echo "$c_help"
       exit 1
@@ -117,13 +133,15 @@ function check_params {
       >&2 echo "Variable RUST_GAME_PORTS_VSCODE_PROJECT not set!"
       exit 1
     fi
-  fi
+    ;;
+  esac
 }
 
 function find_current_step {
   local target_step
+  local name_pattern="*$v_current_step_pattern*"
 
-  target_step=$(find "$c_port_base_dir" -mindepth 1 -maxdepth 1 -printf '%P\n' | grep -vP '^(target|\.cargo)$' | sort | tail -n 1)
+  target_step=$(find "$c_port_base_dir" -mindepth 1 -maxdepth 1 -name "$name_pattern" -printf '%P\n' | grep -vP '^(target|\.cargo)$' | sort | tail -n 1)
 
   if [[ -z $target_step ]]; then
     >&2 echo "Couldn't find current step"
