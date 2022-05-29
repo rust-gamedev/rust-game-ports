@@ -90,17 +90,7 @@ function decode_cmdline_args {
   done
 
   check_params "$@"
-
-  case $1 in
-  "$c_reset_mode")
-    v_reset_step_path=$2
-    ;;
-  "$c_compare_curr_mode")
-    v_current_step_pattern=${2:-}
-    ;;
-  esac
-
-  v_mode=$1
+  set_param_variables "$@"
 }
 
 function check_params {
@@ -135,6 +125,19 @@ function check_params {
     fi
     ;;
   esac
+}
+
+function set_param_variables {
+  case $1 in
+  "$c_reset_mode")
+    v_reset_step_path=$2
+    ;;
+  "$c_compare_curr_mode")
+    v_current_step_pattern=${2:-}
+    ;;
+  esac
+
+  v_mode=$1
 }
 
 function find_current_step {
