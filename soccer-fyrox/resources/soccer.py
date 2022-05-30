@@ -717,25 +717,25 @@ class Game:
 #         self.reset()
 #
     def reset(self):
-        # Called at game start, and after a goal has been scored
-
-        # Set up players list/positions
-        # The lambda function is used to give the player start positions a slight random offset so they're not
-        # perfectly aligned to their starting spots
-        self.players = []
-        random_offset = lambda x: x + random.randint(-32, 32)
-        for pos in PLAYER_START_POS:
-            # pos is a pair of coordinates in a tuple
-            # For each entry in pos, create one player for each team - positions are flipped (both horizontally and
-            # vertically) versions of each other
-            self.players.append(Player(random_offset(pos[0]), random_offset(pos[1]), 0))
-            self.players.append(Player(random_offset(LEVEL_W - pos[0]), random_offset(LEVEL_H - pos[1]), 1))
-
-        # Players in the list are stored in an alternating fashion - a team 0 player, then a team 1 player, and so on.
-        # The peer for each player is the opposing team player at the opposite end of the list. As there are 14 players
-        # in total, the peers are 0 and 13, 1 and 12, 2 and 11, and so on.
-        for a, b in zip(self.players, self.players[::-1]):
-            a.peer = b
+#         # Called at game start, and after a goal has been scored
+#
+#         # Set up players list/positions
+#         # The lambda function is used to give the player start positions a slight random offset so they're not
+#         # perfectly aligned to their starting spots
+#         self.players = []
+#         random_offset = lambda x: x + random.randint(-32, 32)
+#         for pos in PLAYER_START_POS:
+#             # pos is a pair of coordinates in a tuple
+#             # For each entry in pos, create one player for each team - positions are flipped (both horizontally and
+#             # vertically) versions of each other
+#             self.players.append(Player(random_offset(pos[0]), random_offset(pos[1]), 0))
+#             self.players.append(Player(random_offset(LEVEL_W - pos[0]), random_offset(LEVEL_H - pos[1]), 1))
+#
+#         # Players in the list are stored in an alternating fashion - a team 0 player, then a team 1 player, and so on.
+#         # The peer for each player is the opposing team player at the opposite end of the list. As there are 14 players
+#         # in total, the peers are 0 and 13, 1 and 12, 2 and 11, and so on.
+#         for a, b in zip(self.players, self.players[::-1]):
+#             a.peer = b
 
         # Create two goals
         self.goals = [Goal(i) for i in range(2)]

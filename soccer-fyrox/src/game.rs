@@ -1,3 +1,5 @@
+use std::{cell::RefCell, rc::Rc};
+
 use fyrox::scene::Scene;
 use rand::Rng;
 
@@ -7,6 +9,7 @@ use crate::{
     game_global::LEVEL_W,
     media::Media,
     player::Player,
+    rust_utils::{new_rcc, RCC},
     team::Team,
 };
 
@@ -26,7 +29,7 @@ pub struct Game {
     difficulty: Difficulty,
     pub score_timer: i32,
     scoring_team: u8,
-    players: Vec<Player>,
+    players: Vec<RCC<Player>>,
 }
 
 impl Game {
@@ -73,6 +76,12 @@ impl Game {
     fn reset(&mut self) {
         //# Called at game start, and after a goal has been scored
 
+        // See Player#peer comment.
+        //
+        for player in &mut self.players {
+            player.borrow_mut().peer = None;
+        }
+
         //# Set up players list/positions
         //# The lambda function is used to give the player start positions a slight random offset so they're not
         //# perfectly aligned to their starting spots
@@ -84,14 +93,26 @@ impl Game {
             //# pos is a pair of coordinates in a tuple
             //# For each entry in pos, create one player for each team - positions are flipped (both horizontally and
             //# vertically) versions of each other
-            self.players
-                .push(Player::new(random_offset(pos.0), random_offset(pos.1), 0));
-            self.players.push(Player::new(
+            self.players.push(Rc::new(RefCell::new(Player::new(
+                random_offset(pos.0),
+                random_offset(pos.1),
+                0,
+            ))));
+            self.players.push(new_rcc(Player::new(
                 random_offset(LEVEL_W - pos.0),
                 random_offset(LEVEL_W - pos.1),
                 1,
-            ));
+            )));
         }
+
+        //# Players in the list are stored in an alternating fashion - a team 0 player, then a team 1 player, and so on.
+        //# The peer for each player is the opposing team player at the opposite end of the list. As there are 14 players
+        //# in total, the peers are 0 and 13, 1 and 12, 2 and 11, and so on.
+        for (a, b) in self.players.iter().zip(self.players.iter().rev()) {
+            a.borrow_mut().peer = Some(Rc::clone(b));
+        }
+        // for a, b in zip(self.players, self.players[::-1]):
+        //     a.peer = b
     }
 
     pub fn update(&mut self) {

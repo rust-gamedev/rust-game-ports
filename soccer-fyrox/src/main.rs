@@ -10,6 +10,7 @@ mod input_controller;
 mod media;
 mod menu_state;
 mod player;
+mod rust_utils;
 mod state;
 mod team;
 
