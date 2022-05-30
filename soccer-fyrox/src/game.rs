@@ -13,6 +13,7 @@ pub struct Game {
     pub teams: Vec<Team>,
     difficulty: Difficulty,
     pub score_timer: i32,
+    scoring_team: u8,
 }
 
 impl Game {
@@ -24,7 +25,6 @@ impl Game {
         media: &mut Media,
     ) -> Self {
         let teams = vec![Team::new(p1_controls), Team::new(p2_controls)];
-        let score_timer = 0;
         let difficulty = difficulty::DIFFICULTY[difficulty as usize];
 
         if teams[0].human() {
@@ -39,11 +39,23 @@ impl Game {
             media.stop_looping_sound(scene, "sounds/crowd");
         }
 
-        Self {
+        let score_timer = 0;
+        let scoring_team = 1;
+
+        let mut instance = Self {
             teams,
             difficulty,
             score_timer,
-        }
+            scoring_team,
+        };
+
+        instance.reset();
+
+        instance
+    }
+
+    fn reset(&mut self) {
+        // WRITEME
     }
 
     pub fn update(&mut self) {

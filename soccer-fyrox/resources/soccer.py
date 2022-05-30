@@ -694,28 +694,28 @@ class Team:
 
 
 class Game:
-    def __init__(self, p1_controls=None, p2_controls=None, difficulty=2):
+#     def __init__(self, p1_controls=None, p2_controls=None, difficulty=2):
 #         self.teams = [Team(p1_controls), Team(p2_controls)]
 #         self.difficulty = DIFFICULTY[difficulty]
-
-        try:
-            if self.teams[0].human():
-                # Beginning a game with at least 1 human player
-                music.fadeout(1)
-                sounds.crowd.play(-1)
-                sounds.start.play()
-            else:
-                # No players - we must be on the menu. Play title music.
-                music.play("theme")
-                sounds.crowd.stop()
-        except:
-            pass
-
+#
+#         try:
+#             if self.teams[0].human():
+#                 # Beginning a game with at least 1 human player
+#                 music.fadeout(1)
+#                 sounds.crowd.play(-1)
+#                 sounds.start.play()
+#             else:
+#                 # No players - we must be on the menu. Play title music.
+#                 music.play("theme")
+#                 sounds.crowd.stop()
+#         except:
+#             pass
+#
 #         self.score_timer = 0
-        self.scoring_team = 1   # Which team has just scored - also governs who kicks off next
-
-        self.reset()
-
+#         self.scoring_team = 1   # Which team has just scored - also governs who kicks off next
+#
+#         self.reset()
+#
     def reset(self):
         # Called at game start, and after a goal has been scored
 
