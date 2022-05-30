@@ -9,6 +9,7 @@ mod game_global;
 mod input_controller;
 mod media;
 mod menu_state;
+mod player;
 mod state;
 mod team;
 

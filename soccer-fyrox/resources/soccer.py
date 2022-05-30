@@ -24,12 +24,12 @@
 # TITLE = "Substitute Soccer"
 #
 # HALF_WINDOW_W = WIDTH / 2
-
-# Size of level, including both the pitch and the boundary surrounding it
-LEVEL_W = 1000
-LEVEL_H = 1400
-HALF_LEVEL_W = LEVEL_W // 2
-HALF_LEVEL_H = LEVEL_H // 2
+#
+# # Size of level, including both the pitch and the boundary surrounding it
+# LEVEL_W = 1000
+# LEVEL_H = 1400
+# HALF_LEVEL_W = LEVEL_W // 2
+# HALF_LEVEL_H = LEVEL_H // 2
 
 HALF_PITCH_W = 442
 HALF_PITCH_H = 622
@@ -54,7 +54,7 @@ AI_MAX_X = LEVEL_W - 78
 AI_MIN_Y = 98
 AI_MAX_Y = LEVEL_H - 98
 
-PLAYER_START_POS = [(350, 550), (650, 450), (200, 850), (500, 750), (800, 950), (350, 1250), (650, 1150)]
+# PLAYER_START_POS = [(350, 550), (650, 450), (200, 850), (500, 750), (800, 950), (350, 1250), (650, 1150)]
 
 LEAD_DISTANCE_1 = 10
 LEAD_DISTANCE_2 = 50

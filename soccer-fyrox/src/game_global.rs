@@ -22,7 +22,14 @@ use crate::{controls::Controls, game};
 
 pub const WIDTH: i16 = 800;
 pub const HEIGHT: i16 = 480;
+
 pub const HALF_WINDOW_W: i16 = WIDTH / 2;
+
+//# Size of level, including both the pitch and the boundary surrounding it
+pub const LEVEL_W: i16 = 1000;
+pub const LEVEL_H: i16 = 1400;
+pub const HALF_LEVEL_W: i16 = LEVEL_W / 2;
+pub const HALF_LEVEL_H: i16 = LEVEL_H / 2;
 
 pub struct GameGlobal {
     media: Media,
