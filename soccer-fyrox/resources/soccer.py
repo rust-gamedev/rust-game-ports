@@ -22,14 +22,14 @@
 # WIDTH = 800
 # HEIGHT = 480
 # TITLE = "Substitute Soccer"
-
-HALF_WINDOW_W = WIDTH / 2
-
-# Size of level, including both the pitch and the boundary surrounding it
-LEVEL_W = 1000
-LEVEL_H = 1400
-HALF_LEVEL_W = LEVEL_W // 2
-HALF_LEVEL_H = LEVEL_H // 2
+#
+# HALF_WINDOW_W = WIDTH / 2
+#
+# # Size of level, including both the pitch and the boundary surrounding it
+# LEVEL_W = 1000
+# LEVEL_H = 1400
+# HALF_LEVEL_W = LEVEL_W // 2
+# HALF_LEVEL_H = LEVEL_H // 2
 
 HALF_PITCH_W = 442
 HALF_PITCH_H = 622
@@ -54,7 +54,7 @@ AI_MAX_X = LEVEL_W - 78
 AI_MIN_Y = 98
 AI_MAX_Y = LEVEL_H - 98
 
-PLAYER_START_POS = [(350, 550), (650, 450), (200, 850), (500, 750), (800, 950), (350, 1250), (650, 1150)]
+# PLAYER_START_POS = [(350, 550), (650, 450), (200, 850), (500, 750), (800, 950), (350, 1250), (650, 1150)]
 
 LEAD_DISTANCE_1 = 10
 LEAD_DISTANCE_2 = 50
@@ -694,48 +694,48 @@ class Team:
 
 
 class Game:
-    def __init__(self, p1_controls=None, p2_controls=None, difficulty=2):
+#     def __init__(self, p1_controls=None, p2_controls=None, difficulty=2):
 #         self.teams = [Team(p1_controls), Team(p2_controls)]
 #         self.difficulty = DIFFICULTY[difficulty]
-
-        try:
-            if self.teams[0].human():
-                # Beginning a game with at least 1 human player
-                music.fadeout(1)
-                sounds.crowd.play(-1)
-                sounds.start.play()
-            else:
-                # No players - we must be on the menu. Play title music.
-                music.play("theme")
-                sounds.crowd.stop()
-        except:
-            pass
-
+#
+#         try:
+#             if self.teams[0].human():
+#                 # Beginning a game with at least 1 human player
+#                 music.fadeout(1)
+#                 sounds.crowd.play(-1)
+#                 sounds.start.play()
+#             else:
+#                 # No players - we must be on the menu. Play title music.
+#                 music.play("theme")
+#                 sounds.crowd.stop()
+#         except:
+#             pass
+#
 #         self.score_timer = 0
-        self.scoring_team = 1   # Which team has just scored - also governs who kicks off next
-
-        self.reset()
-
+#         self.scoring_team = 1   # Which team has just scored - also governs who kicks off next
+#
+#         self.reset()
+#
     def reset(self):
-        # Called at game start, and after a goal has been scored
-
-        # Set up players list/positions
-        # The lambda function is used to give the player start positions a slight random offset so they're not
-        # perfectly aligned to their starting spots
-        self.players = []
-        random_offset = lambda x: x + random.randint(-32, 32)
-        for pos in PLAYER_START_POS:
-            # pos is a pair of coordinates in a tuple
-            # For each entry in pos, create one player for each team - positions are flipped (both horizontally and
-            # vertically) versions of each other
-            self.players.append(Player(random_offset(pos[0]), random_offset(pos[1]), 0))
-            self.players.append(Player(random_offset(LEVEL_W - pos[0]), random_offset(LEVEL_H - pos[1]), 1))
-
-        # Players in the list are stored in an alternating fashion - a team 0 player, then a team 1 player, and so on.
-        # The peer for each player is the opposing team player at the opposite end of the list. As there are 14 players
-        # in total, the peers are 0 and 13, 1 and 12, 2 and 11, and so on.
-        for a, b in zip(self.players, self.players[::-1]):
-            a.peer = b
+#         # Called at game start, and after a goal has been scored
+#
+#         # Set up players list/positions
+#         # The lambda function is used to give the player start positions a slight random offset so they're not
+#         # perfectly aligned to their starting spots
+#         self.players = []
+#         random_offset = lambda x: x + random.randint(-32, 32)
+#         for pos in PLAYER_START_POS:
+#             # pos is a pair of coordinates in a tuple
+#             # For each entry in pos, create one player for each team - positions are flipped (both horizontally and
+#             # vertically) versions of each other
+#             self.players.append(Player(random_offset(pos[0]), random_offset(pos[1]), 0))
+#             self.players.append(Player(random_offset(LEVEL_W - pos[0]), random_offset(LEVEL_H - pos[1]), 1))
+#
+#         # Players in the list are stored in an alternating fashion - a team 0 player, then a team 1 player, and so on.
+#         # The peer for each player is the opposing team player at the opposite end of the list. As there are 14 players
+#         # in total, the peers are 0 and 13, 1 and 12, 2 and 11, and so on.
+#         for a, b in zip(self.players, self.players[::-1]):
+#             a.peer = b
 
         # Create two goals
         self.goals = [Goal(i) for i in range(2)]
@@ -948,59 +948,59 @@ class Game:
                 pass
 
 
-# Dictionary to keep track of which keys are currently being held down
-key_status = {}
-
-# Was the given key just pressed? (i.e. is it currently down, but wasn't down on the previous frame?)
-def key_just_pressed(key):
-    result = False
-
-    # Get key's previous status from the key_status dictionary. The dictionary.get method allows us to check for a given
-    # entry without giving an error if that entry is not present in the dictionary. False is the default value returned
-    # when the key is not present.
-    prev_status = key_status.get(key, False)
-
-    # If the key wasn't previously being pressed, but it is now, we're going to return True
-    if not prev_status and keyboard[key]:
-        result = True
-
-    # Before we return, we need to update the key's entry in the key_status dictionary (or create an entry if there
-    # wasn't one already
-    key_status[key] = keyboard[key]
-
-    return result
-
-class Controls:
-    def __init__(self, player_num):
-        if player_num == 0:
-            self.key_up = keys.UP
-            self.key_down = keys.DOWN
-            self.key_left = keys.LEFT
-            self.key_right = keys.RIGHT
-            self.key_shoot = keys.SPACE
-        else:
-            self.key_up = keys.W
-            self.key_down = keys.S
-            self.key_left = keys.A
-            self.key_right = keys.D
-            self.key_shoot = keys.LSHIFT
-
-    def move(self, speed):
-        # Return vector representing amount of movement that should occur
-        dx, dy = 0, 0
-        if keyboard[self.key_left]:
-            dx = -1
-        elif keyboard[self.key_right]:
-            dx = 1
-        if keyboard[self.key_up]:
-            dy = -1
-        elif keyboard[self.key_down]:
-            dy = 1
-        return Vector2(dx, dy) * speed
-
-    def shoot(self):
-        return key_just_pressed(self.key_shoot)
-
+# # Dictionary to keep track of which keys are currently being held down
+# key_status = {}
+#
+# # Was the given key just pressed? (i.e. is it currently down, but wasn't down on the previous frame?)
+# def key_just_pressed(key):
+#     result = False
+#
+#     # Get key's previous status from the key_status dictionary. The dictionary.get method allows us to check for a given
+#     # entry without giving an error if that entry is not present in the dictionary. False is the default value returned
+#     # when the key is not present.
+#     prev_status = key_status.get(key, False)
+#
+#     # If the key wasn't previously being pressed, but it is now, we're going to return True
+#     if not prev_status and keyboard[key]:
+#         result = True
+#
+#     # Before we return, we need to update the key's entry in the key_status dictionary (or create an entry if there
+#     # wasn't one already
+#     key_status[key] = keyboard[key]
+#
+#     return result
+#
+# class Controls:
+#     def __init__(self, player_num):
+#         if player_num == 0:
+#             self.key_up = keys.UP
+#             self.key_down = keys.DOWN
+#             self.key_left = keys.LEFT
+#             self.key_right = keys.RIGHT
+#             self.key_shoot = keys.SPACE
+#         else:
+#             self.key_up = keys.W
+#             self.key_down = keys.S
+#             self.key_left = keys.A
+#             self.key_right = keys.D
+#             self.key_shoot = keys.LSHIFT
+#
+#     def move(self, speed):
+#         # Return vector representing amount of movement that should occur
+#         dx, dy = 0, 0
+#         if keyboard[self.key_left]:
+#             dx = -1
+#         elif keyboard[self.key_right]:
+#             dx = 1
+#         if keyboard[self.key_up]:
+#             dy = -1
+#         elif keyboard[self.key_down]:
+#             dy = 1
+#         return Vector2(dx, dy) * speed
+#
+#     def shoot(self):
+#         return key_just_pressed(self.key_shoot)
+#
 # # Pygame Zero calls the update and draw functions each frame
 #
 # class State(Enum):
@@ -1011,10 +1011,10 @@ class Controls:
 # class MenuState(Enum):
 #     NUM_PLAYERS = 0
 #     DIFFICULTY = 1
-
-def update():
-    global state, game, menu_state, menu_num_players, menu_difficulty
-
+#
+# def update():
+#     global state, game, menu_state, menu_num_players, menu_difficulty
+#
 #     if state == State.MENU:
 #         if key_just_pressed(keys.SPACE):
 #             if menu_state == MenuState.NUM_PLAYERS:
