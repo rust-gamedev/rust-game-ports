@@ -22,8 +22,8 @@
 # WIDTH = 800
 # HEIGHT = 480
 # TITLE = "Substitute Soccer"
-
-HALF_WINDOW_W = WIDTH / 2
+#
+# HALF_WINDOW_W = WIDTH / 2
 
 # Size of level, including both the pitch and the boundary surrounding it
 LEVEL_W = 1000
@@ -948,28 +948,28 @@ class Game:
                 pass
 
 
-# Dictionary to keep track of which keys are currently being held down
-key_status = {}
-
-# Was the given key just pressed? (i.e. is it currently down, but wasn't down on the previous frame?)
-def key_just_pressed(key):
-    result = False
-
-    # Get key's previous status from the key_status dictionary. The dictionary.get method allows us to check for a given
-    # entry without giving an error if that entry is not present in the dictionary. False is the default value returned
-    # when the key is not present.
-    prev_status = key_status.get(key, False)
-
-    # If the key wasn't previously being pressed, but it is now, we're going to return True
-    if not prev_status and keyboard[key]:
-        result = True
-
-    # Before we return, we need to update the key's entry in the key_status dictionary (or create an entry if there
-    # wasn't one already
-    key_status[key] = keyboard[key]
-
-    return result
-
+# # Dictionary to keep track of which keys are currently being held down
+# key_status = {}
+#
+# # Was the given key just pressed? (i.e. is it currently down, but wasn't down on the previous frame?)
+# def key_just_pressed(key):
+#     result = False
+#
+#     # Get key's previous status from the key_status dictionary. The dictionary.get method allows us to check for a given
+#     # entry without giving an error if that entry is not present in the dictionary. False is the default value returned
+#     # when the key is not present.
+#     prev_status = key_status.get(key, False)
+#
+#     # If the key wasn't previously being pressed, but it is now, we're going to return True
+#     if not prev_status and keyboard[key]:
+#         result = True
+#
+#     # Before we return, we need to update the key's entry in the key_status dictionary (or create an entry if there
+#     # wasn't one already
+#     key_status[key] = keyboard[key]
+#
+#     return result
+#
 # class Controls:
 #     def __init__(self, player_num):
 #         if player_num == 0:
@@ -1011,10 +1011,10 @@ def key_just_pressed(key):
 # class MenuState(Enum):
 #     NUM_PLAYERS = 0
 #     DIFFICULTY = 1
-
-def update():
-    global state, game, menu_state, menu_num_players, menu_difficulty
-
+#
+# def update():
+#     global state, game, menu_state, menu_num_players, menu_difficulty
+#
 #     if state == State.MENU:
 #         if key_just_pressed(keys.SPACE):
 #             if menu_state == MenuState.NUM_PLAYERS:
