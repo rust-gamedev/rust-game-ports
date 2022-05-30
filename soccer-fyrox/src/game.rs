@@ -28,13 +28,13 @@ impl Game {
         let difficulty = difficulty::DIFFICULTY[difficulty as usize];
 
         if teams[0].human() {
-            // Beginning a game with at least 1 human player
-            // music.fadeout(1); // WRITEME: Fyrox doesn't currently support fading out
+            //# Beginning a game with at least 1 human player
+            //# music.fadeout(1); // WRITEME: Fyrox doesn't currently support fading out
             media.stop_looping_sound(scene, "music/theme"); // ^^ remove once fadeout is implemented
             media.play_looping_sound(scene, "sounds/crowd");
             media.play_sound(scene, "sounds/start", &[]);
         } else {
-            // No players - we must be on the menu. Play title music.
+            //# No players - we must be on the menu. Play title music.
             media.play_looping_sound(scene, "music/theme");
             media.stop_looping_sound(scene, "sounds/crowd");
         }

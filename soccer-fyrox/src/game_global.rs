@@ -101,7 +101,7 @@ impl GameGlobal {
         let window = engine.get_window();
 
         // WATCH OUT! Don't invert this and the following, otherwise, resize won't work.
-        // See https://github.com/rust-windowing/winit/issues/2306.
+        // See https://#github.com/rust-windowing/winit/issues/2306.
         //
         window.set_resizable(false);
 
@@ -121,11 +121,11 @@ impl GameGlobal {
             Menu => {
                 if self.input.is_key_just_pressed(Space) {
                     if let Some(NumPlayers) = self.menu_state {
-                        // If we're doing a 2 player game, skip difficulty selection
+                        //# If we're doing a 2 player game, skip difficulty selection
                         if self.menu_num_players == 1 {
                             self.menu_state = Some(MenuState::Difficulty);
                         } else {
-                            // Start 2P game
+                            //# Start 2P game
                             self.state = State::Play;
                             self.menu_state = None;
                             self.game = Game::new(
@@ -137,7 +137,7 @@ impl GameGlobal {
                             )
                         }
                     } else {
-                        // Start 1P game
+                        //# Start 1P game
                         self.state = State::Play;
                         self.menu_state = None;
                         self.game = Game::new(
@@ -149,7 +149,7 @@ impl GameGlobal {
                         );
                     }
                 } else {
-                    // Detect + act on up/down arrow keys
+                    //# Detect + act on up/down arrow keys
                     let mut selection_change: i8 = 0;
                     if self.input.is_key_just_pressed(Down) {
                         selection_change = 1
@@ -170,7 +170,7 @@ impl GameGlobal {
                 self.game.update()
             }
             Play => {
-                // First player to 9 wins
+                //# First player to 9 wins
                 let max_score = self.game.teams.iter().map(|t| t.score).max().unwrap();
 
                 if max_score == 9 && self.game.score_timer == 1 {
@@ -181,7 +181,7 @@ impl GameGlobal {
             }
             GameOver => {
                 if self.input.is_key_just_pressed(Space) {
-                    // Switch to menu state, and create a new game object without a player
+                    //# Switch to menu state, and create a new game object without a player
                     self.state = State::Menu;
                     self.menu_state = Some(MenuState::NumPlayers);
                     self.game = Game::new(
@@ -197,7 +197,7 @@ impl GameGlobal {
     }
 
     fn draw(&mut self, engine: &mut Engine) {
-        // self.game.draw(); // WRITEME
+        //# self.game.draw(); //# WRITEME
 
         let scene = &mut engine.scenes[self.scene];
 
@@ -214,10 +214,10 @@ impl GameGlobal {
                     .draw_image(scene, "menu", &[image_i1, image_i2], 0, 0, 0);
             }
             Play => {
-                // Display score bar at top
+                //# Display score bar at top
                 self.media
                     .draw_image(scene, "bar", &[], HALF_WINDOW_W - 176, 0, 0);
-                // Show score for each team
+                //# Show score for each team
                 for i in 0..2 {
                     self.media.draw_image(
                         scene,
@@ -229,7 +229,7 @@ impl GameGlobal {
                     );
                 }
 
-                // Show GOAL image if a goal has recently been scored
+                //# Show GOAL image if a goal has recently been scored
                 if self.game.score_timer > 0 {
                     self.media.draw_image(
                         scene,
@@ -242,11 +242,11 @@ impl GameGlobal {
                 }
             }
             GameOver => {
-                // Display "Game Over" image
+                //# Display "Game Over" image
                 let index = (self.game.teams[1].score > self.game.teams[0].score) as u8;
                 self.media.draw_image(scene, "over", &[index], 0, 0, 0);
 
-                // Show score for each team
+                //# Show score for each team
                 for i in 0..2 {
                     self.media.draw_image(
                         scene,
