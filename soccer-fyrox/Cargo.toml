@@ -5,7 +5,8 @@ version = "0.1.0"
 
 [dependencies]
 
-fyrox = "0.26.0"
+fyrox = "0.26.0" 
+rand = "*" # Use the same as Fyrox
 
 # Fixes window resizing (see https://github.com/rust-windowing/winit/issues/2306).
 #
