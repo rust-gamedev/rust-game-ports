@@ -683,14 +683,14 @@ class Player(MyActor):
         self.shadow.vpos = Vector2(self.vpos)
 
 
-class Team:
-    def __init__(self, controls):
+# class Team:
+#     def __init__(self, controls):
 #         self.controls = controls
-        self.active_control_player = None
+#         self.active_control_player = None
 #         self.score = 0
-
-    def human(self):
-        return self.controls != None
+#
+#     def human(self):
+#         return self.controls != None
 
 
 class Game:
