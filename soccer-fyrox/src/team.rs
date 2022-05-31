@@ -1,15 +1,21 @@
-use crate::controls::Controls;
+use crate::{controls::Controls, player::Player, rust_utils::RCC};
 
 pub struct Team {
     controls: Option<Controls>,
     pub score: u8,
+    pub active_control_player: Option<RCC<Player>>,
 }
 
 impl Team {
     pub fn new(controls: Option<Controls>) -> Self {
         let score = 0;
+        let active_control_player = None;
 
-        Self { controls, score }
+        Self {
+            controls,
+            score,
+            active_control_player,
+        }
     }
 
     pub fn human(&self) -> bool {

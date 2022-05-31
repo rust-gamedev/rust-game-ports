@@ -2,10 +2,12 @@
 // #![allow(unused_variables)]
 #![allow(dead_code)]
 
+mod actor;
 mod controls;
 mod difficulty;
 mod game;
 mod game_global;
+mod goal;
 mod input_controller;
 mod media;
 mod menu_state;
