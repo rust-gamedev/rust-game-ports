@@ -2,6 +2,7 @@
 // #![allow(unused_variables)]
 #![allow(dead_code)]
 
+mod actor;
 mod controls;
 mod difficulty;
 mod game;
