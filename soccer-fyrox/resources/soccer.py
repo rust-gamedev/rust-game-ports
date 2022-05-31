@@ -173,12 +173,12 @@ def steps(distance):
     return steps
 
 class Goal(MyActor):
-    def __init__(self, team):
-        x = HALF_LEVEL_W
-        y = 0 if team == 0 else LEVEL_H
-        super().__init__("goal" + str(team), x, y)
-
-        self.team = team
+#     def __init__(self, team):
+#         x = HALF_LEVEL_W
+#         y = 0 if team == 0 else LEVEL_H
+#         super().__init__("goal" + str(team), x, y)
+#
+#         self.team = team
 
     def active(self):
         # Is ball within 500 pixels on the Y axis?
