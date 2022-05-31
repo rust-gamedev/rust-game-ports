@@ -7,6 +7,7 @@ use crate::{
     controls::Controls,
     difficulty::{self, Difficulty},
     game_global::LEVEL_W,
+    goal::Goal,
     media::Media,
     player::Player,
     rust_utils::{new_rcc, RCC},
@@ -30,6 +31,8 @@ pub struct Game {
     pub score_timer: i32,
     scoring_team: u8,
     players: Vec<RCC<Player>>,
+    goals: Vec<Goal>,
+    kickoff_player: Option<RCC<Player>>,
 }
 
 impl Game {
@@ -59,6 +62,8 @@ impl Game {
         let scoring_team = 1;
 
         let players = vec![];
+        let goals = vec![];
+        let kickoff_player = None;
 
         let mut instance = Self {
             teams,
@@ -66,6 +71,8 @@ impl Game {
             score_timer,
             scoring_team,
             players,
+            goals,
+            kickoff_player,
         };
 
         instance.reset();
@@ -111,8 +118,22 @@ impl Game {
         for (a, b) in self.players.iter().zip(self.players.iter().rev()) {
             a.borrow_mut().peer = Some(Rc::clone(b));
         }
-        // for a, b in zip(self.players, self.players[::-1]):
-        //     a.peer = b
+
+        //# Create two goals
+        self.goals = (0..2).into_iter().map(|i| Goal::new(i)).collect();
+
+        //# The current active player under control by each team, indicated by arrows over their heads
+        //# Choose first two players to begin with
+        self.teams[0].active_control_player = Some(Rc::clone(&self.players[0]));
+        self.teams[1].active_control_player = Some(Rc::clone(&self.players[1]));
+
+        //# If team 1 just scored (or if it's the start of the game), team 0 will kick off
+        let other_team = if self.scoring_team == 0 { 1 } else { 0 };
+
+        //# Players are stored in the players list in an alternating fashion – the first player being on team 0, the
+        //# second on team 1, the third on team 0 etc. The player that kicks off will always be the first player of
+        //# the relevant team.
+        self.kickoff_player = Some(Rc::clone(&self.players[other_team as usize]));
     }
 
     pub fn update(&mut self) {

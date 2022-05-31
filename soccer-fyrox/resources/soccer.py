@@ -736,22 +736,22 @@ class Game:
 #         # in total, the peers are 0 and 13, 1 and 12, 2 and 11, and so on.
 #         for a, b in zip(self.players, self.players[::-1]):
 #             a.peer = b
-
-        # Create two goals
-        self.goals = [Goal(i) for i in range(2)]
-
-        # The current active player under control by each team, indicated by arrows over their heads
-        # Choose first two players to begin with
-        self.teams[0].active_control_player = self.players[0]
-        self.teams[1].active_control_player = self.players[1]
-
-        # If team 1 just scored (or if it's the start of the game), team 0 will kick off
-        other_team = 1 if self.scoring_team == 0 else 0
-
-        # Players are stored in the players list in an alternating fashion – the first player being on team 0, the
-        # second on team 1, the third on team 0 etc. The player that kicks off will always be the first player of
-        # the relevant team.
-        self.kickoff_player = self.players[other_team]
+#
+#         # Create two goals
+#         self.goals = [Goal(i) for i in range(2)]
+#
+#         # The current active player under control by each team, indicated by arrows over their heads
+#         # Choose first two players to begin with
+#         self.teams[0].active_control_player = self.players[0]
+#         self.teams[1].active_control_player = self.players[1]
+#
+#         # If team 1 just scored (or if it's the start of the game), team 0 will kick off
+#         other_team = 1 if self.scoring_team == 0 else 0
+#
+#         # Players are stored in the players list in an alternating fashion – the first player being on team 0, the
+#         # second on team 1, the third on team 0 etc. The player that kicks off will always be the first player of
+#         # the relevant team.
+#         self.kickoff_player = self.players[other_team]
 
         # Set pos of kickoff player. A team 0 player will stand to the left of the ball, team 1 on the right
         self.kickoff_player.vpos = Vector2(HALF_LEVEL_W - 30 + other_team * 60, HALF_LEVEL_H)
