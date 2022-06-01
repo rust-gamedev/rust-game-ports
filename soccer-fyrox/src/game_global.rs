@@ -1,35 +1,13 @@
 use fyrox::{
-    core::pool::Handle,
     dpi::PhysicalSize,
-    engine::framework::prelude::*,
+    engine::framework::prelude::GameState,
     engine::Engine,
-    event::{ElementState, VirtualKeyCode, WindowEvent},
+    event::{ElementState, WindowEvent},
     event_loop::ControlFlow,
-    scene::{
-        base::BaseBuilder,
-        camera::{CameraBuilder, OrthographicProjection, Projection},
-        node::Node,
-        Scene,
-    },
+    scene::camera::{CameraBuilder, OrthographicProjection, Projection},
 };
 
-use crate::game::Game;
-use crate::input_controller::InputController;
-use crate::media::Media;
-use crate::menu_state::MenuState;
-use crate::state::State;
-use crate::{controls::Controls, game};
-
-pub const WIDTH: i16 = 800;
-pub const HEIGHT: i16 = 480;
-
-pub const HALF_WINDOW_W: i16 = WIDTH / 2;
-
-//# Size of level, including both the pitch and the boundary surrounding it
-pub const LEVEL_W: i16 = 1000;
-pub const LEVEL_H: i16 = 1400;
-pub const HALF_LEVEL_W: i16 = LEVEL_W / 2;
-pub const HALF_LEVEL_H: i16 = LEVEL_H / 2;
+use crate::prelude::*;
 
 pub struct GameGlobal {
     media: Media,
@@ -55,7 +33,7 @@ impl GameState for GameGlobal {
 
         let input = InputController::new();
 
-        let game = Game::new(None, None, game::DEFAULT_DIFFICULTY, &mut scene, &mut media);
+        let game = Game::new(None, None, DEFAULT_DIFFICULTY, &mut scene, &mut media);
         let state = State::Menu;
         let menu_state = Some(MenuState::NumPlayers);
 
@@ -138,7 +116,7 @@ impl GameGlobal {
                             self.game = Game::new(
                                 Some(Controls::new(0)),
                                 Some(Controls::new(1)),
-                                game::DEFAULT_DIFFICULTY,
+                                DEFAULT_DIFFICULTY,
                                 &mut scene,
                                 &mut self.media,
                             )
@@ -191,13 +169,8 @@ impl GameGlobal {
                     //# Switch to menu state, and create a new game object without a player
                     self.state = State::Menu;
                     self.menu_state = Some(MenuState::NumPlayers);
-                    self.game = Game::new(
-                        None,
-                        None,
-                        game::DEFAULT_DIFFICULTY,
-                        &mut scene,
-                        &mut self.media,
-                    );
+                    self.game =
+                        Game::new(None, None, DEFAULT_DIFFICULTY, &mut scene, &mut self.media);
                 }
             }
         }

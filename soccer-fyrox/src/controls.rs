@@ -1,6 +1,4 @@
-use fyrox::{core::algebra::Vector2, event::VirtualKeyCode};
-
-use crate::input_controller::InputController;
+use crate::prelude::*;
 
 pub struct Controls {
     key_up: VirtualKeyCode,

@@ -1,7 +1,4 @@
-use crate::{
-    actor::Actor,
-    game_global::{HALF_LEVEL_W, LEVEL_H},
-};
+use crate::prelude::*;
 
 pub struct Goal {
     x: i16,
