@@ -1,25 +1,17 @@
 use std::{collections::HashMap, fmt::Display};
 
 use fyrox::{
-    core::{
-        algebra::Vector3,
-        futures::{executor::block_on, future::join_all},
-        pool::Handle,
-    },
+    core::futures::{executor::block_on, future::join_all},
     engine::resource_manager::ResourceManager,
     resource::texture::{Texture, TextureKind},
     scene::{
-        base::BaseBuilder,
         dim2::rectangle::RectangleBuilder,
-        node::Node,
         pivot::PivotBuilder,
         sound::{SoundBufferResource, SoundBuilder, Status},
-        transform::TransformBuilder,
-        Scene,
     },
 };
 
-use crate::game_global;
+use crate::prelude::*;
 
 const ZERO_ORD: u8 = '0' as u8;
 
@@ -159,10 +151,8 @@ impl Media {
             height: texture_height,
         } = texture_kind
         {
-            let fyrox_x =
-                game_global::WIDTH as f32 / 2.0 - texture_width as f32 / 2.0 - std_x as f32;
-            let fyrox_y =
-                game_global::HEIGHT as f32 / 2.0 - texture_height as f32 / 2.0 - std_y as f32;
+            let fyrox_x = WIDTH as f32 / 2.0 - texture_width as f32 / 2.0 - std_x as f32;
+            let fyrox_y = HEIGHT as f32 / 2.0 - texture_height as f32 / 2.0 - std_y as f32;
 
             let node = RectangleBuilder::new(
                 BaseBuilder::new().with_local_transform(

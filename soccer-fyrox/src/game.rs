@@ -1,18 +1,8 @@
 use std::{cell::RefCell, rc::Rc};
 
-use fyrox::scene::Scene;
 use rand::Rng;
 
-use crate::{
-    controls::Controls,
-    difficulty::{self, Difficulty},
-    game_global::LEVEL_W,
-    goal::Goal,
-    media::Media,
-    player::Player,
-    rust_utils::{new_rcc, RCC},
-    team::Team,
-};
+use crate::prelude::*;
 
 pub const DEFAULT_DIFFICULTY: u8 = 2;
 pub const PLAYER_START_POS: [(i16, i16); 7] = [
@@ -44,7 +34,7 @@ impl Game {
         media: &mut Media,
     ) -> Self {
         let teams = vec![Team::new(p1_controls), Team::new(p2_controls)];
-        let difficulty = difficulty::DIFFICULTY[difficulty as usize];
+        let difficulty = DIFFICULTY[difficulty as usize];
 
         if teams[0].human() {
             //# Beginning a game with at least 1 human player

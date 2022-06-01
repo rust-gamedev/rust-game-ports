@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use fyrox::event::VirtualKeyCode;
+use crate::prelude::*;
 
 #[derive(Default)]
 pub struct InputController {
