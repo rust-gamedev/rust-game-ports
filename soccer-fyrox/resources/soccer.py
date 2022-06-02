@@ -130,20 +130,20 @@ def safe_normalise(vec):
     else:
         return vec.normalize(), length
 
-# The MyActor class extends Pygame Zero's Actor class by providing the attribute 'vpos', which stores the object's
-# current position using Pygame's Vector2 class. All code should change or read the position via vpos, as opposed to
-# Actor's x/y or pos attributes. When the object is drawn, we set self.pos (equivalent to setting both self.x and
-# self.y) based on vpos, but taking scrolling into account.
-class MyActor(Actor):
+# # The MyActor class extends Pygame Zero's Actor class by providing the attribute 'vpos', which stores the object's
+# # current position using Pygame's Vector2 class. All code should change or read the position via vpos, as opposed to
+# # Actor's x/y or pos attributes. When the object is drawn, we set self.pos (equivalent to setting both self.x and
+# # self.y) based on vpos, but taking scrolling into account.
+# class MyActor(Actor):
 #     def __init__(self, img, x=0, y=0, anchor=None):
 #         super().__init__(img, (0, 0), anchor=anchor)
 #         self.vpos = Vector2(x, y)
 #
-    # We draw with the supplied offset to enable scrolling
-    def draw(self, offset_x, offset_y):
-        # Set Actor's screen pos
-        self.pos = (self.vpos.x - offset_x, self.vpos.y - offset_y)
-        super().draw()
+#     # We draw with the supplied offset to enable scrolling
+#     def draw(self, offset_x, offset_y):
+#         # Set Actor's screen pos
+#         self.pos = (self.vpos.x - offset_x, self.vpos.y - offset_y)
+#         super().draw()
 
 # Ball physics model parameters
 KICK_STRENGTH = 11.5

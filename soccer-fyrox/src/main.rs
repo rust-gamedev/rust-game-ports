@@ -2,7 +2,6 @@
 // #![allow(unused_variables)]
 #![allow(dead_code)]
 
-mod actor;
 mod controls;
 mod difficulty;
 mod game;
@@ -11,6 +10,7 @@ mod goal;
 mod input_controller;
 mod media;
 mod menu_state;
+mod my_actor;
 mod player;
 mod rust_utils;
 mod state;
@@ -26,7 +26,6 @@ pub mod prelude {
         scene::{base::BaseBuilder, node::Node, transform::TransformBuilder, Scene},
     };
 
-    pub use crate::actor::Actor;
     pub use crate::controls::Controls;
     pub use crate::difficulty::{Difficulty, DIFFICULTY};
     pub use crate::game::{Game, DEFAULT_DIFFICULTY};
@@ -34,6 +33,7 @@ pub mod prelude {
     pub use crate::input_controller::InputController;
     pub use crate::media::Media;
     pub use crate::menu_state::MenuState;
+    pub use crate::my_actor::MyActor;
     pub use crate::player::Player;
     pub use crate::rust_utils::*;
     pub use crate::state::State;
