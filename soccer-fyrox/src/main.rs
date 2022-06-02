@@ -38,6 +38,7 @@ pub mod prelude {
     pub use crate::rust_utils::*;
     pub use crate::state::State;
     pub use crate::team::Team;
+    pub use soccer_macros_fyrox::my_actor_based;
 
     pub const WIDTH: i16 = 800;
     pub const HEIGHT: i16 = 480;
