@@ -1,8 +1,7 @@
 use crate::prelude::*;
 
+#[my_actor_based]
 pub struct Goal {
-    x: i16,
-    y: i16,
     team: u8,
 }
 
@@ -10,13 +9,16 @@ impl Goal {
     pub fn new(team: u8) -> Self {
         let x = HALF_LEVEL_W;
         let y = if team == 0 { 0 } else { LEVEL_H };
+        let vpos = Vector2::new(x, y);
 
-        Self { x, y, team }
-    }
-}
+        let img_base = "base";
+        let img_indexes = vec![team];
 
-impl Actor for Goal {
-    fn draw_info(&self) -> (&'static str, Vec<u8>, i16, i16) {
-        ("base", vec![self.team], self.x, self.y)
+        Self {
+            img_base,
+            img_indexes,
+            vpos,
+            team,
+        }
     }
 }
