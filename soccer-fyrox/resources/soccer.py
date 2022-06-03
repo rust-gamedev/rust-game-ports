@@ -443,19 +443,19 @@ class Player(MyActor):
     ANCHOR = (25,37)
 
     def __init__(self, x, y, team):
-        # Player objects are recreated each time there is a kickoff
-        # Team will be 0 or 1
-        # The x and y values supplied represent our 'home' position - the place we'll return to by default when not near
-        # the ball. However, on creation, we want players to be in their kickoff positions, which means all players from
-        # team 0 will be below the halfway line, and players from team 1 above. The player chosen to actually do the
-        # kickoff is moved to be alongside the centre spot after the player objects have been created.
-
-        # Calculate our initial position for kickoff by halving y, adding 550 and then subtracting either 400 for
-        # team 1, or nothing for team 0
-        kickoff_y = (y / 2) + 550 - (team * 400)
-
-        # Call the constructor of the parent class (MyActor)
-        super().__init__("blank", x, kickoff_y, Player.ANCHOR)
+#         # Player objects are recreated each time there is a kickoff
+#         # Team will be 0 or 1
+#         # The x and y values supplied represent our 'home' position - the place we'll return to by default when not near
+#         # the ball. However, on creation, we want players to be in their kickoff positions, which means all players from
+#         # team 0 will be below the halfway line, and players from team 1 above. The player chosen to actually do the
+#         # kickoff is moved to be alongside the centre spot after the player objects have been created.
+#
+#         # Calculate our initial position for kickoff by halving y, adding 550 and then subtracting either 400 for
+#         # team 1, or nothing for team 0
+#         kickoff_y = (y / 2) + 550 - (team * 400)
+#
+#         # Call the constructor of the parent class (MyActor)
+#         super().__init__("blank", x, kickoff_y, Player.ANCHOR)
 
         # Remember home position, where we'll stand by default if we're not active (i.e. far from the ball)
         self.home = Vector2(x, y)
