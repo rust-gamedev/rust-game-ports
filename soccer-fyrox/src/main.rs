@@ -3,6 +3,7 @@
 #![allow(dead_code)]
 
 mod anchor;
+mod ball;
 mod bare_actor;
 mod controls;
 mod difficulty;
@@ -29,6 +30,7 @@ pub mod prelude {
     };
 
     pub use crate::anchor::Anchor;
+    pub use crate::ball::Ball;
     pub use crate::bare_actor::BareActor;
     pub use crate::controls::Controls;
     pub use crate::difficulty::{Difficulty, DIFFICULTY};

@@ -229,16 +229,16 @@ def on_pitch(x, y):
            or GOAL_1_RECT.collidepoint(x,y)
 
 class Ball(MyActor):
-    def __init__(self):
-        super().__init__("ball", HALF_LEVEL_W, HALF_LEVEL_H)
-
-        # Velocity
-        self.vel = Vector2(0, 0)
-
-        self.owner = None
-        self.timer = 0
-
-        self.shadow = MyActor("balls")
+#     def __init__(self):
+#         super().__init__("ball", HALF_LEVEL_W, HALF_LEVEL_H)
+#
+#         # Velocity
+#         self.vel = Vector2(0, 0)
+#
+#         self.owner = None
+#         self.timer = 0
+#
+#         self.shadow = MyActor("balls")
 
     # Check for collision with player p
     def collide(self, p):
