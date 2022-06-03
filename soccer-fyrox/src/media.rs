@@ -142,6 +142,7 @@ impl Media {
         std_x: i16,
         std_y: i16,
         z: i16,
+        anchor: Anchor,
     ) {
         let texture = self.image(base, indexes);
         let texture_kind = texture.data_ref().kind();
@@ -151,8 +152,18 @@ impl Media {
             height: texture_height,
         } = texture_kind
         {
-            let fyrox_x = WIDTH as f32 / 2.0 - texture_width as f32 / 2.0 - std_x as f32;
-            let fyrox_y = HEIGHT as f32 / 2.0 - texture_height as f32 / 2.0 - std_y as f32;
+            let mut fyrox_x = WIDTH as f32 / 2.0 - texture_width as f32 / 2.0 - std_x as f32;
+            let mut fyrox_y = HEIGHT as f32 / 2.0 - texture_height as f32 / 2.0 - std_y as f32;
+
+            use Anchor::*;
+
+            match anchor {
+                Center => {}
+                Custom(anchor) => {
+                    fyrox_x += texture_width as f32 / 2.0 - anchor.x as f32;
+                    fyrox_y += texture_height as f32 / 2.0 - anchor.y as f32;
+                }
+            };
 
             let node = RectangleBuilder::new(
                 BaseBuilder::new().with_local_transform(
