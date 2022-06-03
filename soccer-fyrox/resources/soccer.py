@@ -229,16 +229,16 @@ def on_pitch(x, y):
            or GOAL_1_RECT.collidepoint(x,y)
 
 class Ball(MyActor):
-    def __init__(self):
-        super().__init__("ball", HALF_LEVEL_W, HALF_LEVEL_H)
-
-        # Velocity
-        self.vel = Vector2(0, 0)
-
-        self.owner = None
-        self.timer = 0
-
-        self.shadow = MyActor("balls")
+#     def __init__(self):
+#         super().__init__("ball", HALF_LEVEL_W, HALF_LEVEL_H)
+#
+#         # Velocity
+#         self.vel = Vector2(0, 0)
+#
+#         self.owner = None
+#         self.timer = 0
+#
+#         self.shadow = MyActor("balls")
 
     # Check for collision with player p
     def collide(self, p):
@@ -440,38 +440,38 @@ def cost(pos, team, handicap=0):
     return result, pos
 
 class Player(MyActor):
-    ANCHOR = (25,37)
+#     ANCHOR = (25,37)
 
     def __init__(self, x, y, team):
-        # Player objects are recreated each time there is a kickoff
-        # Team will be 0 or 1
-        # The x and y values supplied represent our 'home' position - the place we'll return to by default when not near
-        # the ball. However, on creation, we want players to be in their kickoff positions, which means all players from
-        # team 0 will be below the halfway line, and players from team 1 above. The player chosen to actually do the
-        # kickoff is moved to be alongside the centre spot after the player objects have been created.
-
-        # Calculate our initial position for kickoff by halving y, adding 550 and then subtracting either 400 for
-        # team 1, or nothing for team 0
-        kickoff_y = (y / 2) + 550 - (team * 400)
-
-        # Call the constructor of the parent class (MyActor)
-        super().__init__("blank", x, kickoff_y, Player.ANCHOR)
-
-        # Remember home position, where we'll stand by default if we're not active (i.e. far from the ball)
-        self.home = Vector2(x, y)
-
-        # Store team
-        self.team = team
-
-        # Facing direction: 0 = up, 1 = top right, up to 7 = top left
-        self.dir = 0
-
-        # Animation frame
-        self.anim_frame = -1
-
-        self.timer = 0
-
-        self.shadow = MyActor("blank", 0, 0, Player.ANCHOR)
+#         # Player objects are recreated each time there is a kickoff
+#         # Team will be 0 or 1
+#         # The x and y values supplied represent our 'home' position - the place we'll return to by default when not near
+#         # the ball. However, on creation, we want players to be in their kickoff positions, which means all players from
+#         # team 0 will be below the halfway line, and players from team 1 above. The player chosen to actually do the
+#         # kickoff is moved to be alongside the centre spot after the player objects have been created.
+#
+#         # Calculate our initial position for kickoff by halving y, adding 550 and then subtracting either 400 for
+#         # team 1, or nothing for team 0
+#         kickoff_y = (y / 2) + 550 - (team * 400)
+#
+#         # Call the constructor of the parent class (MyActor)
+#         super().__init__("blank", x, kickoff_y, Player.ANCHOR)
+#
+#         # Remember home position, where we'll stand by default if we're not active (i.e. far from the ball)
+#         self.home = Vector2(x, y)
+#
+#         # Store team
+#         self.team = team
+#
+#         # Facing direction: 0 = up, 1 = top right, up to 7 = top left
+#         self.dir = 0
+#
+#         # Animation frame
+#         self.anim_frame = -1
+#
+#         self.timer = 0
+#
+#         self.shadow = MyActor("blank", 0, 0, Player.ANCHOR)
 
         # Used when DEBUG_SHOW_TARGETS is on
         self.debug_target = Vector2(0, 0)
@@ -752,9 +752,9 @@ class Game:
 #         # second on team 1, the third on team 0 etc. The player that kicks off will always be the first player of
 #         # the relevant team.
 #         self.kickoff_player = self.players[other_team]
-
-        # Set pos of kickoff player. A team 0 player will stand to the left of the ball, team 1 on the right
-        self.kickoff_player.vpos = Vector2(HALF_LEVEL_W - 30 + other_team * 60, HALF_LEVEL_H)
+#
+#         # Set pos of kickoff player. A team 0 player will stand to the left of the ball, team 1 on the right
+#         self.kickoff_player.vpos = Vector2(HALF_LEVEL_W - 30 + other_team * 60, HALF_LEVEL_H)
 
         # Create ball
         self.ball = Ball()

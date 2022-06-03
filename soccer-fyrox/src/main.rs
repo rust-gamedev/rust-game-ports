@@ -2,6 +2,9 @@
 // #![allow(unused_variables)]
 #![allow(dead_code)]
 
+mod anchor;
+mod ball;
+mod bare_actor;
 mod controls;
 mod difficulty;
 mod game;
@@ -26,6 +29,9 @@ pub mod prelude {
         scene::{base::BaseBuilder, node::Node, transform::TransformBuilder, Scene},
     };
 
+    pub use crate::anchor::Anchor;
+    pub use crate::ball::Ball;
+    pub use crate::bare_actor::BareActor;
     pub use crate::controls::Controls;
     pub use crate::difficulty::{Difficulty, DIFFICULTY};
     pub use crate::game::{Game, DEFAULT_DIFFICULTY};

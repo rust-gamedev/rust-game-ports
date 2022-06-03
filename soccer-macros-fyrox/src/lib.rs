@@ -22,6 +22,7 @@ pub fn my_actor_based(args: TokenStream, input: TokenStream) -> TokenStream {
             quote! { img_base: &'static str },
             quote! { img_indexes: Vec<u8> },
             quote! { pub vpos: Vector2<i16> },
+            quote! { anchor: Anchor },
         ];
 
         for field_tokens in fields_tokens {
@@ -49,6 +50,10 @@ pub fn my_actor_based(args: TokenStream, input: TokenStream) -> TokenStream {
 
             fn img_indexes(&self) -> &[u8] {
                 &self.img_indexes
+            }
+
+            fn anchor(&self) -> Anchor {
+                self.anchor
             }
         }
     };
