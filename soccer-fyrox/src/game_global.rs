@@ -190,13 +190,20 @@ impl GameGlobal {
                     Difficulty => (1, self.menu_difficulty),
                 };
 
-                self.media
-                    .draw_image(scene, "menu", &[image_i1, image_i2], 0, 0, 0);
+                self.media.draw_image(
+                    scene,
+                    "menu",
+                    &[image_i1, image_i2],
+                    0,
+                    0,
+                    0,
+                    Anchor::Center,
+                );
             }
             Play => {
                 //# Display score bar at top
                 self.media
-                    .draw_image(scene, "bar", &[], HALF_WINDOW_W - 176, 0, 0);
+                    .draw_image(scene, "bar", &[], HALF_WINDOW_W - 176, 0, 0, Anchor::Center);
                 //# Show score for each team
                 for i in 0..2 {
                     self.media.draw_image(
@@ -206,6 +213,7 @@ impl GameGlobal {
                         HALF_WINDOW_W + 7 - 39 * (i as i16),
                         6,
                         0,
+                        Anchor::Center,
                     );
                 }
 
@@ -218,13 +226,15 @@ impl GameGlobal {
                         HALF_WINDOW_W - 300,
                         HEIGHT / 2 - 88,
                         0,
+                        Anchor::Center,
                     );
                 }
             }
             GameOver => {
                 //# Display "Game Over" image
                 let index = (self.game.teams[1].score > self.game.teams[0].score) as u8;
-                self.media.draw_image(scene, "over", &[index], 0, 0, 0);
+                self.media
+                    .draw_image(scene, "over", &[index], 0, 0, 0, Anchor::Center);
 
                 //# Show score for each team
                 for i in 0..2 {
@@ -235,6 +245,7 @@ impl GameGlobal {
                         HALF_WINDOW_W + 25 - 125 * i,
                         144,
                         0,
+                        Anchor::Center,
                     );
                 }
             }

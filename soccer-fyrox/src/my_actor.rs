@@ -17,6 +17,14 @@ pub trait MyActor {
         let pos_x = self.vpos().x - offset_x;
         let pos_y = self.vpos().y - offset_y;
 
-        media.draw_image(scene, self.img_base(), &self.img_indexes(), pos_x, pos_y, 0);
+        media.draw_image(
+            scene,
+            self.img_base(),
+            &self.img_indexes(),
+            pos_x,
+            pos_y,
+            0,
+            self.anchor(),
+        );
     }
 }

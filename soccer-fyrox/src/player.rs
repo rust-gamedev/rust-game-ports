@@ -1,5 +1,7 @@
 use crate::prelude::*;
 
+const ANCHOR: Vector2<i16> = Vector2::new(25, 37);
+
 #[my_actor_based]
 pub struct Player {
     // We trivially solve the cyclical references problem, by erasing the references at the start of
@@ -30,6 +32,7 @@ impl Player {
             vpos,
             img_base,
             img_indexes,
+            anchor: Anchor::Custom(ANCHOR),
             peer,
         }
     }

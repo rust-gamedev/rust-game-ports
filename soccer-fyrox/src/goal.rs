@@ -19,6 +19,7 @@ impl Goal {
             img_indexes,
             vpos,
             team,
+            anchor: Anchor::Center,
         }
     }
 }

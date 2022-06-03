@@ -440,7 +440,7 @@ def cost(pos, team, handicap=0):
     return result, pos
 
 class Player(MyActor):
-    ANCHOR = (25,37)
+#     ANCHOR = (25,37)
 
     def __init__(self, x, y, team):
 #         # Player objects are recreated each time there is a kickoff
