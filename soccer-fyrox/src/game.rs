@@ -124,6 +124,10 @@ impl Game {
         //# second on team 1, the third on team 0 etc. The player that kicks off will always be the first player of
         //# the relevant team.
         self.kickoff_player = Some(Rc::clone(&self.players[other_team as usize]));
+
+        //# Set pos of kickoff player. A team 0 player will stand to the left of the ball, team 1 on the right
+        self.kickoff_player.as_ref().unwrap().borrow_mut().vpos =
+            Vector2::new(HALF_LEVEL_W - 30 + other_team * 60, HALF_LEVEL_H);
     }
 
     pub fn update(&mut self) {

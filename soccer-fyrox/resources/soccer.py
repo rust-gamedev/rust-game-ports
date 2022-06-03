@@ -752,9 +752,9 @@ class Game:
 #         # second on team 1, the third on team 0 etc. The player that kicks off will always be the first player of
 #         # the relevant team.
 #         self.kickoff_player = self.players[other_team]
-
-        # Set pos of kickoff player. A team 0 player will stand to the left of the ball, team 1 on the right
-        self.kickoff_player.vpos = Vector2(HALF_LEVEL_W - 30 + other_team * 60, HALF_LEVEL_H)
+#
+#         # Set pos of kickoff player. A team 0 player will stand to the left of the ball, team 1 on the right
+#         self.kickoff_player.vpos = Vector2(HALF_LEVEL_W - 30 + other_team * 60, HALF_LEVEL_H)
 
         # Create ball
         self.ball = Ball()
