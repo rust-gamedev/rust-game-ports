@@ -12,24 +12,44 @@ c_next_mode=next
 c_reset_mode=reset
 
 c_help="\
-Usage: $(basename "$0") [$c_compare_source_prev_mode <step_pattern>|$c_next_mode|$c_reset_mode <step_path>]
+Usage: $(basename "$0") [
+  $c_compare_curr_mode <step_pattern> |
+  $c_compare_source_prev_mode <step_pattern> |
+  $c_next_mode |
+  $c_reset_mode <step_path>
+]
 
-The script has three modes:
+The script has several modes:
 
-- $c_compare_curr_mode        : compares the current step of the source vs port projects
-  - if <step_pattern> is specified (example: '6*1'), it's used in the search as path basename substring match
-    - WATCH OUT! If multiple steps are found, the last is selected
-- $c_compare_source_prev_mode : compares the source project current step (based on the latest port) with the previous one
-- $c_next_mode                :
-  - create the next port step:
-    - creates a repository branch
-    - updates the VS Code project
-    - removes the old steps and adds the new ones
-    - commits with a prepared title
-    - executes $c_compare_source_prev_mode mode
-  - requires env variable RUST_GAME_PORTS_VSCODE_PROJECT pointing to the project file
-- $c_reset_mode               : reset the VSC project to the given step (port path)
-  - requires env variable RUST_GAME_PORTS_VSCODE_PROJECT pointing to the project file
+## $c_compare_curr_mode ########################################################
+
+Compares the current step of the source vs port projects.
+
+If <step_pattern> is specified (example: '6*1'), it's used in the search as path basename substring match.
+
+WATCH OUT! If multiple steps are found, the last is selected.
+
+## $c_compare_source_prev_mode #################################################
+
+Compares the source project current step (based on the latest port) with the previous one.
+
+## $c_next_mode ################################################################
+
+Create the next port step:
+
+- creates a repository branch
+- updates the VS Code project
+- removes the old steps and adds the new ones
+- commits with a prepared title
+- executes $c_compare_source_prev_mode mode
+
+Requires env variable RUST_GAME_PORTS_VSCODE_PROJECT pointing to the project file.
+
+## $c_reset_mode ###############################################################
+
+Reset the VSC project to the given step (port path).
+
+Requires env variable RUST_GAME_PORTS_VSCODE_PROJECT pointing to the project file.
 "
 c_port_base_dir=$(readlink -f "$(dirname "$0")/../rusty_roguelike-bevy")
 c_source_base_dir=$(readlink -f "$(dirname "$0")/../source_projects/rusty_roguelike")
