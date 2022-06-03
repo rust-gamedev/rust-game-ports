@@ -8,6 +8,7 @@ shopt -s inherit_errexit
 
 c_compare_curr_mode=compare_curr
 c_compare_source_prev_mode=compare_source_prev
+c_compare_port_prev_mode=compare_port_prev
 c_next_mode=next
 c_reset_mode=reset
 
@@ -15,6 +16,7 @@ c_help="\
 Usage: $(basename "$0") [
   $c_compare_curr_mode <step_pattern> |
   $c_compare_source_prev_mode <step_pattern> |
+  $c_compare_port_prev_mode <step_pattern> |
   $c_next_mode |
   $c_reset_mode <step_path>
 ]
@@ -32,6 +34,10 @@ WATCH OUT! If multiple steps are found, the last is selected.
 ## $c_compare_source_prev_mode #################################################
 
 Compares the source project current step (based on the latest port) with the previous one.
+
+## $c_compare_port_prev_mode ###################################################
+
+Compares the port project's specified step with the previous one.
 
 ## $c_next_mode ################################################################
 
@@ -129,6 +135,12 @@ function check_params {
       exit 1
     fi
     ;;
+  "$c_compare_port_prev_mode")
+    if [[ $# -ne 2 ]]; then
+      echo "$c_help"
+      exit 1
+    fi
+    ;;
   "$c_compare_curr_mode")
     if [[ $# -gt 2 ]]; then
       echo "$c_help"
@@ -154,6 +166,9 @@ function set_param_variables {
     ;;
   "$c_compare_curr_mode")
     v_current_step_pattern=${2:-}
+    ;;
+  "$c_compare_port_prev_mode")
+    v_current_step_pattern=$2
     ;;
   esac
 
@@ -211,6 +226,12 @@ function compare_source_steps {
   local previous_step=$1 current_step=$2
 
   "$c_compare_program" "$c_source_base_dir/$previous_step" "$c_source_base_dir/$current_step"
+}
+
+function compare_port_steps {
+  local previous_step=$1 current_step=$2
+
+  "$c_compare_program" "$c_port_base_dir"/{"$previous_step","$current_step"}
 }
 
 function create_git_branch {
@@ -274,6 +295,10 @@ case $v_mode in
 "$c_compare_source_prev_mode")
   previous_step=$(find_step preceding "$current_step")
   compare_source_steps "$previous_step" "$current_step"
+  ;;
+"$c_compare_port_prev_mode")
+  previous_step=$(find_step preceding "$current_step")
+  compare_port_steps "$previous_step" "$current_step"
   ;;
 "$c_next_mode")
   next_step=$(find_step following "$current_step")
