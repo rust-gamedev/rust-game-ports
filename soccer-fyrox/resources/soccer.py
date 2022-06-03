@@ -456,22 +456,22 @@ class Player(MyActor):
 #
 #         # Call the constructor of the parent class (MyActor)
 #         super().__init__("blank", x, kickoff_y, Player.ANCHOR)
-
-        # Remember home position, where we'll stand by default if we're not active (i.e. far from the ball)
-        self.home = Vector2(x, y)
-
-        # Store team
-        self.team = team
-
-        # Facing direction: 0 = up, 1 = top right, up to 7 = top left
-        self.dir = 0
-
-        # Animation frame
-        self.anim_frame = -1
-
-        self.timer = 0
-
-        self.shadow = MyActor("blank", 0, 0, Player.ANCHOR)
+#
+#         # Remember home position, where we'll stand by default if we're not active (i.e. far from the ball)
+#         self.home = Vector2(x, y)
+#
+#         # Store team
+#         self.team = team
+#
+#         # Facing direction: 0 = up, 1 = top right, up to 7 = top left
+#         self.dir = 0
+#
+#         # Animation frame
+#         self.anim_frame = -1
+#
+#         self.timer = 0
+#
+#         self.shadow = MyActor("blank", 0, 0, Player.ANCHOR)
 
         # Used when DEBUG_SHOW_TARGETS is on
         self.debug_target = Vector2(0, 0)
