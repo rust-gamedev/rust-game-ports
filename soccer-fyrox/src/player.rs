@@ -7,7 +7,10 @@ pub struct Player {
     // We trivially solve the cyclical references problem, by erasing the references at the start of
     // each game.
     pub peer: Option<RCC<Player>>,
+    pub mark: Option<RCC<Player>>,
+    pub lead: Option<RCC<Player>>,
     home: Vector2<i16>,
+    pub team: u8,
     dir: u8,
     anim_frame: i8,
     timer: i32,
@@ -32,6 +35,8 @@ impl Player {
         let img_indexes = vec![];
 
         let peer = None;
+        let mark = None;
+        let lead = None;
 
         //# Remember home position, where we'll stand by default if we're not active (i.e. far from the ball)
         let home = Vector2::new(x, y);
@@ -52,7 +57,10 @@ impl Player {
             img_indexes,
             anchor: Anchor::Custom(ANCHOR),
             peer,
+            mark,
+            lead,
             home,
+            team,
             dir,
             anim_frame,
             timer,
