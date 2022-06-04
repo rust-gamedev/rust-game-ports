@@ -11,7 +11,7 @@ impl Goal {
         let y = if team == 0 { 0 } else { LEVEL_H };
         let vpos = Vector2::new(x, y);
 
-        let img_base = "base";
+        let img_base = "goal";
         let img_indexes = vec![team];
 
         Self {
