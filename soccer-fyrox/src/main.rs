@@ -16,7 +16,6 @@ mod media;
 mod menu_state;
 mod my_actor;
 mod player;
-mod rust_utils;
 mod state;
 mod team;
 
@@ -24,7 +23,7 @@ pub mod prelude {
     pub use fyrox::{
         core::{
             algebra::{Vector2, Vector3},
-            pool::Handle,
+            pool::{Handle, Pool},
         },
         event::VirtualKeyCode,
         scene::{base::BaseBuilder, node::Node, transform::TransformBuilder, Scene},
@@ -43,7 +42,6 @@ pub mod prelude {
     pub use crate::menu_state::MenuState;
     pub use crate::my_actor::MyActor;
     pub use crate::player::Player;
-    pub use crate::rust_utils::*;
     pub use crate::state::State;
     pub use crate::team::Team;
     pub use soccer_macros_fyrox::my_actor_based;

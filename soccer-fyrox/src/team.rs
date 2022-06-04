@@ -3,7 +3,7 @@ use crate::prelude::*;
 pub struct Team {
     controls: Option<Controls>,
     pub score: u8,
-    pub active_control_player: Option<RCC<Player>>,
+    pub active_control_player: Option<Handle<Player>>,
 }
 
 impl Team {
