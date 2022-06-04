@@ -20,6 +20,8 @@ const ZERO_ORD: u8 = '0' as u8;
 pub const BLANK_IMAGE: &str = "blank";
 
 const IMAGE_PATHS: &'static [&'static str] = &[
+    "resources/images/arrow0.png",
+    "resources/images/arrow1.png",
     "resources/images/ball.png",
     "resources/images/bar.png",
     "resources/images/goal0.png",
@@ -53,6 +55,7 @@ const IMAGE_PATHS: &'static [&'static str] = &[
     "resources/images/over0.png",
     "resources/images/over1.png",
     "resources/images/over1.png",
+    "resources/images/pitch.png",
     "resources/images/s0.png",
     "resources/images/s1.png",
     "resources/images/s2.png",

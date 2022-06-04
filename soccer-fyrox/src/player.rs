@@ -11,7 +11,7 @@ pub struct Player {
     dir: u8,
     anim_frame: i8,
     timer: i32,
-    shadow: BareActor,
+    pub shadow: BareActor,
 }
 
 impl Player {

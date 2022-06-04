@@ -177,9 +177,9 @@ impl GameGlobal {
     }
 
     fn draw(&mut self, engine: &mut Engine) {
-        //# self.game.draw(); //# WRITEME
-
         let scene = &mut engine.scenes[self.scene];
+
+        self.game.draw(scene, &mut self.media);
 
         use {MenuState::*, State::*};
 
