@@ -20,13 +20,7 @@ const ZERO_ORD: u8 = '0' as u8;
 pub const BLANK_IMAGE: &str = "blank";
 
 const IMAGES_PATH: &str = "resources/images";
-
-const SOUND_PATHS: &'static [&'static str] = &[
-    "resources/sounds/crowd.ogg",
-    "resources/sounds/move.ogg",
-    "resources/sounds/start.ogg",
-    "resources/sounds/theme.ogg",
-];
+const SOUNDS_PATH: &str = "resources/sounds";
 
 // It's not easy to make the overall design of the program simple, since Fyrox requires several elements
 // to be carried around (scene, handles, resources...).
@@ -54,8 +48,13 @@ impl Media {
                 .map(|path| resource_manager.request_texture(path)),
         );
 
+        let sound_paths = read_dir(SOUNDS_PATH)
+            .unwrap()
+            .map(|entry| entry.unwrap().path().to_string_lossy().into_owned())
+            .collect::<Vec<String>>();
+
         let sound_requests = join_all(
-            SOUND_PATHS
+            sound_paths
                 .iter()
                 .map(|path| resource_manager.request_sound_buffer(path)),
         );
@@ -66,7 +65,7 @@ impl Media {
             .map(|(path, texture)| (path.to_string(), texture.unwrap()))
             .collect::<HashMap<_, _>>();
 
-        let sound_resources = SOUND_PATHS
+        let sound_resources = sound_paths
             .iter()
             .zip(block_on(sound_requests))
             .map(|(path, texture)| (path.to_string(), texture.unwrap()))
