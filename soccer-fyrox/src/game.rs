@@ -41,13 +41,13 @@ impl Game {
         if teams[0].human() {
             //# Beginning a game with at least 1 human player
             //# music.fadeout(1); // WRITEME: Fyrox doesn't currently support fading out
-            media.stop_looping_sound(scene, "music/theme"); // ^^ remove once fadeout is implemented
-            media.play_looping_sound(scene, "sounds/crowd");
-            media.play_sound(scene, "sounds/start", &[]);
+            media.stop_looping_sound(scene, "theme"); // ^^ remove once fadeout is implemented
+            media.play_looping_sound(scene, "crowd");
+            media.play_sound(scene, "start", &[]);
         } else {
             //# No players - we must be on the menu. Play title music.
-            media.play_looping_sound(scene, "music/theme");
-            media.stop_looping_sound(scene, "sounds/crowd");
+            media.play_looping_sound(scene, "theme");
+            media.stop_looping_sound(scene, "crowd");
         }
 
         let score_timer = 0;

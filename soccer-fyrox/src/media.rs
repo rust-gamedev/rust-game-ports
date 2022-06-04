@@ -25,7 +25,7 @@ const SOUND_PATHS: &'static [&'static str] = &[
     "resources/sounds/crowd.ogg",
     "resources/sounds/move.ogg",
     "resources/sounds/start.ogg",
-    "resources/music/theme.ogg",
+    "resources/sounds/theme.ogg",
 ];
 
 // It's not easy to make the overall design of the program simple, since Fyrox requires several elements
@@ -227,7 +227,7 @@ impl Media {
             panic!();
         }
 
-        let mut full_path = format!("resources/{}", base);
+        let mut full_path = format!("resources/sounds/{}", base);
 
         for index in indexes {
             full_path.push((ZERO_ORD + index) as char);
