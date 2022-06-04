@@ -1,4 +1,4 @@
-use std::{collections::HashMap, fmt::Display};
+use std::{collections::HashMap, fmt::Display, fs::read_dir};
 
 use fyrox::{
     core::futures::{executor::block_on, future::join_all},
@@ -19,61 +19,8 @@ const ZERO_ORD: u8 = '0' as u8;
 //
 pub const BLANK_IMAGE: &str = "blank";
 
-const IMAGE_PATHS: &'static [&'static str] = &[
-    "resources/images/arrow0.png",
-    "resources/images/arrow1.png",
-    "resources/images/ball.png",
-    "resources/images/bar.png",
-    "resources/images/goal0.png",
-    "resources/images/goal1.png",
-    "resources/images/l00.png",
-    "resources/images/l01.png",
-    "resources/images/l02.png",
-    "resources/images/l03.png",
-    "resources/images/l04.png",
-    "resources/images/l05.png",
-    "resources/images/l06.png",
-    "resources/images/l07.png",
-    "resources/images/l08.png",
-    "resources/images/l09.png",
-    "resources/images/l10.png",
-    "resources/images/l11.png",
-    "resources/images/l12.png",
-    "resources/images/l13.png",
-    "resources/images/l14.png",
-    "resources/images/l15.png",
-    "resources/images/l16.png",
-    "resources/images/l17.png",
-    "resources/images/l18.png",
-    "resources/images/l19.png",
-    "resources/images/menu01.png",
-    "resources/images/menu02.png",
-    "resources/images/menu10.png",
-    "resources/images/menu11.png",
-    "resources/images/menu12.png",
-    "resources/images/over0.png",
-    "resources/images/over0.png",
-    "resources/images/over1.png",
-    "resources/images/over1.png",
-    "resources/images/pitch.png",
-    "resources/images/s0.png",
-    "resources/images/s1.png",
-    "resources/images/s2.png",
-    "resources/images/s3.png",
-    "resources/images/s4.png",
-    "resources/images/s5.png",
-    "resources/images/s6.png",
-    "resources/images/s7.png",
-    "resources/images/s8.png",
-    "resources/images/s9.png",
-];
-
-const SOUND_PATHS: &'static [&'static str] = &[
-    "resources/sounds/crowd.ogg",
-    "resources/sounds/move.ogg",
-    "resources/sounds/start.ogg",
-    "resources/music/theme.ogg",
-];
+const IMAGES_PATH: &str = "resources/images";
+const SOUNDS_PATH: &str = "resources/sounds";
 
 // It's not easy to make the overall design of the program simple, since Fyrox requires several elements
 // to be carried around (scene, handles, resources...).
@@ -87,28 +34,38 @@ pub struct Media {
 
 impl Media {
     pub fn new(resource_manager: &ResourceManager, scene: &mut Scene) -> Self {
+        let image_paths = read_dir(IMAGES_PATH)
+            .unwrap()
+            .map(|entry| entry.unwrap().path().to_string_lossy().into_owned())
+            .collect::<Vec<String>>();
+
         // As of Fyrox v0.25, loading textures in debug mode is extremely slow (1.4" for each PNG file,
         // even if small), so we need to load them asynchronously.
         //
         let texture_requests = join_all(
-            IMAGE_PATHS
+            image_paths
                 .iter()
                 .map(|path| resource_manager.request_texture(path)),
         );
 
+        let sound_paths = read_dir(SOUNDS_PATH)
+            .unwrap()
+            .map(|entry| entry.unwrap().path().to_string_lossy().into_owned())
+            .collect::<Vec<String>>();
+
         let sound_requests = join_all(
-            SOUND_PATHS
+            sound_paths
                 .iter()
                 .map(|path| resource_manager.request_sound_buffer(path)),
         );
 
-        let image_textures = IMAGE_PATHS
+        let image_textures = image_paths
             .iter()
             .zip(block_on(texture_requests))
             .map(|(path, texture)| (path.to_string(), texture.unwrap()))
             .collect::<HashMap<_, _>>();
 
-        let sound_resources = SOUND_PATHS
+        let sound_resources = sound_paths
             .iter()
             .zip(block_on(sound_requests))
             .map(|(path, texture)| (path.to_string(), texture.unwrap()))
@@ -269,7 +226,7 @@ impl Media {
             panic!();
         }
 
-        let mut full_path = format!("resources/{}", base);
+        let mut full_path = format!("resources/sounds/{}", base);
 
         for index in indexes {
             full_path.push((ZERO_ORD + index) as char);
