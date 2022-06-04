@@ -939,15 +939,15 @@ class Game:
                     screen_pos = (screen_pos.x,screen_pos.y)    # draw.text can't reliably take a Vector2
                     screen.draw.text("{0:.0f}".format(c), center=screen_pos)
 
-    def play_sound(self, name, c):
-        # Only play sounds if we're not in the menu state
-        if state != State.MENU:
-            try:
-                getattr(sounds, name+str(random.randint(0, c-1))).play()
-            except:
-                pass
-
-
+#     def play_sound(self, name, c):
+#         # Only play sounds if we're not in the menu state
+#         if state != State.MENU:
+#             try:
+#                 getattr(sounds, name+str(random.randint(0, c-1))).play()
+#             except:
+#                 pass
+#
+#
 # # Dictionary to keep track of which keys are currently being held down
 # key_status = {}
 #
