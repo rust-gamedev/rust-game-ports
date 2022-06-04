@@ -23,6 +23,8 @@ pub struct Game {
     players: Vec<RCC<Player>>,
     goals: Vec<Goal>,
     kickoff_player: Option<RCC<Player>>,
+    ball: Ball,
+    camera_focus: Vector2<i16>,
 }
 
 impl Game {
@@ -55,6 +57,12 @@ impl Game {
         let goals = vec![];
         let kickoff_player = None;
 
+        //# Create ball
+        let ball = Ball::new();
+
+        //# Focus camera on ball - copy ball pos
+        let camera_focus = ball.vpos.clone();
+
         let mut instance = Self {
             teams,
             difficulty,
@@ -63,6 +71,8 @@ impl Game {
             players,
             goals,
             kickoff_player,
+            ball,
+            camera_focus,
         };
 
         instance.reset();
@@ -132,5 +142,86 @@ impl Game {
 
     pub fn update(&mut self) {
         // WRITEME
+    }
+
+    pub fn draw(&self, scene: &mut Scene, media: &mut Media) {
+        //# For the purpose of scrolling, all objects will be drawn with these offsets
+        let offset_x = (self.camera_focus.x - WIDTH / 2).clamp(0, LEVEL_W - WIDTH); // max(0, min(LEVEL_W - WIDTH, self.camera_focus.x - WIDTH / 2));
+        let offset_y = (self.camera_focus.y - HEIGHT / 2).clamp(0, LEVEL_H - HEIGHT);
+        let offset = Vector2::new(offset_x, offset_y);
+
+        media.draw_image(scene, "pitch", &[], -offset_x, -offset_y, 0, Anchor::Center);
+
+        //# Prepare to draw all objects
+        //# 1. Create a list of all players and the ball, sorted based on their Y positions
+        //# 2. Add object shadows to the list
+        //# 3. Add the two goals at each end of the list
+        //# (note - technically we're not adding items to the list in steps two and three, we're creating a new list
+        //# which consists of the old list plus the new items)
+
+        // We need a bit of trickery in Rust (assuming we don't use (Fyrox) object handles, which, at
+        // this stage, we don't); we draw in chunks: goals[0], ball+players, shadows, goals[1].
+        // Additionally, we use vpos.y instead of y; in this game, x/y are not used (vpos.x/y are)
+        // except here, and for this specific logic, vpos.y and y can be used interchangeably.
+
+        self.goals[0].draw(scene, media, offset_x, offset_y);
+
+        let mut sorted_players = self
+            .players
+            .iter()
+            .map(|player| Rc::clone(&player))
+            .collect::<Vec<_>>();
+
+        sorted_players.sort_by(|a, b| (a.borrow().vpos.y.partial_cmp(&b.borrow().vpos.y).unwrap()));
+
+        let ball_draw_i = sorted_players
+            .iter()
+            .position(|player| player.borrow().vpos().y > self.ball.vpos().y)
+            .unwrap_or(sorted_players.len());
+
+        for (i, player) in sorted_players.iter().enumerate() {
+            if i == ball_draw_i {
+                self.ball.draw(scene, media, offset_x, offset_y);
+            }
+
+            player.borrow().draw(scene, media, offset_x, offset_y);
+
+            if i == sorted_players.len() - 1 && ball_draw_i == sorted_players.len() {
+                self.ball.draw(scene, media, offset_x, offset_y);
+            }
+        }
+
+        for player in sorted_players {
+            player
+                .borrow()
+                .shadow
+                .draw(scene, media, offset_x, offset_y);
+        }
+
+        self.goals[1].draw(scene, media, offset_x, offset_y);
+
+        //# Show active players
+        for t in 0..2 {
+            //# Only show arrow for human teams
+            if self.teams[t].human() {
+                let arrow_pos = &self.teams[t]
+                    .active_control_player
+                    .as_ref()
+                    .unwrap()
+                    .borrow()
+                    .vpos()
+                    - offset
+                    - Vector2::new(11, 45);
+                media.draw_image(
+                    scene,
+                    "arrow",
+                    &[t as u8],
+                    arrow_pos.x,
+                    arrow_pos.y,
+                    0,
+                    Anchor::Center,
+                );
+            }
+        }
     }
 }

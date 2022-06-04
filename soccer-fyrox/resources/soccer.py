@@ -755,12 +755,12 @@ class Game:
 #
 #         # Set pos of kickoff player. A team 0 player will stand to the left of the ball, team 1 on the right
 #         self.kickoff_player.vpos = Vector2(HALF_LEVEL_W - 30 + other_team * 60, HALF_LEVEL_H)
-
-        # Create ball
-        self.ball = Ball()
-
-        # Focus camera on ball - copy ball pos
-        self.camera_focus = Vector2(self.ball.vpos)
+#
+#         # Create ball
+#         self.ball = Ball()
+#
+#         # Focus camera on ball - copy ball pos
+#         self.camera_focus = Vector2(self.ball.vpos)
 
         self.debug_shoot_target = None
 
@@ -878,33 +878,33 @@ class Game:
             self.camera_focus -= camera_ball_vec * min(distance, 8)
 
     def draw(self):
-        # For the purpose of scrolling, all objects will be drawn with these offsets
-        offset_x = max(0, min(LEVEL_W - WIDTH, self.camera_focus.x - WIDTH / 2))
-        offset_y = max(0, min(LEVEL_H - HEIGHT, self.camera_focus.y - HEIGHT / 2))
-        offset = Vector2(offset_x, offset_y)
-
-        screen.blit("pitch", (-offset_x, -offset_y))
-
-        # Prepare to draw all objects
-        # 1. Create a list of all players and the ball, sorted based on their Y positions
-        # 2. Add object shadows to the list
-        # 3. Add the two goals at each end of the list
-        # (note - technically we're not adding items to the list in steps two and three, we're creating a new list
-        # which consists of the old list plus the new items)
-        objects = sorted([self.ball] + self.players, key = lambda obj: obj.y)
-        objects = objects + [obj.shadow for obj in objects]
-        objects = [self.goals[0]] + objects + [self.goals[1]]
-
-        # Draw all objects
-        for obj in objects:
-            obj.draw(offset_x, offset_y)
-
-        # Show active players
-        for t in range(2):
-            # Only show arrow for human teams
-            if self.teams[t].human():
-                arrow_pos = self.teams[t].active_control_player.vpos - offset - Vector2(11, 45)
-                screen.blit("arrow" + str(t), arrow_pos)
+#         # For the purpose of scrolling, all objects will be drawn with these offsets
+#         offset_x = max(0, min(LEVEL_W - WIDTH, self.camera_focus.x - WIDTH / 2))
+#         offset_y = max(0, min(LEVEL_H - HEIGHT, self.camera_focus.y - HEIGHT / 2))
+#         offset = Vector2(offset_x, offset_y)
+#
+#         screen.blit("pitch", (-offset_x, -offset_y))
+#
+#         # Prepare to draw all objects
+#         # 1. Create a list of all players and the ball, sorted based on their Y positions
+#         # 2. Add object shadows to the list
+#         # 3. Add the two goals at each end of the list
+#         # (note - technically we're not adding items to the list in steps two and three, we're creating a new list
+#         # which consists of the old list plus the new items)
+#         objects = sorted([self.ball] + self.players, key = lambda obj: obj.y)
+#         objects = objects + [obj.shadow for obj in objects]
+#         objects = [self.goals[0]] + objects + [self.goals[1]]
+#
+#         # Draw all objects
+#         for obj in objects:
+#             obj.draw(offset_x, offset_y)
+#
+#         # Show active players
+#         for t in range(2):
+#             # Only show arrow for human teams
+#             if self.teams[t].human():
+#                 arrow_pos = self.teams[t].active_control_player.vpos - offset - Vector2(11, 45)
+#                 screen.blit("arrow" + str(t), arrow_pos)
 
         if DEBUG_SHOW_LEADS:
             for p in self.players:

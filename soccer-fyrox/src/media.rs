@@ -15,9 +15,17 @@ use crate::prelude::*;
 
 const ZERO_ORD: u8 = '0' as u8;
 
+// Drawing is skipped for images with this name.
+//
+pub const BLANK_IMAGE: &str = "blank";
+
 const IMAGE_PATHS: &'static [&'static str] = &[
+    "resources/images/arrow0.png",
+    "resources/images/arrow1.png",
+    "resources/images/ball.png",
     "resources/images/bar.png",
-    "resources/images/goal.png",
+    "resources/images/goal0.png",
+    "resources/images/goal1.png",
     "resources/images/l00.png",
     "resources/images/l01.png",
     "resources/images/l02.png",
@@ -47,6 +55,7 @@ const IMAGE_PATHS: &'static [&'static str] = &[
     "resources/images/over0.png",
     "resources/images/over1.png",
     "resources/images/over1.png",
+    "resources/images/pitch.png",
     "resources/images/s0.png",
     "resources/images/s1.png",
     "resources/images/s2.png",
@@ -144,6 +153,10 @@ impl Media {
         z: i16,
         anchor: Anchor,
     ) {
+        if base == BLANK_IMAGE {
+            return;
+        }
+
         let texture = self.image(base, indexes);
         let texture_kind = texture.data_ref().kind();
 
