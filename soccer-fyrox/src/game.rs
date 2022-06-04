@@ -116,7 +116,7 @@ impl Game {
         //# The peer for each player is the opposing team player at the opposite end of the list. As there are 14 players
         //# in total, the peers are 0 and 13, 1 and 12, 2 and 11, and so on.
         for (a, b) in self.players.iter().zip(self.players.iter().rev()) {
-            self.players_pool.borrow_mut(*a).peer = Some(*b);
+            self.players_pool.borrow_mut(*a).peer = *b;
         }
 
         //# Create two goals
@@ -162,7 +162,7 @@ impl Game {
         //# Each frame, reset mark and lead of each player
         for b in &self.players {
             let b = self.players_pool.borrow_mut(*b);
-            b.mark = Some(b.peer.unwrap());
+            b.mark = b.peer;
             b.lead = None;
         }
 
@@ -185,7 +185,7 @@ impl Game {
                     .unwrap();
 
                 //# Set the ball owner's peer to mark whoever the goalie was marking, then set the goalie to mark the goal
-                self.players_pool.borrow_mut(o.peer.unwrap()).mark = Some(nearest.mark.unwrap());
+                self.players_pool.borrow_mut(o.peer).mark = nearest.mark;
 
                 // WRITEME
             }
