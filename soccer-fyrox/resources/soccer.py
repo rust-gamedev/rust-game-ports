@@ -801,7 +801,7 @@ class Game:
 #
 #                 # Set the ball owner's peer to mark whoever the goalie was marking, then set the goalie to mark the goal
 #                 o.peer.mark = nearest.mark
-                nearest.mark = owners_target_goal
+#                 nearest.mark = owners_target_goal
 
             # Choose one or two lead players to spearhead the attack on the ball owner
             # Create a list of players who are on the opposite team from the ball owner, are allowed to acquire

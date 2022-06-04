@@ -168,30 +168,45 @@ impl Game {
         //# Each frame, reset mark and lead of each player
         for b in &self.players {
             let b = self.players_pool.borrow_mut(*b);
-            b.mark = b.peer;
+            b.mark = TargetRef::Player(b.peer);
             b.lead = None;
         }
 
         if let Some(o) = &self.ball.owner {
+            // This part requires considerable BCK gymnastics, because of the multiple borrows; several
+            // statements had to be moved around.
+
             //# Ball has an owner (above is equivalent to s.ball.owner != None, or s.ball.owner is not None)
             //# Assign some shorthand variables
-            let o = self.players_pool.borrow(*o);
-            let (pos, team) = (o.vpos, o.team);
-            let owners_target_goal = self.goals_pool.borrow(self.goals[team as usize]);
-            let other_team = if team == 0 { 1 } else { 1 };
+            let (_pos, team, peer) = {
+                let o = self.players_pool.borrow(*o);
+                (o.vpos, o.team, o.peer)
+            };
+            let _other_team = if team == 0 { 1 } else { 1 };
 
             if self.difficulty.goalie_enabled {
-                //# Find the nearest opposing team player to the goal, and make them mark the goal
-                let nearest = self
-                    .players
-                    .iter()
-                    .map(|p| self.players_pool.borrow(*p))
-                    .filter(|p| p.team != team)
-                    .min_by(|p1, p2| dist_key(p1, p2, owners_target_goal.vpos))
-                    .unwrap();
+                let previous_nearest_mark = {
+                    let owners_target_goal_h = self.goals[team as usize];
+                    let owners_target_goal_vpos = self.goals_pool.borrow(owners_target_goal_h).vpos;
+
+                    //# Find the nearest opposing team player to the goal, and make them mark the goal
+                    let nearest = self
+                        .players_pool
+                        .iter_mut()
+                        .filter(|p| p.team != team)
+                        .min_by(|p1, p2| dist_key(p1, p2, owners_target_goal_vpos))
+                        .unwrap();
+
+                    // See comment below this block; this part is described as "then..." (in the source
+                    // project, this statement was after).
+                    std::mem::replace(
+                        &mut nearest.mark,
+                        TargetRef::Goal(self.goals[team as usize]),
+                    )
+                };
 
                 //# Set the ball owner's peer to mark whoever the goalie was marking, then set the goalie to mark the goal
-                self.players_pool.borrow_mut(o.peer).mark = nearest.mark;
+                self.players_pool.borrow_mut(peer).mark = previous_nearest_mark;
 
                 // WRITEME
             }
