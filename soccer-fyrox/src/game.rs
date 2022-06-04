@@ -19,12 +19,13 @@ pub struct Game {
     pub score_timer: i32,
     scoring_team: u8,
     players: Vec<Handle<Player>>,
-    goals: Vec<Goal>,
+    goals: Vec<Handle<Goal>>,
     kickoff_player: Option<Handle<Player>>,
     ball: Ball,
     camera_focus: Vector2<i16>,
 
     players_pool: Pool<Player>,
+    goals_pool: Pool<Goal>,
 }
 
 impl Game {
@@ -65,6 +66,7 @@ impl Game {
         let camera_focus = ball.vpos.clone();
 
         let players_pool = Pool::new();
+        let goals_pool = Pool::new();
 
         let mut instance = Self {
             teams,
@@ -77,6 +79,7 @@ impl Game {
             ball,
             camera_focus,
             players_pool,
+            goals_pool,
         };
 
         instance.reset();
@@ -120,7 +123,10 @@ impl Game {
         }
 
         //# Create two goals
-        self.goals = (0..2).into_iter().map(|i| Goal::new(i)).collect();
+        self.goals = (0..2)
+            .into_iter()
+            .map(|i| self.goals_pool.spawn(Goal::new(i)))
+            .collect();
 
         //# The current active player under control by each team, indicated by arrows over their heads
         //# Choose first two players to begin with
@@ -171,7 +177,7 @@ impl Game {
             //# Assign some shorthand variables
             let o = self.players_pool.borrow(*o);
             let (pos, team) = (o.vpos, o.team);
-            let owners_target_goal = &self.goals[team as usize];
+            let owners_target_goal = self.goals_pool.borrow(self.goals[team as usize]);
             let other_team = if team == 0 { 1 } else { 1 };
 
             if self.difficulty.goalie_enabled {
@@ -218,7 +224,9 @@ impl Game {
         // testing the index.
         // Note that we could simplify and just draw players+shadows on a single cycle.
 
-        self.goals[0].draw(scene, media, offset_x, offset_y);
+        self.goals_pool
+            .borrow(self.goals[0])
+            .draw(scene, media, offset_x, offset_y);
 
         let mut sorted_players = self
             .players
@@ -256,7 +264,9 @@ impl Game {
             }
         }
 
-        self.goals[1].draw(scene, media, offset_x, offset_y);
+        self.goals_pool
+            .borrow(self.goals[1])
+            .draw(scene, media, offset_x, offset_y);
 
         //# Show active players
         for t in 0..2 {
