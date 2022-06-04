@@ -17,6 +17,8 @@ mod menu_state;
 mod my_actor;
 mod player;
 mod state;
+mod target;
+mod target_ref;
 mod team;
 
 pub mod prelude {
@@ -43,6 +45,8 @@ pub mod prelude {
     pub use crate::my_actor::MyActor;
     pub use crate::player::Player;
     pub use crate::state::State;
+    pub use crate::target::Target;
+    pub use crate::target_ref::TargetRef;
     pub use crate::team::Team;
     pub use soccer_macros_fyrox::my_actor_based;
 
