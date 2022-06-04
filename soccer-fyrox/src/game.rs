@@ -25,6 +25,8 @@ pub struct Game {
     kickoff_player: Option<RCC<Player>>,
     ball: Ball,
     camera_focus: Vector2<i16>,
+
+    players_pool: Pool<Player>,
 }
 
 impl Game {
@@ -63,6 +65,8 @@ impl Game {
         //# Focus camera on ball - copy ball pos
         let camera_focus = ball.vpos.clone();
 
+        let players_pool = Pool::new();
+
         let mut instance = Self {
             teams,
             difficulty,
@@ -73,6 +77,7 @@ impl Game {
             kickoff_player,
             ball,
             camera_focus,
+            players_pool,
         };
 
         instance.reset();

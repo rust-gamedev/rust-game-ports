@@ -24,7 +24,7 @@ pub mod prelude {
     pub use fyrox::{
         core::{
             algebra::{Vector2, Vector3},
-            pool::Handle,
+            pool::{Handle, Pool},
         },
         event::VirtualKeyCode,
         scene::{base::BaseBuilder, node::Node, transform::TransformBuilder, Scene},
