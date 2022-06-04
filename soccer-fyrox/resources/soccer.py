@@ -30,9 +30,9 @@
 # LEVEL_H = 1400
 # HALF_LEVEL_W = LEVEL_W // 2
 # HALF_LEVEL_H = LEVEL_H // 2
-
-HALF_PITCH_W = 442
-HALF_PITCH_H = 622
+#
+# HALF_PITCH_W = 442
+# HALF_PITCH_H = 622
 
 GOAL_WIDTH = 186
 GOAL_DEPTH = 20
@@ -113,12 +113,12 @@ def vec_to_angle(vec):
 def angle_to_vec(angle):
     return Vector2(sin(angle), -cos(angle))
 
-# Used when calling functions such as sorted and min.
-# todo explain more
-# p.vpos - pos results in a Vector2 which we can get the length of, giving us
-# the distance between pos and p.vpos
-def dist_key(pos):
-    return lambda p: (p.vpos - pos).length()
+# # Used when calling functions such as sorted and min.
+# # todo explain more
+# # p.vpos - pos results in a Vector2 which we can get the length of, giving us
+# # the distance between pos and p.vpos
+# def dist_key(pos):
+#     return lambda p: (p.vpos - pos).length()
 
 # Turn a vector into a unit vector - i.e. a vector with length 1
 # We also return the original length, before normalisation.
@@ -476,12 +476,12 @@ class Player(MyActor):
         # Used when DEBUG_SHOW_TARGETS is on
         self.debug_target = Vector2(0, 0)
 
-    def active(self):
-        # Is ball within 400 pixels on the Y axis? If so I'll be considered active, meaning I'm currently doing
-        # something useful in the game like trying to get the ball. If I'm not active, I'll either mark another player,
-        # or just stay at my home position
-        return abs(game.ball.vpos.y - self.home.y) < 400
-
+#     def active(self):
+#         # Is ball within 400 pixels on the Y axis? If so I'll be considered active, meaning I'm currently doing
+#         # something useful in the game like trying to get the ball. If I'm not active, I'll either mark another player,
+#         # or just stay at my home position
+#         return abs(game.ball.vpos.y - self.home.y) < 400
+#
     def update(self):
         # decrement holdoff timer
         self.timer -= 1
@@ -765,42 +765,42 @@ class Game:
         self.debug_shoot_target = None
 
     def update(self):
-        self.score_timer -= 1
-
-        if self.score_timer == 0:
-            # Reset for new kick-off after goal scored
-            self.reset()
-
-        elif self.score_timer < 0 and abs(self.ball.vpos.y - HALF_LEVEL_H) > HALF_PITCH_H:
-            game.play_sound("goal", 2)
-
-            self.scoring_team = 0 if self.ball.vpos.y < HALF_LEVEL_H else 1
-            self.teams[self.scoring_team].score += 1
-            self.score_timer = 60      # Game goes into "scored a goal" state for 60 frames
-
-        # Each frame, reset mark and lead of each player
-        for b in self.players:
-            b.mark = b.peer
-            b.lead = None
+#         self.score_timer -= 1
+#
+#         if self.score_timer == 0:
+#             # Reset for new kick-off after goal scored
+#             self.reset()
+#
+#         elif self.score_timer < 0 and abs(self.ball.vpos.y - HALF_LEVEL_H) > HALF_PITCH_H:
+#             game.play_sound("goal", 2)
+#
+#             self.scoring_team = 0 if self.ball.vpos.y < HALF_LEVEL_H else 1
+#             self.teams[self.scoring_team].score += 1
+#             self.score_timer = 60      # Game goes into "scored a goal" state for 60 frames
+#
+#         # Each frame, reset mark and lead of each player
+#         for b in self.players:
+#             b.mark = b.peer
+#             b.lead = None
             b.debug_target = None
 
         # Reset debug shoot target
         self.debug_shoot_target = None
 
-        if self.ball.owner:
-            # Ball has an owner (above is equivalent to s.ball.owner != None, or s.ball.owner is not None)
-            # Assign some shorthand variables
-            o = self.ball.owner
-            pos, team = o.vpos, o.team
-            owners_target_goal = game.goals[team]
-            other_team = 1 if team == 0 else 1
-
-            if self.difficulty.goalie_enabled:
-                # Find the nearest opposing team player to the goal, and make them mark the goal
-                nearest = min([p for p in self.players if p.team != team], key = dist_key(owners_target_goal.vpos))
-
-                # Set the ball owner's peer to mark whoever the goalie was marking, then set the goalie to mark the goal
-                o.peer.mark = nearest.mark
+#         if self.ball.owner:
+#             # Ball has an owner (above is equivalent to s.ball.owner != None, or s.ball.owner is not None)
+#             # Assign some shorthand variables
+#             o = self.ball.owner
+#             pos, team = o.vpos, o.team
+#             owners_target_goal = game.goals[team]
+#             other_team = 1 if team == 0 else 1
+#
+#             if self.difficulty.goalie_enabled:
+#                 # Find the nearest opposing team player to the goal, and make them mark the goal
+#                 nearest = min([p for p in self.players if p.team != team], key = dist_key(owners_target_goal.vpos))
+#
+#                 # Set the ball owner's peer to mark whoever the goalie was marking, then set the goalie to mark the goal
+#                 o.peer.mark = nearest.mark
                 nearest.mark = owners_target_goal
 
             # Choose one or two lead players to spearhead the attack on the ball owner
@@ -939,15 +939,15 @@ class Game:
                     screen_pos = (screen_pos.x,screen_pos.y)    # draw.text can't reliably take a Vector2
                     screen.draw.text("{0:.0f}".format(c), center=screen_pos)
 
-    def play_sound(self, name, c):
-        # Only play sounds if we're not in the menu state
-        if state != State.MENU:
-            try:
-                getattr(sounds, name+str(random.randint(0, c-1))).play()
-            except:
-                pass
-
-
+#     def play_sound(self, name, c):
+#         # Only play sounds if we're not in the menu state
+#         if state != State.MENU:
+#             try:
+#                 getattr(sounds, name+str(random.randint(0, c-1))).play()
+#             except:
+#                 pass
+#
+#
 # # Dictionary to keep track of which keys are currently being held down
 # key_status = {}
 #

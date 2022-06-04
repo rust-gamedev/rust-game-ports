@@ -152,7 +152,7 @@ impl GameGlobal {
                     }
                 }
 
-                self.game.update()
+                self.game.update(&self.media, scene)
             }
             Play => {
                 //# First player to 9 wins
@@ -161,7 +161,7 @@ impl GameGlobal {
                 if max_score == 9 && self.game.score_timer == 1 {
                     self.state = State::GameOver;
                 } else {
-                    self.game.update();
+                    self.game.update(&self.media, scene);
                 }
             }
             GameOver => {
