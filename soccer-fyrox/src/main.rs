@@ -58,6 +58,9 @@ pub mod prelude {
     pub const LEVEL_H: i16 = 1400;
     pub const HALF_LEVEL_W: i16 = LEVEL_W / 2;
     pub const HALF_LEVEL_H: i16 = LEVEL_H / 2;
+
+    pub const HALF_PITCH_W: i16 = 442;
+    pub const HALF_PITCH_H: i16 = 622;
 }
 
 use fyrox::engine::framework::Framework;

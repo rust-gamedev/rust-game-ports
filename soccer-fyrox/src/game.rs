@@ -1,6 +1,6 @@
 use std::{cell::RefCell, rc::Rc};
 
-use rand::Rng;
+use rand::{thread_rng, Rng};
 
 use crate::prelude::*;
 
@@ -140,8 +140,55 @@ impl Game {
             Vector2::new(HALF_LEVEL_W - 30 + other_team * 60, HALF_LEVEL_H);
     }
 
-    pub fn update(&mut self) {
-        // WRITEME
+    pub fn update(&mut self, media: &Media, scene: &mut Scene) {
+        self.score_timer -= 1;
+
+        if self.score_timer == 0 {
+            //# Reset for new kick-off after goal scored
+            self.reset();
+        } else if self.score_timer < 0 && (self.ball.vpos.y - HALF_LEVEL_H).abs() > HALF_PITCH_H {
+            media.play_sound(scene, "goal", &[thread_rng().gen_range(0..2)]);
+
+            self.scoring_team = if self.ball.vpos.y < HALF_LEVEL_H {
+                0
+            } else {
+                1
+            };
+            self.teams[self.scoring_team as usize].score += 1;
+            self.score_timer = 60; //# Game goes into "scored a goal" state for 60 frames;
+        }
+
+        //# Each frame, reset mark and lead of each player
+        for b in &mut self.players {
+            let mut b = b.borrow_mut();
+            b.mark = Some(Rc::clone(b.peer.as_ref().unwrap()));
+            b.lead = None;
+        }
+
+        if let Some(o) = &self.ball.owner {
+            //# Ball has an owner (above is equivalent to s.ball.owner != None, or s.ball.owner is not None)
+            //# Assign some shorthand variables
+            let o = o.borrow();
+            let (pos, team) = (o.vpos, o.team);
+            let owners_target_goal = &self.goals[team as usize];
+            let other_team = if team == 0 { 1 } else { 1 };
+
+            if self.difficulty.goalie_enabled {
+                //# Find the nearest opposing team player to the goal, and make them mark the goal
+                let nearest = self
+                    .players
+                    .iter()
+                    .map(|p| p.borrow())
+                    .filter(|p| p.team != team)
+                    .min_by(|p1, p2| dist_key(p1, p2, owners_target_goal.vpos))
+                    .unwrap();
+
+                //# Set the ball owner's peer to mark whoever the goalie was marking, then set the goalie to mark the goal
+                o.peer.as_ref().unwrap().borrow_mut().mark =
+                    Some(Rc::clone(&nearest.mark.as_ref().unwrap()));
+                // WRITEME
+            }
+        }
     }
 
     pub fn draw(&self, scene: &mut Scene, media: &mut Media) {
