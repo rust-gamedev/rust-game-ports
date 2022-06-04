@@ -755,12 +755,12 @@ class Game:
 #
 #         # Set pos of kickoff player. A team 0 player will stand to the left of the ball, team 1 on the right
 #         self.kickoff_player.vpos = Vector2(HALF_LEVEL_W - 30 + other_team * 60, HALF_LEVEL_H)
-
-        # Create ball
-        self.ball = Ball()
-
-        # Focus camera on ball - copy ball pos
-        self.camera_focus = Vector2(self.ball.vpos)
+#
+#         # Create ball
+#         self.ball = Ball()
+#
+#         # Focus camera on ball - copy ball pos
+#         self.camera_focus = Vector2(self.ball.vpos)
 
         self.debug_shoot_target = None
 
