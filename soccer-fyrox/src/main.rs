@@ -11,6 +11,7 @@ mod game;
 mod game_global;
 mod goal;
 mod input_controller;
+mod math_utils;
 mod media;
 mod menu_state;
 mod my_actor;
@@ -37,6 +38,7 @@ pub mod prelude {
     pub use crate::game::{Game, DEFAULT_DIFFICULTY};
     pub use crate::goal::Goal;
     pub use crate::input_controller::InputController;
+    pub use crate::math_utils::*;
     pub use crate::media::{Media, BLANK_IMAGE};
     pub use crate::menu_state::MenuState;
     pub use crate::my_actor::MyActor;

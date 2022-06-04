@@ -113,12 +113,12 @@ def vec_to_angle(vec):
 def angle_to_vec(angle):
     return Vector2(sin(angle), -cos(angle))
 
-# Used when calling functions such as sorted and min.
-# todo explain more
-# p.vpos - pos results in a Vector2 which we can get the length of, giving us
-# the distance between pos and p.vpos
-def dist_key(pos):
-    return lambda p: (p.vpos - pos).length()
+# # Used when calling functions such as sorted and min.
+# # todo explain more
+# # p.vpos - pos results in a Vector2 which we can get the length of, giving us
+# # the distance between pos and p.vpos
+# def dist_key(pos):
+#     return lambda p: (p.vpos - pos).length()
 
 # Turn a vector into a unit vector - i.e. a vector with length 1
 # We also return the original length, before normalisation.
