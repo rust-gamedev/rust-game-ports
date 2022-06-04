@@ -4,11 +4,9 @@ const ANCHOR: Vector2<i16> = Vector2::new(25, 37);
 
 #[my_actor_based]
 pub struct Player {
-    // We trivially solve the cyclical references problem, by erasing the references at the start of
-    // each game.
-    pub peer: Option<RCC<Player>>,
-    pub mark: Option<RCC<Player>>,
-    pub lead: Option<RCC<Player>>,
+    pub peer: Option<Handle<Player>>,
+    pub mark: Option<Handle<Player>>,
+    pub lead: Option<Handle<Player>>,
     home: Vector2<i16>,
     pub team: u8,
     dir: u8,

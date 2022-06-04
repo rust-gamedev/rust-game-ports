@@ -1,5 +1,3 @@
-use std::{cell::RefCell, rc::Rc};
-
 use rand::{thread_rng, Rng};
 
 use crate::prelude::*;
@@ -20,9 +18,9 @@ pub struct Game {
     difficulty: Difficulty,
     pub score_timer: i32,
     scoring_team: u8,
-    players: Vec<RCC<Player>>,
+    players: Vec<Handle<Player>>,
     goals: Vec<Goal>,
-    kickoff_player: Option<RCC<Player>>,
+    kickoff_player: Option<Handle<Player>>,
     ball: Ball,
     camera_focus: Vector2<i16>,
 
@@ -55,6 +53,7 @@ impl Game {
         let score_timer = 0;
         let scoring_team = 1;
 
+        // Owner of the players.
         let players = vec![];
         let goals = vec![];
         let kickoff_player = None;
@@ -88,16 +87,13 @@ impl Game {
     fn reset(&mut self) {
         //# Called at game start, and after a goal has been scored
 
-        // See Player#peer comment.
-        //
-        for player in &mut self.players {
-            player.borrow_mut().peer = None;
-        }
-
         //# Set up players list/positions
         //# The lambda function is used to give the player start positions a slight random offset so they're not
         //# perfectly aligned to their starting spots
+        //
+        self.players_pool.clear();
         self.players.clear();
+
         // Watch out! Python's randint() spec is different, as it's inclusive on both ends, so we use
         // 33 on the right end.
         let random_offset = |x| x + rand::thread_rng().gen_range(-32..33);
@@ -105,23 +101,22 @@ impl Game {
             //# pos is a pair of coordinates in a tuple
             //# For each entry in pos, create one player for each team - positions are flipped (both horizontally and
             //# vertically) versions of each other
-            self.players.push(Rc::new(RefCell::new(Player::new(
-                random_offset(pos.0),
-                random_offset(pos.1),
-                0,
-            ))));
-            self.players.push(new_rcc(Player::new(
+            let player = Player::new(random_offset(pos.0), random_offset(pos.1), 0);
+            self.players.push(self.players_pool.spawn(player));
+
+            let player = Player::new(
                 random_offset(LEVEL_W - pos.0),
                 random_offset(LEVEL_W - pos.1),
                 1,
-            )));
+            );
+            self.players.push(self.players_pool.spawn(player));
         }
 
         //# Players in the list are stored in an alternating fashion - a team 0 player, then a team 1 player, and so on.
         //# The peer for each player is the opposing team player at the opposite end of the list. As there are 14 players
         //# in total, the peers are 0 and 13, 1 and 12, 2 and 11, and so on.
         for (a, b) in self.players.iter().zip(self.players.iter().rev()) {
-            a.borrow_mut().peer = Some(Rc::clone(b));
+            self.players_pool.borrow_mut(*a).peer = Some(*b);
         }
 
         //# Create two goals
@@ -129,8 +124,8 @@ impl Game {
 
         //# The current active player under control by each team, indicated by arrows over their heads
         //# Choose first two players to begin with
-        self.teams[0].active_control_player = Some(Rc::clone(&self.players[0]));
-        self.teams[1].active_control_player = Some(Rc::clone(&self.players[1]));
+        self.teams[0].active_control_player = Some(self.players[0]);
+        self.teams[1].active_control_player = Some(self.players[1]);
 
         //# If team 1 just scored (or if it's the start of the game), team 0 will kick off
         let other_team = if self.scoring_team == 0 { 1 } else { 0 };
@@ -138,11 +133,12 @@ impl Game {
         //# Players are stored in the players list in an alternating fashion – the first player being on team 0, the
         //# second on team 1, the third on team 0 etc. The player that kicks off will always be the first player of
         //# the relevant team.
-        self.kickoff_player = Some(Rc::clone(&self.players[other_team as usize]));
+        self.kickoff_player = Some(self.players[other_team as usize]);
 
         //# Set pos of kickoff player. A team 0 player will stand to the left of the ball, team 1 on the right
-        self.kickoff_player.as_ref().unwrap().borrow_mut().vpos =
-            Vector2::new(HALF_LEVEL_W - 30 + other_team * 60, HALF_LEVEL_H);
+        self.players_pool
+            .borrow_mut(self.kickoff_player.unwrap())
+            .vpos = Vector2::new(HALF_LEVEL_W - 30 + other_team * 60, HALF_LEVEL_H);
     }
 
     pub fn update(&mut self, media: &Media, scene: &mut Scene) {
@@ -164,16 +160,16 @@ impl Game {
         }
 
         //# Each frame, reset mark and lead of each player
-        for b in &mut self.players {
-            let mut b = b.borrow_mut();
-            b.mark = Some(Rc::clone(b.peer.as_ref().unwrap()));
+        for b in &self.players {
+            let b = self.players_pool.borrow_mut(*b);
+            b.mark = Some(b.peer.unwrap());
             b.lead = None;
         }
 
         if let Some(o) = &self.ball.owner {
             //# Ball has an owner (above is equivalent to s.ball.owner != None, or s.ball.owner is not None)
             //# Assign some shorthand variables
-            let o = o.borrow();
+            let o = self.players_pool.borrow(*o);
             let (pos, team) = (o.vpos, o.team);
             let owners_target_goal = &self.goals[team as usize];
             let other_team = if team == 0 { 1 } else { 1 };
@@ -183,14 +179,14 @@ impl Game {
                 let nearest = self
                     .players
                     .iter()
-                    .map(|p| p.borrow())
+                    .map(|p| self.players_pool.borrow(*p))
                     .filter(|p| p.team != team)
                     .min_by(|p1, p2| dist_key(p1, p2, owners_target_goal.vpos))
                     .unwrap();
 
                 //# Set the ball owner's peer to mark whoever the goalie was marking, then set the goalie to mark the goal
-                o.peer.as_ref().unwrap().borrow_mut().mark =
-                    Some(Rc::clone(&nearest.mark.as_ref().unwrap()));
+                self.players_pool.borrow_mut(o.peer.unwrap()).mark = Some(nearest.mark.unwrap());
+
                 // WRITEME
             }
         }
@@ -227,15 +223,15 @@ impl Game {
         let mut sorted_players = self
             .players
             .iter()
-            .map(|player| Rc::clone(&player))
+            .map(|player| self.players_pool.borrow(*player))
             .collect::<Vec<_>>();
 
-        sorted_players.sort_by(|a, b| (a.borrow().vpos.y.partial_cmp(&b.borrow().vpos.y).unwrap()));
+        sorted_players.sort_by(|a, b| (a.vpos.y.partial_cmp(&b.vpos.y).unwrap()));
 
         let ball_draw_i = sorted_players
             .iter()
             .enumerate()
-            .find_map(|(i, p)| (self.ball.vpos().y < p.borrow().vpos().y).then_some(i))
+            .find_map(|(i, p)| (self.ball.vpos().y < p.vpos().y).then_some(i))
             .unwrap_or(sorted_players.len());
 
         for i in 0..=sorted_players.len() {
@@ -244,9 +240,7 @@ impl Game {
             }
 
             if i < sorted_players.len() {
-                sorted_players[i]
-                    .borrow()
-                    .draw(scene, media, offset_x, offset_y)
+                sorted_players[i].draw(scene, media, offset_x, offset_y)
             }
         }
 
@@ -257,7 +251,6 @@ impl Game {
 
             if i < sorted_players.len() {
                 sorted_players[i]
-                    .borrow()
                     .shadow
                     .draw(scene, media, offset_x, offset_y)
             }
@@ -269,11 +262,9 @@ impl Game {
         for t in 0..2 {
             //# Only show arrow for human teams
             if self.teams[t].human() {
-                let arrow_pos = &self.teams[t]
-                    .active_control_player
-                    .as_ref()
-                    .unwrap()
-                    .borrow()
+                let arrow_pos = self
+                    .players_pool
+                    .borrow(self.teams[t].active_control_player.unwrap())
                     .vpos()
                     - offset
                     - Vector2::new(11, 45);
