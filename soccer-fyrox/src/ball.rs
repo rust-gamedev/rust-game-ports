@@ -5,7 +5,7 @@ pub struct Ball {
     vel: Vector2<f32>,
     pub owner: Option<RCC<Player>>,
     timer: i32,
-    shadow: BareActor,
+    pub shadow: BareActor,
 }
 
 impl Ball {

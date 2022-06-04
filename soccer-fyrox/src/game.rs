@@ -159,10 +159,16 @@ impl Game {
         //# (note - technically we're not adding items to the list in steps two and three, we're creating a new list
         //# which consists of the old list plus the new items)
 
-        // We need a bit of trickery in Rust (assuming we don't use (Fyrox) object handles, which, at
-        // this stage, we don't); we draw in chunks: goals[0], ball+players, shadows, goals[1].
-        // Additionally, we use vpos.y instead of y; in this game, x/y are not used (vpos.x/y are)
-        // except here, and for this specific logic, vpos.y and y can be used interchangeably.
+        // There are different approaches to modeling the Rust logic, although it's not worth mixing
+        // the  `Goal`s in the iteration anyway.
+        // One approach is to add a `shadow -> Option<BareActor>` function to `MyActor`.
+        // This requires modifying the macro, because the fn needs to be a default in the trait, and
+        // the macro needs to overwrite it when specified as macro parameter.
+        // Another approach is to create a subtrait with this function, which doesn't require chaning
+        // the macro.
+        // The other (below) approach is to sort the players and find the ball index, then iterate while
+        // testing the index.
+        // Note that we could simplify and just draw players+shadows on a single cycle.
 
         self.goals[0].draw(scene, media, offset_x, offset_y);
 
@@ -176,26 +182,33 @@ impl Game {
 
         let ball_draw_i = sorted_players
             .iter()
-            .position(|player| player.borrow().vpos().y > self.ball.vpos().y)
+            .enumerate()
+            .find_map(|(i, p)| (self.ball.vpos().y < p.borrow().vpos().y).then_some(i))
             .unwrap_or(sorted_players.len());
 
-        for (i, player) in sorted_players.iter().enumerate() {
+        for i in 0..=sorted_players.len() {
             if i == ball_draw_i {
                 self.ball.draw(scene, media, offset_x, offset_y);
             }
 
-            player.borrow().draw(scene, media, offset_x, offset_y);
-
-            if i == sorted_players.len() - 1 && ball_draw_i == sorted_players.len() {
-                self.ball.draw(scene, media, offset_x, offset_y);
+            if i < sorted_players.len() {
+                sorted_players[i]
+                    .borrow()
+                    .draw(scene, media, offset_x, offset_y)
             }
         }
 
-        for player in sorted_players {
-            player
-                .borrow()
-                .shadow
-                .draw(scene, media, offset_x, offset_y);
+        for i in 0..=sorted_players.len() {
+            if i == ball_draw_i {
+                self.ball.shadow.draw(scene, media, offset_x, offset_y);
+            }
+
+            if i < sorted_players.len() {
+                sorted_players[i]
+                    .borrow()
+                    .shadow
+                    .draw(scene, media, offset_x, offset_y)
+            }
         }
 
         self.goals[1].draw(scene, media, offset_x, offset_y);
