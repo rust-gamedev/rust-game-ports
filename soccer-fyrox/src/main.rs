@@ -37,7 +37,7 @@ pub mod prelude {
     pub use crate::game::{Game, DEFAULT_DIFFICULTY};
     pub use crate::goal::Goal;
     pub use crate::input_controller::InputController;
-    pub use crate::media::Media;
+    pub use crate::media::{Media, BLANK_IMAGE};
     pub use crate::menu_state::MenuState;
     pub use crate::my_actor::MyActor;
     pub use crate::player::Player;

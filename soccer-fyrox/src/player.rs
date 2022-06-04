@@ -28,7 +28,7 @@ impl Player {
         let kickoff_y = (y / 2) + 550 - (team as i16 * 400);
 
         let vpos = Vector2::new(x, kickoff_y);
-        let img_base = "blank";
+        let img_base = BLANK_IMAGE;
         let img_indexes = vec![];
 
         let peer = None;
