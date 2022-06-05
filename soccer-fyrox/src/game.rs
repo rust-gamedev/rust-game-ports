@@ -112,7 +112,7 @@ impl Game {
 
             let player = Player::new(
                 random_offset(LEVEL_W - pos.0),
-                random_offset(LEVEL_W - pos.1),
+                random_offset(LEVEL_H - pos.1),
                 1,
             );
             self.players.push(self.players_pool.spawn(player));
