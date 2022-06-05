@@ -119,17 +119,17 @@ def angle_to_vec(angle):
 # # the distance between pos and p.vpos
 # def dist_key(pos):
 #     return lambda p: (p.vpos - pos).length()
-
-# Turn a vector into a unit vector - i.e. a vector with length 1
-# We also return the original length, before normalisation.
-# We check for zero length, as trying to normalise a zero-length vector results in an error
-def safe_normalise(vec):
-    length = vec.length()
-    if length == 0:
-        return Vector2(0,0), 0
-    else:
-        return vec.normalize(), length
-
+#
+# # Turn a vector into a unit vector - i.e. a vector with length 1
+# # We also return the original length, before normalisation.
+# # We check for zero length, as trying to normalise a zero-length vector results in an error
+# def safe_normalise(vec):
+#     length = vec.length()
+#     if length == 0:
+#         return Vector2(0,0), 0
+#     else:
+#         return vec.normalize(), length
+#
 # # The MyActor class extends Pygame Zero's Actor class by providing the attribute 'vpos', which stores the object's
 # # current position using Pygame's Vector2 class. All code should change or read the position via vpos, as opposed to
 # # Actor's x/y or pos attributes. When the object is drawn, we set self.pos (equivalent to setting both self.x and
@@ -839,43 +839,43 @@ class Game:
 #             # be None, and will remain None
 #             self.kickoff_player = None
 #
-        # Update all players and ball
-        for obj in self.players + [self.ball]:
-            obj.update()
-
-        owner = self.ball.owner
-
-        for team_num in range(2):
-            team_obj = self.teams[team_num]
-
-            # Manual player switching when space is pressed
-            if team_obj.human() and team_obj.controls.shoot():
-                # Find nearest player to the ball on our team
-                # If the ball has an owner (who must be on the other team because if not, control would have
-                # automatically switched to the ball owner and we wouldn't need to manually switch), we weight the
-                # choice in favour of players who are upfield (towards our goal), since such players may be better
-                # placed to intercept the ball owner.
-                # The function dist_key_weighted is equivalent to the dist_key function earlier in the code, but with
-                # this weighting added. We use this function as the key for the min function, which will choose
-                # the player who results in the lowest value when passed as an argument to dist_key_weighted.
-                def dist_key_weighted(p):
-                    dist_to_ball = (p.vpos - self.ball.vpos).length()
-                    # Thonny gives a warning about the following line, relating to closures (an advanced topic), but
-                    # in this case there is not actually a problem as the closure is only called within the loop
-                    goal_dir = (2 * team_num - 1)
-                    if owner and (p.vpos.y - self.ball.vpos.y) * goal_dir < 0:
-                        return dist_to_ball / 2
-                    else:
-                        return dist_to_ball
-
-                self.teams[team_num].active_control_player = min([p for p in game.players if p.team == team_num],
-                                                                 key = dist_key_weighted)
-
-        # Get vector between current camera pos and ball pos
-        camera_ball_vec, distance = safe_normalise(self.camera_focus - self.ball.vpos)
-        if distance > 0:
-            # Move camera towards ball, at no more than 8 pixels per frame
-            self.camera_focus -= camera_ball_vec * min(distance, 8)
+#         # Update all players and ball
+#         for obj in self.players + [self.ball]:
+#             obj.update()
+#
+#         owner = self.ball.owner
+#
+#         for team_num in range(2):
+#             team_obj = self.teams[team_num]
+#
+#             # Manual player switching when space is pressed
+#             if team_obj.human() and team_obj.controls.shoot():
+#                 # Find nearest player to the ball on our team
+#                 # If the ball has an owner (who must be on the other team because if not, control would have
+#                 # automatically switched to the ball owner and we wouldn't need to manually switch), we weight the
+#                 # choice in favour of players who are upfield (towards our goal), since such players may be better
+#                 # placed to intercept the ball owner.
+#                 # The function dist_key_weighted is equivalent to the dist_key function earlier in the code, but with
+#                 # this weighting added. We use this function as the key for the min function, which will choose
+#                 # the player who results in the lowest value when passed as an argument to dist_key_weighted.
+#                 def dist_key_weighted(p):
+#                     dist_to_ball = (p.vpos - self.ball.vpos).length()
+#                     # Thonny gives a warning about the following line, relating to closures (an advanced topic), but
+#                     # in this case there is not actually a problem as the closure is only called within the loop
+#                     goal_dir = (2 * team_num - 1)
+#                     if owner and (p.vpos.y - self.ball.vpos.y) * goal_dir < 0:
+#                         return dist_to_ball / 2
+#                     else:
+#                         return dist_to_ball
+#
+#                 self.teams[team_num].active_control_player = min([p for p in game.players if p.team == team_num],
+#                                                                  key = dist_key_weighted)
+#
+#         # Get vector between current camera pos and ball pos
+#         camera_ball_vec, distance = safe_normalise(self.camera_focus - self.ball.vpos)
+#         if distance > 0:
+#             # Move camera towards ball, at no more than 8 pixels per frame
+#             self.camera_focus -= camera_ball_vec * min(distance, 8)
 
     def draw(self):
 #         # For the purpose of scrolling, all objects will be drawn with these offsets
