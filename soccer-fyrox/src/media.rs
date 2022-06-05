@@ -98,6 +98,20 @@ impl Media {
         }
     }
 
+    // This is a convenience, to make comparison with the source project simpler.
+    // Blitting is equal to drawing with a TopLeft Anchor.
+    pub fn blit_image(
+        &mut self,
+        scene: &mut Scene,
+        base: &str,
+        indexes: &[u8],
+        std_x: i16,
+        std_y: i16,
+        z: f32,
+    ) {
+        self.draw_image(scene, base, indexes, std_x, std_y, z, Anchor::TopLeft);
+    }
+
     // Draws the image (loads the texture, adds the node to the scene, and links it to the root).
     //
     // The coordinates ("std" = "standard") are the typical orientation used for 2d libraries (center
