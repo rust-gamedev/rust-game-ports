@@ -194,7 +194,7 @@ impl Game {
                         .players_pool
                         .iter_mut()
                         .filter(|p| p.team != team)
-                        .min_by(|p1, p2| dist_key(p1, p2, owners_target_goal_vpos))
+                        .min_by(|p1, p2| dist_key(&p1.vpos, &p2.vpos, owners_target_goal_vpos))
                         .unwrap();
 
                     // See comment below this block; this part is described as "then..." (in the source
@@ -226,7 +226,7 @@ impl Game {
 
                         is_p_match.then_some(p)
                     })
-                    .min_by(|p1, p2| dist_key(p1, p2, pos))
+                    .min_by(|p1, p2| dist_key(p1.vpos, p2.vpos, pos))
                     .unwrap();
 
                 // WRITEME
