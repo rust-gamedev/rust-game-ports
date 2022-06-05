@@ -365,79 +365,57 @@ impl Game {
         //# (note - technically we're not adding items to the list in steps two and three, we're creating a new list
         //# which consists of the old list plus the new items)
 
-        // There are different approaches to modeling the Rust logic, although it's not worth mixing
-        // the  `Goal`s in the iteration anyway.
-        // One approach is to add a `shadow -> Option<BareActor>` function to `MyActor`.
-        // This requires modifying the macro, because the fn needs to be a default in the trait, and
-        // the macro needs to overwrite it when specified as macro parameter.
-        // Another approach is to create a subtrait with this function, which doesn't require chaning
-        // the macro.
-        // The other (below) approach is to sort the players and find the ball index, then iterate while
-        // testing the index.
-        // Note that we could simplify and just draw players+shadows on a single cycle.
+        // We deviate from the source project here, by taking advantage of the z-depth, which considerably
+        // simplifies the port.
 
         self.goals_pool
             .borrow(self.goals[0])
             .draw(scene, media, offset_x, offset_y, DRAW_GOAL_0_Z);
 
-        let mut sorted_players = self
-            .players
+        // Min/max also include the ball.
+        let min_player_y = self
+            .players_pool
             .iter()
-            .map(|player| self.players_pool.borrow(*player))
-            .collect::<Vec<_>>();
-
-        sorted_players.sort_by(|a, b| (a.vpos.y.partial_cmp(&b.vpos.y).unwrap()));
-
-        let ball_draw_i = sorted_players
+            .map(|p| p.vpos.y)
+            .min()
+            .unwrap()
+            .min(self.ball.vpos.y);
+        let max_player_y = self
+            .players_pool
             .iter()
-            .enumerate()
-            .find_map(|(i, p)| (self.ball.vpos().y < p.vpos().y).then_some(i))
-            .unwrap_or(sorted_players.len());
+            .map(|p| p.vpos.y)
+            .max()
+            .unwrap()
+            .max(self.ball.vpos.y);
 
-        let player_z_step = (DRAW_PLAYERS_Z.1 - DRAW_PLAYERS_Z.0) / sorted_players.len() as f32;
+        // This crashes if all the players, and the ball, are on the exact same y coordinate :)
+        let players_z_unit =
+            (DRAW_PLAYERS_Z.1 - DRAW_PLAYERS_Z.0) / (max_player_y - min_player_y) as f32;
 
-        for i in 0..=sorted_players.len() {
-            let current_z = DRAW_PLAYERS_Z.0 + player_z_step * i as f32;
+        for player in self.players_pool.iter() {
+            let player_z =
+                DRAW_PLAYERS_Z.0 + (player.vpos.y - min_player_y) as f32 * players_z_unit;
+            player.draw(scene, media, offset_x, offset_y, player_z);
 
-            if i == ball_draw_i {
-                self.ball.draw(scene, media, offset_x, offset_y, current_z);
-            }
-
-            if i < sorted_players.len() {
-                // We add half step, to make sure that the player draws on top of the ball, when the
-                // index corresponds.
-                sorted_players[i].draw(
-                    scene,
-                    media,
-                    offset_x,
-                    offset_y,
-                    current_z + player_z_step / 2.0,
-                )
-            }
+            let player_shadow_z =
+                DRAW_SHADOWS_Z.0 + (player.shadow.vpos.y - min_player_y) as f32 * players_z_unit;
+            player
+                .shadow
+                .draw(scene, media, offset_x, offset_y, player_shadow_z);
         }
 
-        for i in 0..=sorted_players.len() {
-            // The step is the same as the players, since the number is the same.
-            let current_z = DRAW_SHADOWS_Z.0 + player_z_step * i as f32;
+        let ball_z = DRAW_PLAYERS_Z.0 + (self.ball.vpos.y - min_player_y) as f32 * players_z_unit;
+        self.ball.draw(scene, media, offset_x, offset_y, ball_z);
 
-            if i == ball_draw_i {
-                self.ball
-                    .shadow
-                    .draw(scene, media, offset_x, offset_y, current_z);
-            }
+        let ball_shadow_z =
+            DRAW_PLAYERS_Z.0 + (self.ball.shadow.vpos.y - min_player_y) as f32 * players_z_unit;
+        self.ball
+            .shadow
+            .draw(scene, media, offset_x, offset_y, ball_shadow_z);
 
-            if i < sorted_players.len() {
-                // See same note on previous loop.
-                sorted_players[i].shadow.draw(
-                    scene,
-                    media,
-                    offset_x,
-                    offset_y,
-                    current_z + player_z_step / 2.0,
-                )
-            }
-        }
-
+        self.goals_pool
+            .borrow(self.goals[0])
+            .draw(scene, media, offset_x, offset_y, DRAW_GOAL_0_Z);
         self.goals_pool
             .borrow(self.goals[1])
             .draw(scene, media, offset_x, offset_y, DRAW_GOAL_1_Z);
