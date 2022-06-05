@@ -150,7 +150,7 @@ impl Game {
             .vpos = Vector2::new(HALF_LEVEL_W - 30 + other_team * 60, HALF_LEVEL_H);
     }
 
-    pub fn update(&mut self, media: &Media, scene: &mut Scene) {
+    pub fn update(&mut self, media: &Media, scene: &mut Scene, input: &InputController) {
         self.score_timer -= 1;
 
         if self.score_timer == 0 {
