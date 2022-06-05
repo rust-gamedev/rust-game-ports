@@ -185,7 +185,8 @@ impl Game {
                 let o = self.players_pool.borrow(*o);
                 (o.vpos, o.team, o.peer)
             };
-            let other_team = if team == 0 { 1 } else { 1 };
+            // Bug here, fixed (was: `other_team = 1 if team == 0 else 1`)
+            let other_team = if team == 0 { 1 } else { 0 };
 
             if self.difficulty.goalie_enabled {
                 let previous_nearest_mark = {
@@ -286,8 +287,18 @@ impl Game {
 
         //# Update all players and ball
         for obj_h in &self.players {
+            let pool_clone = self.players_pool.clone();
+
             let obj = self.players_pool.borrow_mut(*obj_h);
-            obj.update(&self.teams, self.kickoff_player, *obj_h, &self.ball, &input);
+            obj.update(
+                &self.teams,
+                self.kickoff_player,
+                *obj_h,
+                &self.ball,
+                &input,
+                &pool_clone,
+                &self.difficulty,
+            );
         }
         self.ball.update();
 

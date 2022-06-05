@@ -32,4 +32,17 @@ impl Target {
             Self::None => panic!(),
         }
     }
+
+    pub fn active(
+        &self,
+        players_pool: &Pool<Player>,
+        goals_pool: &Pool<Goal>,
+        ball: &Ball,
+    ) -> bool {
+        match self {
+            Self::Player(handle) => players_pool.borrow(*handle).active(ball),
+            Self::Goal(handle) => goals_pool.borrow(*handle).active(ball),
+            Self::None => panic!(),
+        }
+    }
 }

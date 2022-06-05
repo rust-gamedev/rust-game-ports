@@ -13,7 +13,7 @@ pub struct Difficulty {
     //# This attribute determines whether there should be one or two lead players
     pub second_lead_enabled: bool,
     //# Speed boost to apply to CPU-team players in certain circumstances
-    speed_boost: f32,
+    pub speed_boost: f32,
     //# Hold-off timer limits rate at which computer-controlled players can pass the ball
     holdoff_timer: u32,
 }
