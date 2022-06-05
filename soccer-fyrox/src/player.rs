@@ -89,19 +89,40 @@ impl Player {
         kickoff_player: Option<Handle<Player>>,
         self_handle: Handle<Player>,
         ball: &Ball,
+        input: &InputController,
     ) {
         //# decrement holdoff timer
         self.timer -= 1;
 
         //# One of the main jobs of this method is to decide where the player will run to, and at what speed.
         //# The default is to run slowly towards home position, but target and speed may be overwritten in the code below
-        let target = self.home.clone(); //# Take a copy of home position
-        let speed = PLAYER_DEFAULT_SPEED;
+        let mut target = self.home.clone(); //# Take a copy of home position
+        let mut speed = PLAYER_DEFAULT_SPEED;
 
         //# Some shorthand variables to make the code below a bit easier to follow
         let my_team = &teams[self.team as usize];
         let pre_kickoff = kickoff_player.is_some();
         let i_am_kickoff_player = Some(self_handle) == kickoff_player;
+
+        if Some(self_handle) == teams[self.team as usize].active_control_player
+            && my_team.human()
+            && (!pre_kickoff || i_am_kickoff_player)
+        {
+            //# This player is the currently active player for its team, and is player-controlled, and either we're not
+            //# currently waiting for kickoff, or this player is the designated kickoff player.
+            //# The last part of the condition ensures that in a 2 player game, player 2 can't make their active player
+            //# run around while waiting for player 1 to do the kickoff (and vice versa)
+
+            //# A player with the ball runs slightly more slowly than one without
+            speed = if ball.owner == Some(self_handle) {
+                HUMAN_PLAYER_WITH_BALL_SPEED
+            } else {
+                HUMAN_PLAYER_WITHOUT_BALL_SPEED
+            };
+
+            //# Find target by calling the controller for the player's team todo comment
+            target = self.vpos + my_team.controls.as_ref().unwrap().move_player(speed, input);
+        }
 
         // WRITEME
 
