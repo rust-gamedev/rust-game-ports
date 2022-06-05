@@ -282,62 +282,63 @@ impl Game {
                 //# be None, and will remain None
                 self.kickoff_player = None;
             }
+        }
 
-            //# Update all players and ball
-            for obj in &self.players {
-                self.players_pool.borrow_mut(*obj).update();
+        //# Update all players and ball
+        for obj_h in &self.players {
+            let obj = self.players_pool.borrow_mut(*obj_h);
+            obj.update(&self.teams, self.kickoff_player, *obj_h, &self.ball);
+        }
+        self.ball.update();
+
+        let owner = self.ball.owner;
+
+        for team_num in 0..2 {
+            let team_obj = &mut self.teams[team_num];
+
+            //# Manual player switching when space is pressed
+            if team_obj.human() && team_obj.controls.as_ref().unwrap().shoot(input) {
+                //# Find nearest player to the ball on our team
+                //# If the ball has an owner (who must be on the other team because if not, control would have
+                //# automatically switched to the ball owner and we wouldn't need to manually switch), we weight the
+                //# choice in favour of players who are upfield (towards our goal), since such players may be better
+                //# placed to intercept the ball owner.
+                //# The function dist_key_weighted is equivalent to the dist_key function earlier in the code, but with
+                //# this weighting added. We use this function as the key for the min function, which will choose
+                //# the player who results in the lowest value when passed as an argument to dist_key_weighted.
+                let dist_key_weighted = |p_vpos: Vector2<i16>| {
+                    let dist_to_ball_v = p_vpos - self.ball.vpos;
+                    let dist_to_ball =
+                        Vector2::new(dist_to_ball_v.x as f32, dist_to_ball_v.y as f32).norm();
+                    //# Thonny gives a warning about the following line, relating to closures (an advanced topic), but
+                    //# in this case there is not actually a problem as the closure is only called within the loop
+                    let goal_dir = (2 * team_num - 1) as i16;
+                    if owner.is_some() && (p_vpos.y - self.ball.vpos.y) * goal_dir < 0 {
+                        dist_to_ball / 2.0
+                    } else {
+                        dist_to_ball
+                    }
+                };
+
+                self.teams[team_num].active_control_player = self
+                    .players_pool
+                    .iter()
+                    .filter(|p| p.team == team_num as u8)
+                    .min_by(|p1, p2| {
+                        dist_key_weighted(p1.vpos)
+                            .partial_cmp(&dist_key_weighted(p2.vpos))
+                            .unwrap()
+                    })
+                    .map(|p| self.players_pool.handle_of(p));
             }
-            self.ball.update();
+        }
 
-            let owner = self.ball.owner;
-
-            for team_num in 0..2 {
-                let team_obj = &mut self.teams[team_num];
-
-                //# Manual player switching when space is pressed
-                if team_obj.human() && team_obj.controls.as_ref().unwrap().shoot(input) {
-                    //# Find nearest player to the ball on our team
-                    //# If the ball has an owner (who must be on the other team because if not, control would have
-                    //# automatically switched to the ball owner and we wouldn't need to manually switch), we weight the
-                    //# choice in favour of players who are upfield (towards our goal), since such players may be better
-                    //# placed to intercept the ball owner.
-                    //# The function dist_key_weighted is equivalent to the dist_key function earlier in the code, but with
-                    //# this weighting added. We use this function as the key for the min function, which will choose
-                    //# the player who results in the lowest value when passed as an argument to dist_key_weighted.
-                    let dist_key_weighted = |p_vpos: Vector2<i16>| {
-                        let dist_to_ball_v = p_vpos - self.ball.vpos;
-                        let dist_to_ball =
-                            Vector2::new(dist_to_ball_v.x as f32, dist_to_ball_v.y as f32).norm();
-                        //# Thonny gives a warning about the following line, relating to closures (an advanced topic), but
-                        //# in this case there is not actually a problem as the closure is only called within the loop
-                        let goal_dir = (2 * team_num - 1) as i16;
-                        if owner.is_some() && (p_vpos.y - self.ball.vpos.y) * goal_dir < 0 {
-                            dist_to_ball / 2.0
-                        } else {
-                            dist_to_ball
-                        }
-                    };
-
-                    self.teams[team_num].active_control_player = self
-                        .players_pool
-                        .iter()
-                        .filter(|p| p.team == team_num as u8)
-                        .min_by(|p1, p2| {
-                            dist_key_weighted(p1.vpos)
-                                .partial_cmp(&dist_key_weighted(p2.vpos))
-                                .unwrap()
-                        })
-                        .map(|p| self.players_pool.handle_of(p));
-                }
-            }
-
-            //# Get vector between current camera pos and ball pos
-            let (camera_ball_vec, distance) = safe_normalise(&(self.camera_focus - self.ball.vpos));
-            if distance > 0.0 {
-                //# Move camera towards ball, at no more than 8 pixels per frame
-                let camera_shift = camera_ball_vec * distance.min(8.0);
-                self.camera_focus -= Vector2::new(camera_shift.x as i16, camera_shift.y as i16);
-            }
+        //# Get vector between current camera pos and ball pos
+        let (camera_ball_vec, distance) = safe_normalise(&(self.camera_focus - self.ball.vpos));
+        if distance > 0.0 {
+            //# Move camera towards ball, at no more than 8 pixels per frame
+            let camera_shift = camera_ball_vec * distance.min(8.0);
+            self.camera_focus -= Vector2::new(camera_shift.x as i16, camera_shift.y as i16);
         }
     }
 
