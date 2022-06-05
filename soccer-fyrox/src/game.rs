@@ -185,7 +185,8 @@ impl Game {
                 let o = self.players_pool.borrow(*o);
                 (o.vpos, o.team, o.peer)
             };
-            let other_team = if team == 0 { 1 } else { 1 };
+            // Bug here, fixed (was: `other_team = 1 if team == 0 else 1`)
+            let other_team = if team == 0 { 1 } else { 0 };
 
             if self.difficulty.goalie_enabled {
                 let previous_nearest_mark = {
