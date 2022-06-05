@@ -394,28 +394,47 @@ impl Game {
             .find_map(|(i, p)| (self.ball.vpos().y < p.vpos().y).then_some(i))
             .unwrap_or(sorted_players.len());
 
+        let player_z_step = (DRAW_PLAYERS_Z.1 - DRAW_PLAYERS_Z.0) / sorted_players.len() as f32;
+
         for i in 0..=sorted_players.len() {
+            let current_z = DRAW_PLAYERS_Z.0 + player_z_step * i as f32;
+
             if i == ball_draw_i {
-                self.ball
-                    .draw(scene, media, offset_x, offset_y, DRAW_PLAYERS_Z.0);
+                self.ball.draw(scene, media, offset_x, offset_y, current_z);
             }
 
             if i < sorted_players.len() {
-                sorted_players[i].draw(scene, media, offset_x, offset_y, DRAW_PLAYERS_Z.0)
+                // We add half step, to make sure that the player draws on top of the ball, when the
+                // index corresponds.
+                sorted_players[i].draw(
+                    scene,
+                    media,
+                    offset_x,
+                    offset_y,
+                    current_z + player_z_step / 2.0,
+                )
             }
         }
 
         for i in 0..=sorted_players.len() {
+            // The step is the same as the players, since the number is the same.
+            let current_z = DRAW_SHADOWS_Z.0 + player_z_step * i as f32;
+
             if i == ball_draw_i {
                 self.ball
                     .shadow
-                    .draw(scene, media, offset_x, offset_y, DRAW_SHADOWS_Z.0);
+                    .draw(scene, media, offset_x, offset_y, current_z);
             }
 
             if i < sorted_players.len() {
-                sorted_players[i]
-                    .shadow
-                    .draw(scene, media, offset_x, offset_y, DRAW_SHADOWS_Z.0)
+                // See same note on previous loop.
+                sorted_players[i].shadow.draw(
+                    scene,
+                    media,
+                    offset_x,
+                    offset_y,
+                    current_z + player_z_step / 2.0,
+                )
             }
         }
 
