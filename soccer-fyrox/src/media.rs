@@ -127,16 +127,31 @@ impl Media {
             height: texture_height,
         } = texture_kind
         {
-            let mut fyrox_x = WIDTH as f32 / 2.0 - texture_width as f32 / 2.0 - std_x as f32;
-            let mut fyrox_y = HEIGHT as f32 / 2.0 - texture_height as f32 / 2.0 - std_y as f32;
-
             use Anchor::*;
 
+            // As a base, we start with the top left corner of the screen, and we subtract the "standard"
+            // coordinates, since they go to the opposite direction to the Fyrox ones.
+            //
+            let (mut fyrox_x, mut fyrox_y) = (
+                WIDTH as f32 / 2.0 - std_x as f32,
+                HEIGHT as f32 / 2.0 - std_y as f32,
+            );
+
             match anchor {
-                Center => {}
+                Center => {
+                    // Do nothing
+                }
+                TopLeft => {
+                    // Shift the texture, to the bottom right, of half texture.
+                    //
+                    fyrox_x = fyrox_x - texture_width as f32 / 2.0;
+                    fyrox_y = fyrox_y - texture_height as f32 / 2.0;
+                }
                 Custom(anchor) => {
-                    fyrox_x += texture_width as f32 / 2.0 - anchor.x as f32;
-                    fyrox_y += texture_height as f32 / 2.0 - anchor.y as f32;
+                    // Shift bottom right like TopLeft, then shift top left according to the anchor.
+                    //
+                    fyrox_x = fyrox_x - texture_width as f32 / 2.0 + anchor.x as f32;
+                    fyrox_y = fyrox_y - texture_height as f32 / 2.0 + anchor.y as f32;
                 }
             };
 
