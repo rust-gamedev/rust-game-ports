@@ -3,10 +3,11 @@ use crate::prelude::*;
 const ANCHOR: Vector2<i16> = Vector2::new(25, 37);
 
 #[my_actor_based]
+#[derive(Clone)]
 pub struct Player {
     pub peer: Handle<Player>,
     pub mark: Target,
-    pub lead: Option<Handle<Player>>,
+    pub lead: Option<i16>,
     home: Vector2<i16>,
     pub team: u8,
     dir: u8,

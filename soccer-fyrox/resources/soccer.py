@@ -55,9 +55,9 @@ AI_MIN_Y = 98
 AI_MAX_Y = LEVEL_H - 98
 
 # PLAYER_START_POS = [(350, 550), (650, 450), (200, 850), (500, 750), (800, 950), (350, 1250), (650, 1150)]
-
-LEAD_DISTANCE_1 = 10
-LEAD_DISTANCE_2 = 50
+#
+# LEAD_DISTANCE_1 = 10
+# LEAD_DISTANCE_2 = 50
 
 DRIBBLE_DIST_X, DRIBBLE_DIST_Y = 18, 16
 
@@ -814,26 +814,26 @@ class Game:
 #                         and not isinstance(p.mark, Goal)],
 #                        key = dist_key(pos))
 #
-            # a is a list of players from l who are upfield of the ball owner (i.e. towards our own goal, away from the
-            # direction of the goal the ball owner is trying to score in). b is all the other players. It's possible for
-            # one of these to be empty, as there might not be any players in the relevant direction.
-            a = [p for p in l if (p.vpos.y > pos.y if team == 0 else p.vpos.y < pos.y)]
-            b = [p for p in l if p not in a]
-
-            # Zip a and b together in an alternating fashion. Why do we add NONE2 (i.e. [None,None]) to each list?
-            # Because the zip function stops when there are no more items in one of the lists. We want our final list
-            # to contain at least 2 elements. Adding NONE2 (i.e. [None,None] as defined near the top) ensures that each
-            # list has at least 2 items. But we don't want any values in the final list to be None, hence the final part
-            # of the list comprehension 'for s in t if s', which discards any None values from the final result
-            NONE2 = [None] * 2
-            zipped = [s for t in zip(a+NONE2, b+NONE2) for s in t if s]
-
-            # Either one or two players (depending on difficulty settings) follow the ball owner, one from up-field and
-            # one from down-field of the owner
-            zipped[0].lead = LEAD_DISTANCE_1
-            if self.difficulty.second_lead_enabled:
-                zipped[1].lead = LEAD_DISTANCE_2
-
+#             # a is a list of players from l who are upfield of the ball owner (i.e. towards our own goal, away from the
+#             # direction of the goal the ball owner is trying to score in). b is all the other players. It's possible for
+#             # one of these to be empty, as there might not be any players in the relevant direction.
+#             a = [p for p in l if (p.vpos.y > pos.y if team == 0 else p.vpos.y < pos.y)]
+#             b = [p for p in l if p not in a]
+#
+#             # Zip a and b together in an alternating fashion. Why do we add NONE2 (i.e. [None,None]) to each list?
+#             # Because the zip function stops when there are no more items in one of the lists. We want our final list
+#             # to contain at least 2 elements. Adding NONE2 (i.e. [None,None] as defined near the top) ensures that each
+#             # list has at least 2 items. But we don't want any values in the final list to be None, hence the final part
+#             # of the list comprehension 'for s in t if s', which discards any None values from the final result
+#             NONE2 = [None] * 2
+#             zipped = [s for t in zip(a+NONE2, b+NONE2) for s in t if s]
+#
+#             # Either one or two players (depending on difficulty settings) follow the ball owner, one from up-field and
+#             # one from down-field of the owner
+#             zipped[0].lead = LEAD_DISTANCE_1
+#             if self.difficulty.second_lead_enabled:
+#                 zipped[1].lead = LEAD_DISTANCE_2
+#
             # If the ball has an owner, kick-off must have taken place, so unset the kickoff player
             # Of course, kick-off might have already taken place a while ago, in which case kick-off_player will already
             # be None, and will remain None
