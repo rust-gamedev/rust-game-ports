@@ -1,4 +1,4 @@
-use std::cmp;
+use std::{cmp, f32::consts::PI};
 
 use crate::prelude::*;
 
@@ -27,4 +27,27 @@ pub fn safe_normalise(vec: &Vector2<f32>) -> (Vector2<f32>, f32) {
     } else {
         (vec.normalize(), length)
     }
+}
+
+//# Custom sine/cosine functions for angles of 0 to 7, where 0 is up,
+//# 1 is up+right, 2 is right, etc.
+pub fn sin(x: u8) -> f32 {
+    (x as f32 * PI / 4.).sin()
+}
+
+pub fn cos(x: u8) -> f32 {
+    sin(x + 2)
+}
+
+//# Convert a vector to an angle in the range 0 to 7
+pub fn vec_to_angle(vec: Vector2<f32>) -> u8 {
+    //# todo explain a bit
+    //# https://gamedev.stackexchange.com/questions/14602/what-are-atan-and-atan2-used-for-in-games
+    (4. * vec.x.atan2(-vec.y) / PI + 8.5) as u8 % 8
+}
+
+//# Convert an angle  in the range 0 to 7 to a direction vector. We use -cos rather than cos as increasing angles move
+//# in a clockwise rather than the usual anti-clockwise direction.
+pub fn angle_to_vec(angle: u8) -> Vector2<f32> {
+    Vector2::new(sin(angle), -cos(angle))
 }

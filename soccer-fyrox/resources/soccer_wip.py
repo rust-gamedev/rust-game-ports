@@ -93,26 +93,26 @@ DEBUG_SHOW_COSTS = False
 #         self.holdoff_timer = holdoff_timer
 #
 # DIFFICULTY = [Difficulty(False, False, 0, 120), Difficulty(False, True, 0.1, 90), Difficulty(True, True, 0.2, 60)]
-
-# Custom sine/cosine functions for angles of 0 to 7, where 0 is up,
-# 1 is up+right, 2 is right, etc.
-def sin(x):
-    return math.sin(x*math.pi/4)
-
-def cos(x):
-    return sin(x+2)
-
-# Convert a vector to an angle in the range 0 to 7
-def vec_to_angle(vec):
-    # todo explain a bit
-    # https://gamedev.stackexchange.com/questions/14602/what-are-atan-and-atan2-used-for-in-games
-    return int(4 * math.atan2(vec.x, -vec.y) / math.pi + 8.5) % 8
-
-# Convert an angle  in the range 0 to 7 to a direction vector. We use -cos rather than cos as increasing angles move
-# in a clockwise rather than the usual anti-clockwise direction.
-def angle_to_vec(angle):
-    return Vector2(sin(angle), -cos(angle))
-
+#
+# # Custom sine/cosine functions for angles of 0 to 7, where 0 is up,
+# # 1 is up+right, 2 is right, etc.
+# def sin(x):
+#     return math.sin(x*math.pi/4)
+#
+# def cos(x):
+#     return sin(x+2)
+#
+# # Convert a vector to an angle in the range 0 to 7
+# def vec_to_angle(vec):
+#     # todo explain a bit
+#     # https://gamedev.stackexchange.com/questions/14602/what-are-atan-and-atan2-used-for-in-games
+#     return int(4 * math.atan2(vec.x, -vec.y) / math.pi + 8.5) % 8
+#
+# # Convert an angle  in the range 0 to 7 to a direction vector. We use -cos rather than cos as increasing angles move
+# # in a clockwise rather than the usual anti-clockwise direction.
+# def angle_to_vec(angle):
+#     return Vector2(sin(angle), -cos(angle))
+#
 # # Used when calling functions such as sorted and min.
 # # todo explain more
 # # p.vpos - pos results in a Vector2 which we can get the length of, giving us
