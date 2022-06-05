@@ -57,7 +57,7 @@ impl Player {
 
         let timer = 0;
 
-        let shadow = BareActor::new(Anchor::Custom(ANCHOR));
+        let shadow = BareActor::new(BLANK_IMAGE, Anchor::Custom(ANCHOR));
 
         Self {
             vpos,

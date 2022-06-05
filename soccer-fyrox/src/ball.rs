@@ -21,7 +21,7 @@ impl Ball {
         let owner = None;
         let timer = 0;
 
-        let shadow = BareActor::new(Anchor::Center);
+        let shadow = BareActor::new("balls", Anchor::Center);
 
         Self {
             img_base,
