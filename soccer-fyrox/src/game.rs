@@ -312,7 +312,7 @@ impl Game {
                         Vector2::new(dist_to_ball_v.x as f32, dist_to_ball_v.y as f32).norm();
                     //# Thonny gives a warning about the following line, relating to closures (an advanced topic), but
                     //# in this case there is not actually a problem as the closure is only called within the loop
-                    let goal_dir = (2 * team_num - 1) as i16;
+                    let goal_dir = (2 * team_num as i16 - 1) as i16;
                     if owner.is_some() && (p_vpos.y - self.ball.vpos.y) * goal_dir < 0 {
                         dist_to_ball / 2.0
                     } else {
