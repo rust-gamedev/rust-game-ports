@@ -36,7 +36,7 @@ impl Controls {
     //
     // Can't name `move`, which is a reserved keyword.
     //
-    pub fn move_player(&self, speed: f32, input: InputController) -> Vector2<f32> {
+    pub fn move_player(&self, speed: f32, input: &InputController) -> Vector2<f32> {
         use VirtualKeyCode::*;
 
         let (mut dx, mut dy) = (0, 0);
