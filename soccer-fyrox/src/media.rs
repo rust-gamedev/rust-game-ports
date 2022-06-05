@@ -59,16 +59,21 @@ impl Media {
                 .map(|path| resource_manager.request_sound_buffer(path)),
         );
 
+        // For simplicity, we strip the extension, and assume:
+        //
+        // - that there are no images with the same bare name but different extension
+        // - that all the extensions are 3 chars long
+        //
         let image_textures = image_paths
             .iter()
             .zip(block_on(texture_requests))
-            .map(|(path, texture)| (path.to_string(), texture.unwrap()))
+            .map(|(path, texture)| (path[..(path.len() - 4)].to_string(), texture.expect(path)))
             .collect::<HashMap<_, _>>();
 
         let sound_resources = sound_paths
             .iter()
             .zip(block_on(sound_requests))
-            .map(|(path, texture)| (path.to_string(), texture.unwrap()))
+            .map(|(path, sound)| (path.to_string(), sound.expect(path)))
             .collect::<HashMap<_, _>>();
 
         let images_root = PivotBuilder::new(BaseBuilder::new()).build(&mut scene.graph);
@@ -93,6 +98,20 @@ impl Media {
         }
     }
 
+    // This is a convenience, to make comparison with the source project simpler.
+    // Blitting is equal to drawing with a TopLeft Anchor.
+    pub fn blit_image(
+        &mut self,
+        scene: &mut Scene,
+        base: &str,
+        indexes: &[u8],
+        std_x: f32,
+        std_y: f32,
+        z: f32,
+    ) {
+        self.draw_image(scene, base, indexes, std_x, std_y, z, Anchor::TopLeft);
+    }
+
     // Draws the image (loads the texture, adds the node to the scene, and links it to the root).
     //
     // The coordinates ("std" = "standard") are the typical orientation used for 2d libraries (center
@@ -105,9 +124,9 @@ impl Media {
         scene: &mut Scene,
         base: &str,
         indexes: &[u8],
-        std_x: i16,
-        std_y: i16,
-        z: i16,
+        std_x: f32,
+        std_y: f32,
+        z: f32,
         anchor: Anchor,
     ) {
         if base == BLANK_IMAGE {
@@ -122,28 +141,38 @@ impl Media {
             height: texture_height,
         } = texture_kind
         {
-            let mut fyrox_x = WIDTH as f32 / 2.0 - texture_width as f32 / 2.0 - std_x as f32;
-            let mut fyrox_y = HEIGHT as f32 / 2.0 - texture_height as f32 / 2.0 - std_y as f32;
-
             use Anchor::*;
 
+            let (texture_width, texture_height) = (texture_width as f32, texture_height as f32);
+
+            // As a base, we start with the top left corner of the screen, and we subtract the "standard"
+            // coordinates, since they go to the opposite direction to the Fyrox ones.
+            //
+            let (mut fyrox_x, mut fyrox_y) = (WIDTH / 2. - std_x, HEIGHT / 2. - std_y);
+
             match anchor {
-                Center => {}
+                Center => {
+                    // Do nothing
+                }
+                TopLeft => {
+                    // Shift the texture, to the bottom right, of half texture.
+                    //
+                    fyrox_x = fyrox_x - texture_width / 2.;
+                    fyrox_y = fyrox_y - texture_height / 2.;
+                }
                 Custom(anchor) => {
-                    fyrox_x += texture_width as f32 / 2.0 - anchor.x as f32;
-                    fyrox_y += texture_height as f32 / 2.0 - anchor.y as f32;
+                    // Shift bottom right like TopLeft, then shift top left according to the anchor.
+                    //
+                    fyrox_x = fyrox_x - texture_width / 2. + anchor.x;
+                    fyrox_y = fyrox_y - texture_height / 2. + anchor.y;
                 }
             };
 
             let node = RectangleBuilder::new(
                 BaseBuilder::new().with_local_transform(
                     TransformBuilder::new()
-                        .with_local_position(Vector3::new(fyrox_x, fyrox_y, z as f32))
-                        .with_local_scale(Vector3::new(
-                            texture_width as f32,
-                            texture_height as f32,
-                            f32::EPSILON,
-                        ))
+                        .with_local_position(Vector3::new(fyrox_x, fyrox_y, z))
+                        .with_local_scale(Vector3::new(texture_width, texture_height, f32::EPSILON))
                         .build(),
                 ),
             )
@@ -201,7 +230,7 @@ impl Media {
     }
 
     fn image<S: AsRef<str> + Display>(&self, base: S, indexes: &[u8]) -> Texture {
-        if indexes.len() > 2 {
+        if indexes.len() > 3 {
             panic!();
         }
 
@@ -210,11 +239,6 @@ impl Media {
         for index in indexes {
             full_path.push((ZERO_ORD + index) as char);
         }
-
-        // Images have been converted to GIF, in order to workaround a Fyrox 0.26 bug (see
-        // https://github.com/FyroxEngine/Fyrox/issues/320).
-        //
-        full_path.push_str(".gif");
 
         self.image_textures
             .get(&full_path)

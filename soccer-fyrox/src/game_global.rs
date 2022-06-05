@@ -190,50 +190,34 @@ impl GameGlobal {
                     Difficulty => (1, self.menu_difficulty),
                 };
 
-                self.media.draw_image(
-                    scene,
-                    "menu",
-                    &[image_i1, image_i2],
-                    0,
-                    0,
-                    -1,
-                    Anchor::Center,
-                );
+                self.media
+                    .blit_image(scene, "menu", &[image_i1, image_i2], 0., 0., DRAW_MENU_Z);
             }
             Play => {
                 //# Display score bar at top
-                self.media.draw_image(
-                    scene,
-                    "bar",
-                    &[],
-                    HALF_WINDOW_W - 176,
-                    0,
-                    -1,
-                    Anchor::Center,
-                );
+                self.media
+                    .blit_image(scene, "bar", &[], HALF_WINDOW_W - 176., 0., DRAW_GAME_HUD_Z);
                 //# Show score for each team
                 for i in 0..2 {
-                    self.media.draw_image(
+                    self.media.blit_image(
                         scene,
                         "s",
                         &[self.game.teams[i].score],
-                        HALF_WINDOW_W + 7 - 39 * (i as i16),
-                        6,
-                        -1,
-                        Anchor::Center,
+                        HALF_WINDOW_W + 7. - 39. * (i as f32),
+                        6.,
+                        DRAW_GAME_SCORES_Z,
                     );
                 }
 
                 //# Show GOAL image if a goal has recently been scored
                 if self.game.score_timer > 0 {
-                    self.media.draw_image(
+                    self.media.blit_image(
                         scene,
                         "goal",
                         &[],
-                        HALF_WINDOW_W - 300,
-                        HEIGHT / 2 - 88,
-                        -1,
-                        Anchor::Center,
+                        HALF_WINDOW_W - 300.,
+                        HEIGHT / 2. - 88.,
+                        DRAW_GAME_HUD_Z,
                     );
                 }
             }
@@ -241,18 +225,17 @@ impl GameGlobal {
                 //# Display "Game Over" image
                 let index = (self.game.teams[1].score > self.game.teams[0].score) as u8;
                 self.media
-                    .draw_image(scene, "over", &[index], 0, 0, -1, Anchor::Center);
+                    .blit_image(scene, "over", &[index], 0., 0., DRAW_GAME_OVER_Z);
 
                 //# Show score for each team
                 for i in 0..2 {
-                    self.media.draw_image(
+                    self.media.blit_image(
                         scene,
                         "l",
                         &[i as u8, self.game.teams[i as usize].score],
-                        HALF_WINDOW_W + 25 - 125 * i,
-                        144,
-                        -1,
-                        Anchor::Center,
+                        HALF_WINDOW_W + 25. - 125. * i as f32,
+                        144.,
+                        DRAW_GAME_OVER_Z,
                     );
                 }
             }
@@ -264,9 +247,9 @@ impl GameGlobal {
     fn build_camera(scene: &mut Scene) -> Handle<Node> {
         CameraBuilder::new(BaseBuilder::new())
             .with_projection(Projection::Orthographic(OrthographicProjection {
-                z_near: -1.0,
-                z_far: 16.0,
-                vertical_size: (HEIGHT / 2) as f32,
+                z_near: CAMERA_NEAR_Z,
+                z_far: CAMERA_FAR_Z,
+                vertical_size: (HEIGHT / 2.),
             }))
             .build(&mut scene.graph)
     }

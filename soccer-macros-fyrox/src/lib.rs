@@ -19,9 +19,9 @@ pub fn my_actor_based(args: TokenStream, input: TokenStream) -> TokenStream {
     }) = &mut ast.data
     {
         let fields_tokens = vec![
-            quote! { img_base: &'static str },
-            quote! { img_indexes: Vec<u8> },
-            quote! { pub vpos: Vector2<i16> },
+            quote! { pub img_base: &'static str },
+            quote! { pub img_indexes: Vec<u8> },
+            quote! { pub vpos: Vector2<f32> },
             quote! { anchor: Anchor },
         ];
 
@@ -40,7 +40,7 @@ pub fn my_actor_based(args: TokenStream, input: TokenStream) -> TokenStream {
         #ast
 
         impl crate::my_actor::MyActor for #name {
-            fn vpos(&self) -> Vector2<i16> {
+            fn vpos(&self) -> Vector2<f32> {
                 self.vpos
             }
 

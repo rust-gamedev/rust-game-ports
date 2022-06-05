@@ -61,14 +61,14 @@ AI_MAX_Y = LEVEL_H - 98
 
 DRIBBLE_DIST_X, DRIBBLE_DIST_Y = 18, 16
 
-# Speeds for players in various situations. Speeds including 'BASE' can be boosted by the speed_boost difficulty
-# setting (only for players on a computer-controlled team)
-PLAYER_DEFAULT_SPEED = 2
-CPU_PLAYER_WITH_BALL_BASE_SPEED = 2.6
-PLAYER_INTERCEPT_BALL_SPEED = 2.75
-LEAD_PLAYER_BASE_SPEED = 2.9
-HUMAN_PLAYER_WITH_BALL_SPEED = 3
-HUMAN_PLAYER_WITHOUT_BALL_SPEED = 3.3
+# # Speeds for players in various situations. Speeds including 'BASE' can be boosted by the speed_boost difficulty
+# # setting (only for players on a computer-controlled team)
+# PLAYER_DEFAULT_SPEED = 2
+# CPU_PLAYER_WITH_BALL_BASE_SPEED = 2.6
+# PLAYER_INTERCEPT_BALL_SPEED = 2.75
+# LEAD_PLAYER_BASE_SPEED = 2.9
+# HUMAN_PLAYER_WITH_BALL_SPEED = 3
+# HUMAN_PLAYER_WITHOUT_BALL_SPEED = 3.3
 
 DEBUG_SHOW_LEADS = False
 DEBUG_SHOW_TARGETS = False
@@ -483,20 +483,20 @@ class Player(MyActor):
 #         return abs(game.ball.vpos.y - self.home.y) < 400
 #
     def update(self):
-        # decrement holdoff timer
-        self.timer -= 1
-
-        # One of the main jobs of this method is to decide where the player will run to, and at what speed.
-        # The default is to run slowly towards home position, but target and speed may be overwritten in the code below
-        target = Vector2(self.home)       # Take a copy of home position
-        speed = PLAYER_DEFAULT_SPEED
-
-        # Some shorthand variables to make the code below a bit easier to follow
-        my_team = game.teams[self.team]
-        pre_kickoff = game.kickoff_player != None
-        i_am_kickoff_player = self == game.kickoff_player
-        ball = game.ball
-
+#         # decrement holdoff timer
+#         self.timer -= 1
+#
+#         # One of the main jobs of this method is to decide where the player will run to, and at what speed.
+#         # The default is to run slowly towards home position, but target and speed may be overwritten in the code below
+#         target = Vector2(self.home)       # Take a copy of home position
+#         speed = PLAYER_DEFAULT_SPEED
+#
+#         # Some shorthand variables to make the code below a bit easier to follow
+#         my_team = game.teams[self.team]
+#         pre_kickoff = game.kickoff_player != None
+#         i_am_kickoff_player = self == game.kickoff_player
+#         ball = game.ball
+#
         if self == game.teams[self.team].active_control_player and my_team.human() and (not pre_kickoff or i_am_kickoff_player):
             # This player is the currently active player for its team, and is player-controlled, and either we're not
             # currently waiting for kickoff, or this player is the designated kickoff player.
@@ -674,13 +674,13 @@ class Player(MyActor):
         dir_diff = (target_dir - self.dir)
         self.dir = (self.dir + [0, 1, 1, 1, 1, 7, 7, 7][dir_diff % 8]) % 8
 
-        suffix = str(self.dir) + str((int(self.anim_frame) // 18) + 1) # todo
-
-        self.image = "player" + str(self.team) + suffix
-        self.shadow.image = "players" + suffix
-
-        # Update shadow position to track player
-        self.shadow.vpos = Vector2(self.vpos)
+#         suffix = str(self.dir) + str((int(self.anim_frame) // 18) + 1) # todo
+#
+#         self.image = "player" + str(self.team) + suffix
+#         self.shadow.image = "players" + suffix
+#
+#         # Update shadow position to track player
+#         self.shadow.vpos = Vector2(self.vpos)
 
 
 # class Team:
