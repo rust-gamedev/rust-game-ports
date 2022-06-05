@@ -105,8 +105,8 @@ impl Media {
         scene: &mut Scene,
         base: &str,
         indexes: &[u8],
-        std_x: i16,
-        std_y: i16,
+        std_x: f32,
+        std_y: f32,
         z: f32,
     ) {
         self.draw_image(scene, base, indexes, std_x, std_y, z, Anchor::TopLeft);
@@ -124,8 +124,8 @@ impl Media {
         scene: &mut Scene,
         base: &str,
         indexes: &[u8],
-        std_x: i16,
-        std_y: i16,
+        std_x: f32,
+        std_y: f32,
         z: f32,
         anchor: Anchor,
     ) {
@@ -143,13 +143,12 @@ impl Media {
         {
             use Anchor::*;
 
+            let (texture_width, texture_height) = (texture_width as f32, texture_height as f32);
+
             // As a base, we start with the top left corner of the screen, and we subtract the "standard"
             // coordinates, since they go to the opposite direction to the Fyrox ones.
             //
-            let (mut fyrox_x, mut fyrox_y) = (
-                WIDTH as f32 / 2.0 - std_x as f32,
-                HEIGHT as f32 / 2.0 - std_y as f32,
-            );
+            let (mut fyrox_x, mut fyrox_y) = (WIDTH / 2. - std_x, HEIGHT / 2. - std_y);
 
             match anchor {
                 Center => {
@@ -158,14 +157,14 @@ impl Media {
                 TopLeft => {
                     // Shift the texture, to the bottom right, of half texture.
                     //
-                    fyrox_x = fyrox_x - texture_width as f32 / 2.0;
-                    fyrox_y = fyrox_y - texture_height as f32 / 2.0;
+                    fyrox_x = fyrox_x - texture_width / 2.;
+                    fyrox_y = fyrox_y - texture_height / 2.;
                 }
                 Custom(anchor) => {
                     // Shift bottom right like TopLeft, then shift top left according to the anchor.
                     //
-                    fyrox_x = fyrox_x - texture_width as f32 / 2.0 + anchor.x as f32;
-                    fyrox_y = fyrox_y - texture_height as f32 / 2.0 + anchor.y as f32;
+                    fyrox_x = fyrox_x - texture_width / 2. + anchor.x;
+                    fyrox_y = fyrox_y - texture_height / 2. + anchor.y;
                 }
             };
 
@@ -173,11 +172,7 @@ impl Media {
                 BaseBuilder::new().with_local_transform(
                     TransformBuilder::new()
                         .with_local_position(Vector3::new(fyrox_x, fyrox_y, z))
-                        .with_local_scale(Vector3::new(
-                            texture_width as f32,
-                            texture_height as f32,
-                            f32::EPSILON,
-                        ))
+                        .with_local_scale(Vector3::new(texture_width, texture_height, f32::EPSILON))
                         .build(),
                 ),
             )

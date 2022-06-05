@@ -8,7 +8,7 @@ pub struct Goal {
 impl Goal {
     pub fn new(team: u8) -> Self {
         let x = HALF_LEVEL_W;
-        let y = if team == 0 { 0 } else { LEVEL_H };
+        let y = if team == 0 { 0. } else { LEVEL_H };
         let vpos = Vector2::new(x, y);
 
         let img_base = "goal";

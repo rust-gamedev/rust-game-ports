@@ -39,19 +39,19 @@ impl Controls {
     pub fn move_player(&self, speed: f32, input: &InputController) -> Vector2<f32> {
         use VirtualKeyCode::*;
 
-        let (mut dx, mut dy) = (0, 0);
+        let (mut dx, mut dy) = (0., 0.);
 
         if input.is_key_pressed(Left) {
-            dx = -1;
+            dx = -1.;
         } else if input.is_key_pressed(Right) {
-            dx = 1;
+            dx = 1.;
         } else if input.is_key_pressed(Up) {
-            dy = -1;
+            dy = -1.;
         } else if input.is_key_pressed(Down) {
-            dy = 1;
+            dy = 1.;
         }
 
-        Vector2::new(dx as f32, dy as f32) * speed
+        Vector2::new(dx, dy) * speed
     }
 
     pub fn shoot(&self, input: &InputController) -> bool {

@@ -3,18 +3,18 @@ use rand::{thread_rng, Rng};
 use crate::prelude::*;
 
 pub const DEFAULT_DIFFICULTY: u8 = 2;
-pub const PLAYER_START_POS: [(i16, i16); 7] = [
-    (350, 550),
-    (650, 450),
-    (200, 850),
-    (500, 750),
-    (800, 950),
-    (350, 1250),
-    (650, 1150),
+pub const PLAYER_START_POS: [(f32, f32); 7] = [
+    (350., 550.),
+    (650., 450.),
+    (200., 850.),
+    (500., 750.),
+    (800., 950.),
+    (350., 1250.),
+    (650., 1150.),
 ];
 
-pub const LEAD_DISTANCE_1: i16 = 10;
-pub const LEAD_DISTANCE_2: i16 = 50;
+pub const LEAD_DISTANCE_1: f32 = 10.;
+pub const LEAD_DISTANCE_2: f32 = 50.;
 
 pub struct Game {
     pub teams: Vec<Team>,
@@ -25,7 +25,7 @@ pub struct Game {
     goals: Vec<Handle<Goal>>,
     kickoff_player: Option<Handle<Player>>,
     ball: Ball,
-    camera_focus: Vector2<i16>,
+    camera_focus: Vector2<f32>,
 
     players_pool: Pool<Player>,
     goals_pool: Pool<Goal>,
@@ -102,7 +102,7 @@ impl Game {
 
         // Watch out! Python's randint() spec is different, as it's inclusive on both ends, so we use
         // 33 on the right end.
-        let random_offset = |x| x + rand::thread_rng().gen_range(-32..33);
+        let random_offset = |x| x + rand::thread_rng().gen_range(-32..33) as f32;
         for pos in PLAYER_START_POS {
             //# pos is a pair of coordinates in a tuple
             //# For each entry in pos, create one player for each team - positions are flipped (both horizontally and
@@ -147,7 +147,7 @@ impl Game {
         //# Set pos of kickoff player. A team 0 player will stand to the left of the ball, team 1 on the right
         self.players_pool
             .borrow_mut(self.kickoff_player.unwrap())
-            .vpos = Vector2::new(HALF_LEVEL_W - 30 + other_team * 60, HALF_LEVEL_H);
+            .vpos = Vector2::new(HALF_LEVEL_W - 30. + other_team as f32 * 60., HALF_LEVEL_H);
     }
 
     pub fn update(&mut self, media: &Media, scene: &mut Scene, input: &InputController) {
@@ -306,14 +306,12 @@ impl Game {
                 //# The function dist_key_weighted is equivalent to the dist_key function earlier in the code, but with
                 //# this weighting added. We use this function as the key for the min function, which will choose
                 //# the player who results in the lowest value when passed as an argument to dist_key_weighted.
-                let dist_key_weighted = |p_vpos: Vector2<i16>| {
-                    let dist_to_ball_v = p_vpos - self.ball.vpos;
-                    let dist_to_ball =
-                        Vector2::new(dist_to_ball_v.x as f32, dist_to_ball_v.y as f32).norm();
+                let dist_key_weighted = |p_vpos: Vector2<f32>| {
+                    let dist_to_ball = (p_vpos - self.ball.vpos).norm();
                     //# Thonny gives a warning about the following line, relating to closures (an advanced topic), but
                     //# in this case there is not actually a problem as the closure is only called within the loop
-                    let goal_dir = (2 * team_num as i16 - 1) as i16;
-                    if owner.is_some() && (p_vpos.y - self.ball.vpos.y) * goal_dir < 0 {
+                    let goal_dir = 2. * team_num as f32 - 1.;
+                    if owner.is_some() && (p_vpos.y - self.ball.vpos.y) * goal_dir < 0. {
                         dist_to_ball / 2.0
                     } else {
                         dist_to_ball
@@ -338,14 +336,14 @@ impl Game {
         if distance > 0.0 {
             //# Move camera towards ball, at no more than 8 pixels per frame
             let camera_shift = camera_ball_vec * distance.min(8.0);
-            self.camera_focus -= Vector2::new(camera_shift.x as i16, camera_shift.y as i16);
+            self.camera_focus -= camera_shift;
         }
     }
 
     pub fn draw(&self, scene: &mut Scene, media: &mut Media) {
         //# For the purpose of scrolling, all objects will be drawn with these offsets
-        let offset_x = (self.camera_focus.x - WIDTH / 2).clamp(0, LEVEL_W - WIDTH);
-        let offset_y = (self.camera_focus.y - HEIGHT / 2).clamp(0, LEVEL_H - HEIGHT);
+        let offset_x = (self.camera_focus.x - WIDTH / 2.).clamp(0., LEVEL_W - WIDTH);
+        let offset_y = (self.camera_focus.y - HEIGHT / 2.).clamp(0., LEVEL_H - HEIGHT);
         let offset = Vector2::new(offset_x, offset_y);
 
         media.blit_image(scene, "pitch", &[], -offset_x, -offset_y, DRAW_PITCH_Z);
@@ -369,38 +367,36 @@ impl Game {
             .players_pool
             .iter()
             .map(|p| p.vpos.y)
-            .min()
+            .min_by(|y1, y2| y1.partial_cmp(y2).unwrap())
             .unwrap()
             .min(self.ball.vpos.y);
         let max_player_y = self
             .players_pool
             .iter()
             .map(|p| p.vpos.y)
-            .max()
+            .max_by(|y1, y2| y1.partial_cmp(y2).unwrap())
             .unwrap()
             .max(self.ball.vpos.y);
 
         // This crashes if all the players, and the ball, are on the exact same y coordinate :)
-        let players_z_unit =
-            (DRAW_PLAYERS_Z.1 - DRAW_PLAYERS_Z.0) / (max_player_y - min_player_y) as f32;
+        let players_z_unit = (DRAW_PLAYERS_Z.1 - DRAW_PLAYERS_Z.0) / (max_player_y - min_player_y);
 
         for player in self.players_pool.iter() {
-            let player_z =
-                DRAW_PLAYERS_Z.0 + (player.vpos.y - min_player_y) as f32 * players_z_unit;
+            let player_z = DRAW_PLAYERS_Z.0 + (player.vpos.y - min_player_y) * players_z_unit;
             player.draw(scene, media, offset_x, offset_y, player_z);
 
             let player_shadow_z =
-                DRAW_SHADOWS_Z.0 + (player.shadow.vpos.y - min_player_y) as f32 * players_z_unit;
+                DRAW_SHADOWS_Z.0 + (player.shadow.vpos.y - min_player_y) * players_z_unit;
             player
                 .shadow
                 .draw(scene, media, offset_x, offset_y, player_shadow_z);
         }
 
-        let ball_z = DRAW_PLAYERS_Z.0 + (self.ball.vpos.y - min_player_y) as f32 * players_z_unit;
+        let ball_z = DRAW_PLAYERS_Z.0 + (self.ball.vpos.y - min_player_y) * players_z_unit;
         self.ball.draw(scene, media, offset_x, offset_y, ball_z);
 
         let ball_shadow_z =
-            DRAW_PLAYERS_Z.0 + (self.ball.shadow.vpos.y - min_player_y) as f32 * players_z_unit;
+            DRAW_PLAYERS_Z.0 + (self.ball.shadow.vpos.y - min_player_y) * players_z_unit;
         self.ball
             .shadow
             .draw(scene, media, offset_x, offset_y, ball_shadow_z);
@@ -421,7 +417,7 @@ impl Game {
                     .borrow(self.teams[t].active_control_player.unwrap())
                     .vpos()
                     - offset
-                    - Vector2::new(11, 45);
+                    - Vector2::new(11., 45.);
                 media.blit_image(
                     scene,
                     "arrow",

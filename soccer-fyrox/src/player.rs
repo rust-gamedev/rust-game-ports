@@ -1,6 +1,6 @@
 use crate::prelude::*;
 
-const ANCHOR: Vector2<i16> = Vector2::new(25, 37);
+const ANCHOR: Vector2<f32> = Vector2::new(25., 37.);
 
 //# Speeds for players in various situations. Speeds including 'BASE' can be boosted by the speed_boost difficulty
 //# setting (only for players on a computer-controlled team)
@@ -16,8 +16,8 @@ pub const HUMAN_PLAYER_WITHOUT_BALL_SPEED: f32 = 3.3;
 pub struct Player {
     pub peer: Handle<Player>,
     pub mark: Target,
-    pub lead: Option<i16>,
-    home: Vector2<i16>,
+    pub lead: Option<f32>,
+    home: Vector2<f32>,
     pub team: u8,
     dir: u8,
     anim_frame: i8,
@@ -26,7 +26,7 @@ pub struct Player {
 }
 
 impl Player {
-    pub fn new(x: i16, y: i16, team: u8) -> Self {
+    pub fn new(x: f32, y: f32, team: u8) -> Self {
         //# Player objects are recreated each time there is a kickoff
         //# Team will be 0 or 1
         //# The x and y values supplied represent our 'home' position - the place we'll return to by default when not near
@@ -36,7 +36,7 @@ impl Player {
 
         //# Calculate our initial position for kickoff by halving y, adding 550 and then subtracting either 400 for
         //# team 1, or nothing for team 0
-        let kickoff_y = (y / 2) + 550 - (team as i16 * 400);
+        let kickoff_y = (y / 2.) + 550. - (team as f32 * 400.);
 
         let vpos = Vector2::new(x, kickoff_y);
         let img_base = BLANK_IMAGE;
@@ -80,7 +80,7 @@ impl Player {
         //# Is ball within 400 pixels on the Y axis? If so I'll be considered active, meaning I'm currently doing
         //# something useful in the game like trying to get the ball. If I'm not active, I'll either mark another player,
         //# or just stay at my home position
-        (ball.vpos.y - self.home.y).abs() < 400
+        (ball.vpos.y - self.home.y).abs() < 400.
     }
 
     pub fn update(
