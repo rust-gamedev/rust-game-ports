@@ -287,8 +287,18 @@ impl Game {
 
         //# Update all players and ball
         for obj_h in &self.players {
+            let pool_clone = self.players_pool.clone();
+
             let obj = self.players_pool.borrow_mut(*obj_h);
-            obj.update(&self.teams, self.kickoff_player, *obj_h, &self.ball, &input);
+            obj.update(
+                &self.teams,
+                self.kickoff_player,
+                *obj_h,
+                &self.ball,
+                &input,
+                &pool_clone,
+                &self.difficulty,
+            );
         }
         self.ball.update();
 

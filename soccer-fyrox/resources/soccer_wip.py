@@ -49,11 +49,11 @@ PITCH_RECT = pygame.rect.Rect(PITCH_BOUNDS_X[0], PITCH_BOUNDS_Y[0], HALF_PITCH_W
 GOAL_0_RECT = pygame.rect.Rect(GOAL_BOUNDS_X[0], GOAL_BOUNDS_Y[0], GOAL_WIDTH, GOAL_DEPTH)
 GOAL_1_RECT = pygame.rect.Rect(GOAL_BOUNDS_X[0], GOAL_BOUNDS_Y[1] - GOAL_DEPTH, GOAL_WIDTH, GOAL_DEPTH)
 
-AI_MIN_X = 78
-AI_MAX_X = LEVEL_W - 78
-AI_MIN_Y = 98
-AI_MAX_Y = LEVEL_H - 98
-
+# AI_MIN_X = 78
+# AI_MAX_X = LEVEL_W - 78
+# AI_MIN_Y = 98
+# AI_MAX_Y = LEVEL_H - 98
+#
 # PLAYER_START_POS = [(350, 550), (650, 450), (200, 850), (500, 750), (800, 950), (350, 1250), (650, 1150)]
 #
 # LEAD_DISTANCE_1 = 10
@@ -179,10 +179,10 @@ class Goal(MyActor):
 #         super().__init__("goal" + str(team), x, y)
 #
 #         self.team = team
-
-    def active(self):
-        # Is ball within 500 pixels on the Y axis?
-        return abs(game.ball.vpos.y - self.vpos.y) < 500
+#
+#     def active(self):
+#         # Is ball within 500 pixels on the Y axis?
+#         return abs(game.ball.vpos.y - self.vpos.y) < 500
 
 # Calculate if player 'target' is a good target for a pass from player 'source'
 # target can also be a goal
@@ -416,28 +416,28 @@ def allow_movement(x, y):
         # of the level
         return abs(y - HALF_LEVEL_H) < HALF_LEVEL_H
 
-# Generate a score for a given position, where lower numbers are considered to be better.
-# This is called when a computer-controlled player with the ball is working out which direction to run in, or whether
-# to pass the ball to another player, or kick it into the goal.
-# Several things make up the final score:
-# - the distance to our own goal – further away is better
-# - the proximity of players on the other team – we want to get the ball away from them as much as possible
-# - a quadratic equation (don’t panic too much!) causing the player to favour the centre of the pitch and their opponents goal
-# - an optional handicap value which can bias the result towards or away from a particular position
-def cost(pos, team, handicap=0):
-    # Get pos of our own goal. We do it this way rather than getting the pos of the actual goal object
-    # because this way gives us the pos of the goal's entrance, whereas the actual goal sprites are not anchored based
-    # on the entrances.
-    own_goal_pos = Vector2(HALF_LEVEL_W, 78 if team == 1 else LEVEL_H - 78)
-    inverse_own_goal_distance = 3500 / (pos - own_goal_pos).length()
-
-    result = inverse_own_goal_distance \
-            + sum([4000 / max(24, (p.vpos - pos).length()) for p in game.players if p.team != team]) \
-            + ((pos.x - HALF_LEVEL_W)**2 / 200 \
-            - pos.y * (4 * team - 2)) \
-            + handicap
-
-    return result, pos
+# # Generate a score for a given position, where lower numbers are considered to be better.
+# # This is called when a computer-controlled player with the ball is working out which direction to run in, or whether
+# # to pass the ball to another player, or kick it into the goal.
+# # Several things make up the final score:
+# # - the distance to our own goal – further away is better
+# # - the proximity of players on the other team – we want to get the ball away from them as much as possible
+# # - a quadratic equation (don’t panic too much!) causing the player to favour the centre of the pitch and their opponents goal
+# # - an optional handicap value which can bias the result towards or away from a particular position
+# def cost(pos, team, handicap=0):
+#     # Get pos of our own goal. We do it this way rather than getting the pos of the actual goal object
+#     # because this way gives us the pos of the goal's entrance, whereas the actual goal sprites are not anchored based
+#     # on the entrances.
+#     own_goal_pos = Vector2(HALF_LEVEL_W, 78 if team == 1 else LEVEL_H - 78)
+#     inverse_own_goal_distance = 3500 / (pos - own_goal_pos).length()
+#
+#     result = inverse_own_goal_distance \
+#             + sum([4000 / max(24, (p.vpos - pos).length()) for p in game.players if p.team != team]) \
+#             + ((pos.x - HALF_LEVEL_W)**2 / 200 \
+#             - pos.y * (4 * team - 2)) \
+#             + handicap
+#
+#     return result, pos
 
 class Player(MyActor):
 #     ANCHOR = (25,37)
@@ -497,109 +497,109 @@ class Player(MyActor):
 #         i_am_kickoff_player = self == game.kickoff_player
 #         ball = game.ball
 #
-        if self == game.teams[self.team].active_control_player and my_team.human() and (not pre_kickoff or i_am_kickoff_player):
-            # This player is the currently active player for its team, and is player-controlled, and either we're not
-            # currently waiting for kickoff, or this player is the designated kickoff player.
-            # The last part of the condition ensures that in a 2 player game, player 2 can't make their active player
-            # run around while waiting for player 1 to do the kickoff (and vice versa)
-
-            # A player with the ball runs slightly more slowly than one without
-            if ball.owner == self:
-                speed = HUMAN_PLAYER_WITH_BALL_SPEED
-            else:
-                speed = HUMAN_PLAYER_WITHOUT_BALL_SPEED
-
-            # Find target by calling the controller for the player's team todo comment
-            target = self.vpos + my_team.controls.move(speed)
-
-        elif ball.owner != None:
-            # Someone has the ball - is it me?
-            if ball.owner == self:
-                # We are the owner, and are computer-controlled (otherwise we would have taken the other arm
-                # of the top-level if statement)
-
-                # Evaluate five positions (left 90, left 45, ahead, right 45, right 90)
-                # target is the one with the lowest value of cost()
-                # List comprehension steps through the angles: -2 to 2, where 0 is up, 1 is up & right, etc
-                # For each angle 'd', we call the cost function with a position, which is 3 pixels from the
-                # current position, if the player were to move in the direction of d. We also pass cost() our team number.
-                # The last parameter, abs(d), introduces a tendency for the player to continue running forward. Try
-                # multiplying it by 3 or 4 to see what happens!
-
-                # First, create a list of costs for each of the 5 tested positions - a lower number is better. Each
-                # element is a tuple containing the cost and the position that cost relates to.
-                costs = [cost(self.vpos + angle_to_vec(self.dir + d) * 3, self.team, abs(d)) for d in range(-2, 3)]
-
-                # Then choose the element with the lowest cost. We use min() to find the element with the lowest value.
-                # min uses < to compare pairs of elements. Each element of costs is a tuple with two elements (a cost
-                # value and the target position). When comparing a pair of tuples using <, Python first compares the
-                # first element of each tuple. If they're different, that's what determines which tuple is considered to
-                # have a lower value. If they're the same, Python moves on to looking at the next element. However, this
-                # can lead to a crash in this case as the target position is an instance of the Vector2 class, which
-                # does not support comparisons using <. In practice it's rare for two positions to have the same cost
-                # value, but it's nevertheless prudent to eliminate the risk. The solution we chosen is to use the
-                # optional 'key' parameter for min, telling the function to only use the first element of each tuple
-                # for the comparisons.
-                # When min finds the tuple with the minimum cost value, we extract the target pos (which is what we
-                # actually care about) and discard the actual cost value - hence the '_' dummy variable
-                _, target = min(costs, key=lambda element: element[0])
-
-                # speed depends on difficulty
-                speed = CPU_PLAYER_WITH_BALL_BASE_SPEED + game.difficulty.speed_boost
-
-            elif ball.owner.team == self.team:
-                # Ball is owned by another player on our team
-                if self.active():
-                    # If I'm near enough to the ball, try to run somewhere useful, and unique to this player - we
-                    # don't want all players running to the same place. Target is halfway between home and a point
-                    # 400 pixels ahead of the ball. Team 0 are trying to score in the goal at the top of the
-                    # pitch, team 1 the goal at the bottom
-                    direction = -1 if self.team == 0 else 1
-                    target.x = (ball.vpos.x + target.x) / 2
-                    target.y = (ball.vpos.y + 400 * direction + target.y) / 2
-                # If we're not active, we'll do the default action of moving towards our home position
-            else:
-                # Ball is owned by a player on the opposite team
-                if self.lead is not None:
-                    # We are one of the players chosen to pursue the owner
-
-                    # Target a position in front of the ball's owner, the distance based on the value of lead, while
-                    # making sure we keep just inside the pitch
-                    target = ball.owner.vpos + angle_to_vec(ball.owner.dir) * self.lead
-
-                    # Stay on the pitch
-                    target.x = max(AI_MIN_X, min(AI_MAX_X, target.x))
-                    target.y = max(AI_MIN_Y, min(AI_MAX_Y, target.y))
-
-                    other_team = 1 if self.team == 0 else 1
-                    speed = LEAD_PLAYER_BASE_SPEED
-                    if game.teams[other_team].human():
-                        speed += game.difficulty.speed_boost
-
-                elif self.mark.active():
-                    # The player or goal we've been chosen to mark is active
-
-                    if my_team.human():
-                        # If I'm on a human team, just run towards the ball.
-                        # We don't do the marking behaviour below for human teams for a number of reasons. Try changing
-                        # the code to see how the game feels when marking behaviour applies to both human and computer
-                        # teams.
-                        target = Vector2(ball.vpos)
-                    else:
-                        # Get vector between the ball and whatever we're marking
-                        vec, length = safe_normalise(ball.vpos - self.mark.vpos)
-
-                        # Alter length to choose a position in between the ball and whatever we're marking
-                        # We don't apply this behaviour for human teams - in that case we just run straight at the ball
-                        if isinstance(self.mark, Goal):
-                            # If I'm currently the goalie, get in between the ball and goal, and don't get too far
-                            # from the goal
-                            length = min(150, length)
-                        else:
-                            # Otherwise, just get halfway between the ball and whoever I'm marking
-                            length /= 2
-
-                        target = self.mark.vpos + vec * length
+#         if self == game.teams[self.team].active_control_player and my_team.human() and (not pre_kickoff or i_am_kickoff_player):
+#             # This player is the currently active player for its team, and is player-controlled, and either we're not
+#             # currently waiting for kickoff, or this player is the designated kickoff player.
+#             # The last part of the condition ensures that in a 2 player game, player 2 can't make their active player
+#             # run around while waiting for player 1 to do the kickoff (and vice versa)
+#
+#             # A player with the ball runs slightly more slowly than one without
+#             if ball.owner == self:
+#                 speed = HUMAN_PLAYER_WITH_BALL_SPEED
+#             else:
+#                 speed = HUMAN_PLAYER_WITHOUT_BALL_SPEED
+#
+#             # Find target by calling the controller for the player's team todo comment
+#             target = self.vpos + my_team.controls.move(speed)
+#
+#         elif ball.owner != None:
+#             # Someone has the ball - is it me?
+#             if ball.owner == self:
+#                 # We are the owner, and are computer-controlled (otherwise we would have taken the other arm
+#                 # of the top-level if statement)
+#
+#                 # Evaluate five positions (left 90, left 45, ahead, right 45, right 90)
+#                 # target is the one with the lowest value of cost()
+#                 # List comprehension steps through the angles: -2 to 2, where 0 is up, 1 is up & right, etc
+#                 # For each angle 'd', we call the cost function with a position, which is 3 pixels from the
+#                 # current position, if the player were to move in the direction of d. We also pass cost() our team number.
+#                 # The last parameter, abs(d), introduces a tendency for the player to continue running forward. Try
+#                 # multiplying it by 3 or 4 to see what happens!
+#
+#                 # First, create a list of costs for each of the 5 tested positions - a lower number is better. Each
+#                 # element is a tuple containing the cost and the position that cost relates to.
+#                 costs = [cost(self.vpos + angle_to_vec(self.dir + d) * 3, self.team, abs(d)) for d in range(-2, 3)]
+#
+#                 # Then choose the element with the lowest cost. We use min() to find the element with the lowest value.
+#                 # min uses < to compare pairs of elements. Each element of costs is a tuple with two elements (a cost
+#                 # value and the target position). When comparing a pair of tuples using <, Python first compares the
+#                 # first element of each tuple. If they're different, that's what determines which tuple is considered to
+#                 # have a lower value. If they're the same, Python moves on to looking at the next element. However, this
+#                 # can lead to a crash in this case as the target position is an instance of the Vector2 class, which
+#                 # does not support comparisons using <. In practice it's rare for two positions to have the same cost
+#                 # value, but it's nevertheless prudent to eliminate the risk. The solution we chosen is to use the
+#                 # optional 'key' parameter for min, telling the function to only use the first element of each tuple
+#                 # for the comparisons.
+#                 # When min finds the tuple with the minimum cost value, we extract the target pos (which is what we
+#                 # actually care about) and discard the actual cost value - hence the '_' dummy variable
+#                 _, target = min(costs, key=lambda element: element[0])
+#
+#                 # speed depends on difficulty
+#                 speed = CPU_PLAYER_WITH_BALL_BASE_SPEED + game.difficulty.speed_boost
+#
+#             elif ball.owner.team == self.team:
+#                 # Ball is owned by another player on our team
+#                 if self.active():
+#                     # If I'm near enough to the ball, try to run somewhere useful, and unique to this player - we
+#                     # don't want all players running to the same place. Target is halfway between home and a point
+#                     # 400 pixels ahead of the ball. Team 0 are trying to score in the goal at the top of the
+#                     # pitch, team 1 the goal at the bottom
+#                     direction = -1 if self.team == 0 else 1
+#                     target.x = (ball.vpos.x + target.x) / 2
+#                     target.y = (ball.vpos.y + 400 * direction + target.y) / 2
+#                 # If we're not active, we'll do the default action of moving towards our home position
+#             else:
+#                 # Ball is owned by a player on the opposite team
+#                 if self.lead is not None:
+#                     # We are one of the players chosen to pursue the owner
+#
+#                     # Target a position in front of the ball's owner, the distance based on the value of lead, while
+#                     # making sure we keep just inside the pitch
+#                     target = ball.owner.vpos + angle_to_vec(ball.owner.dir) * self.lead
+#
+#                     # Stay on the pitch
+#                     target.x = max(AI_MIN_X, min(AI_MAX_X, target.x))
+#                     target.y = max(AI_MIN_Y, min(AI_MAX_Y, target.y))
+#
+#                     other_team = 1 if self.team == 0 else 1
+#                     speed = LEAD_PLAYER_BASE_SPEED
+#                     if game.teams[other_team].human():
+#                         speed += game.difficulty.speed_boost
+#
+#                 elif self.mark.active():
+#                     # The player or goal we've been chosen to mark is active
+#
+#                     if my_team.human():
+#                         # If I'm on a human team, just run towards the ball.
+#                         # We don't do the marking behaviour below for human teams for a number of reasons. Try changing
+#                         # the code to see how the game feels when marking behaviour applies to both human and computer
+#                         # teams.
+#                         target = Vector2(ball.vpos)
+#                     else:
+#                         # Get vector between the ball and whatever we're marking
+#                         vec, length = safe_normalise(ball.vpos - self.mark.vpos)
+#
+#                         # Alter length to choose a position in between the ball and whatever we're marking
+#                         # We don't apply this behaviour for human teams - in that case we just run straight at the ball
+#                         if isinstance(self.mark, Goal):
+#                             # If I'm currently the goalie, get in between the ball and goal, and don't get too far
+#                             # from the goal
+#                             length = min(150, length)
+#                         else:
+#                             # Otherwise, just get halfway between the ball and whoever I'm marking
+#                             length /= 2
+#
+#                         target = self.mark.vpos + vec * length
         else:
             # No-one has the ball
 
