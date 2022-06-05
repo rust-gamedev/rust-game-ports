@@ -59,10 +59,15 @@ impl Media {
                 .map(|path| resource_manager.request_sound_buffer(path)),
         );
 
+        // For simplicity, we strip the extension, and assume:
+        //
+        // - that there are no images with the same bare name but different extension
+        // - that all the extensions are 3 chars long
+        //
         let image_textures = image_paths
             .iter()
             .zip(block_on(texture_requests))
-            .map(|(path, texture)| (path.to_string(), texture.unwrap()))
+            .map(|(path, texture)| (path[..(path.len() - 4)].to_string(), texture.unwrap()))
             .collect::<HashMap<_, _>>();
 
         let sound_resources = sound_paths
@@ -210,11 +215,6 @@ impl Media {
         for index in indexes {
             full_path.push((ZERO_ORD + index) as char);
         }
-
-        // Images have been converted to GIF, in order to workaround a Fyrox 0.26 bug (see
-        // https://github.com/FyroxEngine/Fyrox/issues/320).
-        //
-        full_path.push_str(".gif");
 
         self.image_textures
             .get(&full_path)
