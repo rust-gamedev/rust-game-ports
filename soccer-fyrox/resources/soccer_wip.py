@@ -674,13 +674,13 @@ class Player(MyActor):
         dir_diff = (target_dir - self.dir)
         self.dir = (self.dir + [0, 1, 1, 1, 1, 7, 7, 7][dir_diff % 8]) % 8
 
-        suffix = str(self.dir) + str((int(self.anim_frame) // 18) + 1) # todo
-
-        self.image = "player" + str(self.team) + suffix
-        self.shadow.image = "players" + suffix
-
-        # Update shadow position to track player
-        self.shadow.vpos = Vector2(self.vpos)
+#         suffix = str(self.dir) + str((int(self.anim_frame) // 18) + 1) # todo
+#
+#         self.image = "player" + str(self.team) + suffix
+#         self.shadow.image = "players" + suffix
+#
+#         # Update shadow position to track player
+#         self.shadow.vpos = Vector2(self.vpos)
 
 
 # class Team:

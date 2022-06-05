@@ -2,6 +2,15 @@ use crate::prelude::*;
 
 const ANCHOR: Vector2<i16> = Vector2::new(25, 37);
 
+//# Speeds for players in various situations. Speeds including 'BASE' can be boosted by the speed_boost difficulty
+//# setting (only for players on a computer-controlled team)
+pub const PLAYER_DEFAULT_SPEED: f32 = 2.0;
+pub const CPU_PLAYER_WITH_BALL_BASE_SPEED: f32 = 2.6;
+pub const PLAYER_INTERCEPT_BALL_SPEED: f32 = 2.75;
+pub const LEAD_PLAYER_BASE_SPEED: f32 = 2.9;
+pub const HUMAN_PLAYER_WITH_BALL_SPEED: f32 = 3.0;
+pub const HUMAN_PLAYER_WITHOUT_BALL_SPEED: f32 = 3.3;
+
 #[my_actor_based]
 #[derive(Clone)]
 pub struct Player {
@@ -74,7 +83,37 @@ impl Player {
         (ball.vpos.y - self.home.y).abs() < 400
     }
 
-    pub fn update(&mut self) {
+    pub fn update(
+        &mut self,
+        teams: &[Team],
+        kickoff_player: Option<Handle<Player>>,
+        self_handle: Handle<Player>,
+        ball: &Ball,
+    ) {
+        //# decrement holdoff timer
+        self.timer -= 1;
+
+        //# One of the main jobs of this method is to decide where the player will run to, and at what speed.
+        //# The default is to run slowly towards home position, but target and speed may be overwritten in the code below
+        let target = self.home.clone(); //# Take a copy of home position
+        let speed = PLAYER_DEFAULT_SPEED;
+
+        //# Some shorthand variables to make the code below a bit easier to follow
+        let my_team = &teams[self.team as usize];
+        let pre_kickoff = kickoff_player.is_some();
+        let i_am_kickoff_player = Some(self_handle) == kickoff_player;
+
         // WRITEME
+
+        let suffix0 = self.dir;
+        let suffix1 = (self.anim_frame.div_euclid(18) + 1) as u8; //# todo
+
+        self.img_base = "player";
+        self.img_indexes = vec![self.team, suffix0, suffix1];
+        self.shadow.img_base = "players";
+        self.shadow.img_indexes = vec![suffix0, suffix1];
+
+        //# Update shadow position to track player
+        self.shadow.vpos = self.vpos.clone();
     }
 }
