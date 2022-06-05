@@ -348,15 +348,7 @@ impl Game {
         let offset_y = (self.camera_focus.y - HEIGHT / 2).clamp(0, LEVEL_H - HEIGHT);
         let offset = Vector2::new(offset_x, offset_y);
 
-        media.draw_image(
-            scene,
-            "pitch",
-            &[],
-            -offset_x,
-            -offset_y,
-            DRAW_PITCH_Z,
-            Anchor::Center,
-        );
+        media.blit_image(scene, "pitch", &[], -offset_x, -offset_y, DRAW_PITCH_Z);
 
         //# Prepare to draw all objects
         //# 1. Create a list of all players and the ball, sorted based on their Y positions
@@ -430,14 +422,13 @@ impl Game {
                     .vpos()
                     - offset
                     - Vector2::new(11, 45);
-                media.draw_image(
+                media.blit_image(
                     scene,
                     "arrow",
                     &[t as u8],
                     arrow_pos.x,
                     arrow_pos.y,
                     DRAW_ARROWS_Z,
-                    Anchor::Center,
                 );
             }
         }
