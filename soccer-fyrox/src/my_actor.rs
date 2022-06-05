@@ -13,7 +13,7 @@ pub trait MyActor {
     fn anchor(&self) -> Anchor;
 
     //# We draw with the supplied offset to enable scrolling
-    fn draw(&self, scene: &mut Scene, media: &mut Media, offset_x: i16, offset_y: i16) {
+    fn draw(&self, scene: &mut Scene, media: &mut Media, offset_x: i16, offset_y: i16, z: f32) {
         let pos_x = self.vpos().x - offset_x;
         let pos_y = self.vpos().y - offset_y;
 
@@ -23,7 +23,7 @@ pub trait MyActor {
             &self.img_indexes(),
             pos_x,
             pos_y,
-            0,
+            z,
             self.anchor(),
         );
     }

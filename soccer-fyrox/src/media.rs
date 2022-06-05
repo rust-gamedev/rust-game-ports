@@ -107,7 +107,7 @@ impl Media {
         indexes: &[u8],
         std_x: i16,
         std_y: i16,
-        z: i16,
+        z: f32,
         anchor: Anchor,
     ) {
         if base == BLANK_IMAGE {
@@ -138,7 +138,7 @@ impl Media {
             let node = RectangleBuilder::new(
                 BaseBuilder::new().with_local_transform(
                     TransformBuilder::new()
-                        .with_local_position(Vector3::new(fyrox_x, fyrox_y, z as f32))
+                        .with_local_position(Vector3::new(fyrox_x, fyrox_y, z))
                         .with_local_scale(Vector3::new(
                             texture_width as f32,
                             texture_height as f32,

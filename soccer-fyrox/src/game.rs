@@ -348,7 +348,15 @@ impl Game {
         let offset_y = (self.camera_focus.y - HEIGHT / 2).clamp(0, LEVEL_H - HEIGHT);
         let offset = Vector2::new(offset_x, offset_y);
 
-        media.draw_image(scene, "pitch", &[], -offset_x, -offset_y, 0, Anchor::Center);
+        media.draw_image(
+            scene,
+            "pitch",
+            &[],
+            -offset_x,
+            -offset_y,
+            DRAW_PITCH_Z,
+            Anchor::Center,
+        );
 
         //# Prepare to draw all objects
         //# 1. Create a list of all players and the ball, sorted based on their Y positions
@@ -370,7 +378,7 @@ impl Game {
 
         self.goals_pool
             .borrow(self.goals[0])
-            .draw(scene, media, offset_x, offset_y);
+            .draw(scene, media, offset_x, offset_y, DRAW_GOAL_0_Z);
 
         let mut sorted_players = self
             .players
@@ -388,29 +396,32 @@ impl Game {
 
         for i in 0..=sorted_players.len() {
             if i == ball_draw_i {
-                self.ball.draw(scene, media, offset_x, offset_y);
+                self.ball
+                    .draw(scene, media, offset_x, offset_y, DRAW_PLAYERS_Z.0);
             }
 
             if i < sorted_players.len() {
-                sorted_players[i].draw(scene, media, offset_x, offset_y)
+                sorted_players[i].draw(scene, media, offset_x, offset_y, DRAW_PLAYERS_Z.0)
             }
         }
 
         for i in 0..=sorted_players.len() {
             if i == ball_draw_i {
-                self.ball.shadow.draw(scene, media, offset_x, offset_y);
+                self.ball
+                    .shadow
+                    .draw(scene, media, offset_x, offset_y, DRAW_SHADOWS_Z.0);
             }
 
             if i < sorted_players.len() {
                 sorted_players[i]
                     .shadow
-                    .draw(scene, media, offset_x, offset_y)
+                    .draw(scene, media, offset_x, offset_y, DRAW_SHADOWS_Z.0)
             }
         }
 
         self.goals_pool
             .borrow(self.goals[1])
-            .draw(scene, media, offset_x, offset_y);
+            .draw(scene, media, offset_x, offset_y, DRAW_GOAL_1_Z);
 
         //# Show active players
         for t in 0..2 {
@@ -428,7 +439,7 @@ impl Game {
                     &[t as u8],
                     arrow_pos.x,
                     arrow_pos.y,
-                    0,
+                    DRAW_ARROWS_Z,
                     Anchor::Center,
                 );
             }

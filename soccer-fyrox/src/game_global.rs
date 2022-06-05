@@ -196,7 +196,7 @@ impl GameGlobal {
                     &[image_i1, image_i2],
                     0,
                     0,
-                    -1,
+                    DRAW_MENU_Z,
                     Anchor::Center,
                 );
             }
@@ -208,7 +208,7 @@ impl GameGlobal {
                     &[],
                     HALF_WINDOW_W - 176,
                     0,
-                    -1,
+                    DRAW_GAME_HUD_Z,
                     Anchor::Center,
                 );
                 //# Show score for each team
@@ -219,7 +219,7 @@ impl GameGlobal {
                         &[self.game.teams[i].score],
                         HALF_WINDOW_W + 7 - 39 * (i as i16),
                         6,
-                        -1,
+                        DRAW_GAME_SCORES_Z,
                         Anchor::Center,
                     );
                 }
@@ -232,7 +232,7 @@ impl GameGlobal {
                         &[],
                         HALF_WINDOW_W - 300,
                         HEIGHT / 2 - 88,
-                        -1,
+                        DRAW_GAME_HUD_Z,
                         Anchor::Center,
                     );
                 }
@@ -240,8 +240,15 @@ impl GameGlobal {
             GameOver => {
                 //# Display "Game Over" image
                 let index = (self.game.teams[1].score > self.game.teams[0].score) as u8;
-                self.media
-                    .draw_image(scene, "over", &[index], 0, 0, -1, Anchor::Center);
+                self.media.draw_image(
+                    scene,
+                    "over",
+                    &[index],
+                    0,
+                    0,
+                    DRAW_GAME_OVER_Z,
+                    Anchor::Center,
+                );
 
                 //# Show score for each team
                 for i in 0..2 {
@@ -251,7 +258,7 @@ impl GameGlobal {
                         &[i as u8, self.game.teams[i as usize].score],
                         HALF_WINDOW_W + 25 - 125 * i,
                         144,
-                        -1,
+                        DRAW_GAME_OVER_Z,
                         Anchor::Center,
                     );
                 }
@@ -264,8 +271,8 @@ impl GameGlobal {
     fn build_camera(scene: &mut Scene) -> Handle<Node> {
         CameraBuilder::new(BaseBuilder::new())
             .with_projection(Projection::Orthographic(OrthographicProjection {
-                z_near: -1.0,
-                z_far: 16.0,
+                z_near: CAMERA_NEAR_Z,
+                z_far: CAMERA_FAR_Z,
                 vertical_size: (HEIGHT / 2) as f32,
             }))
             .build(&mut scene.graph)
