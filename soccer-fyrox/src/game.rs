@@ -178,11 +178,11 @@ impl Game {
 
             //# Ball has an owner (above is equivalent to s.ball.owner != None, or s.ball.owner is not None)
             //# Assign some shorthand variables
-            let (_pos, team, peer) = {
+            let (pos, team, peer) = {
                 let o = self.players_pool.borrow(*o);
                 (o.vpos, o.team, o.peer)
             };
-            let _other_team = if team == 0 { 1 } else { 1 };
+            let other_team = if team == 0 { 1 } else { 1 };
 
             if self.difficulty.goalie_enabled {
                 let previous_nearest_mark = {
@@ -199,14 +199,35 @@ impl Game {
 
                     // See comment below this block; this part is described as "then..." (in the source
                     // project, this statement was after).
-                    std::mem::replace(
-                        &mut nearest.mark,
-                        TargetRef::Goal(self.goals[team as usize]),
-                    )
+                    std::mem::replace(&mut nearest.mark, Target::Goal(self.goals[team as usize]))
                 };
 
                 //# Set the ball owner's peer to mark whoever the goalie was marking, then set the goalie to mark the goal
                 self.players_pool.borrow_mut(peer).mark = previous_nearest_mark;
+
+                //# Choose one or two lead players to spearhead the attack on the ball owner
+                //# Create a list of players who are on the opposite team from the ball owner, are allowed to acquire
+                //# the ball (their hold-off timer must not be positive), are not currently being controlled by a human,
+                //# and are not currently assigned to be the goalie. The list is sorted based on distance from the ball owner.
+                let sorted_players = self
+                    .players
+                    .iter()
+                    .filter_map(|p_h| {
+                        let p = self.players_pool.borrow(*p_h);
+
+                        let other_active_p = self.teams[other_team]
+                            .active_control_player
+                            .unwrap_or(Handle::NONE);
+
+                        let is_p_match = p.team != team
+                            && p.timer <= 0
+                            && (!self.teams[other_team].human() || *p_h != other_active_p)
+                            && !p.mark.is_goal();
+
+                        is_p_match.then_some(p)
+                    })
+                    .min_by(|p1, p2| dist_key(p1, p2, pos))
+                    .unwrap();
 
                 // WRITEME
             }
