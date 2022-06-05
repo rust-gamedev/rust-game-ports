@@ -211,7 +211,10 @@ impl Media {
             full_path.push((ZERO_ORD + index) as char);
         }
 
-        full_path.push_str(".png");
+        // Images have been converted to GIF, in order to workaround a Fyrox 0.26 bug (see
+        // https://github.com/FyroxEngine/Fyrox/issues/320).
+        //
+        full_path.push_str(".gif");
 
         self.image_textures
             .get(&full_path)

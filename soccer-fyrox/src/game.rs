@@ -13,6 +13,9 @@ pub const PLAYER_START_POS: [(i16, i16); 7] = [
     (650, 1150),
 ];
 
+pub const LEAD_DISTANCE_1: i16 = 10;
+pub const LEAD_DISTANCE_2: i16 = 50;
+
 pub struct Game {
     pub teams: Vec<Team>,
     difficulty: Difficulty,
@@ -147,7 +150,7 @@ impl Game {
             .vpos = Vector2::new(HALF_LEVEL_W - 30 + other_team * 60, HALF_LEVEL_H);
     }
 
-    pub fn update(&mut self, media: &Media, scene: &mut Scene) {
+    pub fn update(&mut self, media: &Media, scene: &mut Scene, input: &InputController) {
         self.score_timer -= 1;
 
         if self.score_timer == 0 {
@@ -194,7 +197,7 @@ impl Game {
                         .players_pool
                         .iter_mut()
                         .filter(|p| p.team != team)
-                        .min_by(|p1, p2| dist_key(p1, p2, owners_target_goal_vpos))
+                        .min_by(|p1, p2| dist_key(&p1.vpos, &p2.vpos, owners_target_goal_vpos))
                         .unwrap();
 
                     // See comment below this block; this part is described as "then..." (in the source
@@ -209,7 +212,7 @@ impl Game {
                 //# Create a list of players who are on the opposite team from the ball owner, are allowed to acquire
                 //# the ball (their hold-off timer must not be positive), are not currently being controlled by a human,
                 //# and are not currently assigned to be the goalie. The list is sorted based on distance from the ball owner.
-                let sorted_players = self
+                let mut l = self
                     .players
                     .iter()
                     .filter_map(|p_h| {
@@ -224,13 +227,118 @@ impl Game {
                             && (!self.teams[other_team].human() || *p_h != other_active_p)
                             && !p.mark.is_goal();
 
-                        is_p_match.then_some(p)
+                        is_p_match.then_some((p_h, p.vpos))
                     })
-                    .min_by(|p1, p2| dist_key(p1, p2, pos))
-                    .unwrap();
+                    .collect::<Vec<_>>();
 
-                // WRITEME
+                l.sort_by(|(_, vpos1), (_, vpos2)| dist_key(vpos1, vpos2, pos));
+
+                //# a is a list of players from l who are upfield of the ball owner (i.e. towards our own goal, away from the
+                //# direction of the goal the ball owner is trying to score in). b is all the other players. It's possible for
+                //# one of these to be empty, as there might not be any players in the relevant direction.
+                //
+                // The direct translation of the source logic is not trivial in Rust, due to Player
+                // not supporting equality, but luckily, the partition() API will do even better :)
+                let (a, b): (Vec<_>, Vec<_>) = l.into_iter().partition(|(_, p_vpos)| {
+                    if team == 0 {
+                        p_vpos.y > pos.y
+                    } else {
+                        p_vpos.y < pos.y
+                    }
+                });
+
+                //# Zip a and b together in an alternating fashion. Why do we add NONE2 (i.e. [None,None]) to each list?
+                //# Because the zip function stops when there are no more items in one of the lists. We want our final list
+                //# to contain at least 2 elements. Adding NONE2 (i.e. [None,None] as defined near the top) ensures that each
+                //# list has at least 2 items. But we don't want any values in the final list to be None, hence the final part
+                //# of the list comprehension 'for s in t if s', which discards any None values from the final result
+                //
+                // The Rust translation is pretty direct, but it's more verbose due to static typing
+                // (primarily, conversion to Option<T> and back).
+                let a = a
+                    .into_iter()
+                    .map(|s| Some(s))
+                    .chain([None, None].into_iter());
+                let b = b
+                    .into_iter()
+                    .map(|s| Some(s))
+                    .chain([None, None].into_iter());
+                let zipped = a
+                    .zip(b)
+                    .map(|(s, t)| [s, t])
+                    .flatten()
+                    .filter_map(|s| s)
+                    .collect::<Vec<_>>();
+
+                //# Either one or two players (depending on difficulty settings) follow the ball owner, one from up-field and
+                //# one from down-field of the owner
+                self.players_pool.borrow_mut(*zipped[0].0).lead = Some(LEAD_DISTANCE_1);
+                if self.difficulty.second_lead_enabled {
+                    self.players_pool.borrow_mut(*zipped[1].0).lead = Some(LEAD_DISTANCE_2);
+                }
+
+                //# If the ball has an owner, kick-off must have taken place, so unset the kickoff player
+                //# Of course, kick-off might have already taken place a while ago, in which case kick-off_player will already
+                //# be None, and will remain None
+                self.kickoff_player = None;
             }
+        }
+
+        //# Update all players and ball
+        for obj_h in &self.players {
+            let obj = self.players_pool.borrow_mut(*obj_h);
+            obj.update(&self.teams, self.kickoff_player, *obj_h, &self.ball);
+        }
+        self.ball.update();
+
+        let owner = self.ball.owner;
+
+        for team_num in 0..2 {
+            let team_obj = &mut self.teams[team_num];
+
+            //# Manual player switching when space is pressed
+            if team_obj.human() && team_obj.controls.as_ref().unwrap().shoot(input) {
+                //# Find nearest player to the ball on our team
+                //# If the ball has an owner (who must be on the other team because if not, control would have
+                //# automatically switched to the ball owner and we wouldn't need to manually switch), we weight the
+                //# choice in favour of players who are upfield (towards our goal), since such players may be better
+                //# placed to intercept the ball owner.
+                //# The function dist_key_weighted is equivalent to the dist_key function earlier in the code, but with
+                //# this weighting added. We use this function as the key for the min function, which will choose
+                //# the player who results in the lowest value when passed as an argument to dist_key_weighted.
+                let dist_key_weighted = |p_vpos: Vector2<i16>| {
+                    let dist_to_ball_v = p_vpos - self.ball.vpos;
+                    let dist_to_ball =
+                        Vector2::new(dist_to_ball_v.x as f32, dist_to_ball_v.y as f32).norm();
+                    //# Thonny gives a warning about the following line, relating to closures (an advanced topic), but
+                    //# in this case there is not actually a problem as the closure is only called within the loop
+                    let goal_dir = (2 * team_num - 1) as i16;
+                    if owner.is_some() && (p_vpos.y - self.ball.vpos.y) * goal_dir < 0 {
+                        dist_to_ball / 2.0
+                    } else {
+                        dist_to_ball
+                    }
+                };
+
+                self.teams[team_num].active_control_player = self
+                    .players_pool
+                    .iter()
+                    .filter(|p| p.team == team_num as u8)
+                    .min_by(|p1, p2| {
+                        dist_key_weighted(p1.vpos)
+                            .partial_cmp(&dist_key_weighted(p2.vpos))
+                            .unwrap()
+                    })
+                    .map(|p| self.players_pool.handle_of(p));
+            }
+        }
+
+        //# Get vector between current camera pos and ball pos
+        let (camera_ball_vec, distance) = safe_normalise(&(self.camera_focus - self.ball.vpos));
+        if distance > 0.0 {
+            //# Move camera towards ball, at no more than 8 pixels per frame
+            let camera_shift = camera_ball_vec * distance.min(8.0);
+            self.camera_focus -= Vector2::new(camera_shift.x as i16, camera_shift.y as i16);
         }
     }
 

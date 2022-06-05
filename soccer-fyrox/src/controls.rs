@@ -54,7 +54,7 @@ impl Controls {
         Vector2::new(dx as f32, dy as f32) * speed
     }
 
-    pub fn shoot(&self, input: InputController) -> bool {
+    pub fn shoot(&self, input: &InputController) -> bool {
         input.is_key_just_pressed(self.key_shoot)
     }
 }

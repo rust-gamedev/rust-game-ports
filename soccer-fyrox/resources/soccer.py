@@ -55,9 +55,9 @@ AI_MIN_Y = 98
 AI_MAX_Y = LEVEL_H - 98
 
 # PLAYER_START_POS = [(350, 550), (650, 450), (200, 850), (500, 750), (800, 950), (350, 1250), (650, 1150)]
-
-LEAD_DISTANCE_1 = 10
-LEAD_DISTANCE_2 = 50
+#
+# LEAD_DISTANCE_1 = 10
+# LEAD_DISTANCE_2 = 50
 
 DRIBBLE_DIST_X, DRIBBLE_DIST_Y = 18, 16
 
@@ -119,17 +119,17 @@ def angle_to_vec(angle):
 # # the distance between pos and p.vpos
 # def dist_key(pos):
 #     return lambda p: (p.vpos - pos).length()
-
-# Turn a vector into a unit vector - i.e. a vector with length 1
-# We also return the original length, before normalisation.
-# We check for zero length, as trying to normalise a zero-length vector results in an error
-def safe_normalise(vec):
-    length = vec.length()
-    if length == 0:
-        return Vector2(0,0), 0
-    else:
-        return vec.normalize(), length
-
+#
+# # Turn a vector into a unit vector - i.e. a vector with length 1
+# # We also return the original length, before normalisation.
+# # We check for zero length, as trying to normalise a zero-length vector results in an error
+# def safe_normalise(vec):
+#     length = vec.length()
+#     if length == 0:
+#         return Vector2(0,0), 0
+#     else:
+#         return vec.normalize(), length
+#
 # # The MyActor class extends Pygame Zero's Actor class by providing the attribute 'vpos', which stores the object's
 # # current position using Pygame's Vector2 class. All code should change or read the position via vpos, as opposed to
 # # Actor's x/y or pos attributes. When the object is drawn, we set self.pos (equivalent to setting both self.x and
@@ -814,68 +814,68 @@ class Game:
 #                         and not isinstance(p.mark, Goal)],
 #                        key = dist_key(pos))
 #
-            # a is a list of players from l who are upfield of the ball owner (i.e. towards our own goal, away from the
-            # direction of the goal the ball owner is trying to score in). b is all the other players. It's possible for
-            # one of these to be empty, as there might not be any players in the relevant direction.
-            a = [p for p in l if (p.vpos.y > pos.y if team == 0 else p.vpos.y < pos.y)]
-            b = [p for p in l if p not in a]
-
-            # Zip a and b together in an alternating fashion. Why do we add NONE2 (i.e. [None,None]) to each list?
-            # Because the zip function stops when there are no more items in one of the lists. We want our final list
-            # to contain at least 2 elements. Adding NONE2 (i.e. [None,None] as defined near the top) ensures that each
-            # list has at least 2 items. But we don't want any values in the final list to be None, hence the final part
-            # of the list comprehension 'for s in t if s', which discards any None values from the final result
-            NONE2 = [None] * 2
-            zipped = [s for t in zip(a+NONE2, b+NONE2) for s in t if s]
-
-            # Either one or two players (depending on difficulty settings) follow the ball owner, one from up-field and
-            # one from down-field of the owner
-            zipped[0].lead = LEAD_DISTANCE_1
-            if self.difficulty.second_lead_enabled:
-                zipped[1].lead = LEAD_DISTANCE_2
-
-            # If the ball has an owner, kick-off must have taken place, so unset the kickoff player
-            # Of course, kick-off might have already taken place a while ago, in which case kick-off_player will already
-            # be None, and will remain None
-            self.kickoff_player = None
-
-        # Update all players and ball
-        for obj in self.players + [self.ball]:
-            obj.update()
-
-        owner = self.ball.owner
-
-        for team_num in range(2):
-            team_obj = self.teams[team_num]
-
-            # Manual player switching when space is pressed
-            if team_obj.human() and team_obj.controls.shoot():
-                # Find nearest player to the ball on our team
-                # If the ball has an owner (who must be on the other team because if not, control would have
-                # automatically switched to the ball owner and we wouldn't need to manually switch), we weight the
-                # choice in favour of players who are upfield (towards our goal), since such players may be better
-                # placed to intercept the ball owner.
-                # The function dist_key_weighted is equivalent to the dist_key function earlier in the code, but with
-                # this weighting added. We use this function as the key for the min function, which will choose
-                # the player who results in the lowest value when passed as an argument to dist_key_weighted.
-                def dist_key_weighted(p):
-                    dist_to_ball = (p.vpos - self.ball.vpos).length()
-                    # Thonny gives a warning about the following line, relating to closures (an advanced topic), but
-                    # in this case there is not actually a problem as the closure is only called within the loop
-                    goal_dir = (2 * team_num - 1)
-                    if owner and (p.vpos.y - self.ball.vpos.y) * goal_dir < 0:
-                        return dist_to_ball / 2
-                    else:
-                        return dist_to_ball
-
-                self.teams[team_num].active_control_player = min([p for p in game.players if p.team == team_num],
-                                                                 key = dist_key_weighted)
-
-        # Get vector between current camera pos and ball pos
-        camera_ball_vec, distance = safe_normalise(self.camera_focus - self.ball.vpos)
-        if distance > 0:
-            # Move camera towards ball, at no more than 8 pixels per frame
-            self.camera_focus -= camera_ball_vec * min(distance, 8)
+#             # a is a list of players from l who are upfield of the ball owner (i.e. towards our own goal, away from the
+#             # direction of the goal the ball owner is trying to score in). b is all the other players. It's possible for
+#             # one of these to be empty, as there might not be any players in the relevant direction.
+#             a = [p for p in l if (p.vpos.y > pos.y if team == 0 else p.vpos.y < pos.y)]
+#             b = [p for p in l if p not in a]
+#
+#             # Zip a and b together in an alternating fashion. Why do we add NONE2 (i.e. [None,None]) to each list?
+#             # Because the zip function stops when there are no more items in one of the lists. We want our final list
+#             # to contain at least 2 elements. Adding NONE2 (i.e. [None,None] as defined near the top) ensures that each
+#             # list has at least 2 items. But we don't want any values in the final list to be None, hence the final part
+#             # of the list comprehension 'for s in t if s', which discards any None values from the final result
+#             NONE2 = [None] * 2
+#             zipped = [s for t in zip(a+NONE2, b+NONE2) for s in t if s]
+#
+#             # Either one or two players (depending on difficulty settings) follow the ball owner, one from up-field and
+#             # one from down-field of the owner
+#             zipped[0].lead = LEAD_DISTANCE_1
+#             if self.difficulty.second_lead_enabled:
+#                 zipped[1].lead = LEAD_DISTANCE_2
+#
+#             # If the ball has an owner, kick-off must have taken place, so unset the kickoff player
+#             # Of course, kick-off might have already taken place a while ago, in which case kick-off_player will already
+#             # be None, and will remain None
+#             self.kickoff_player = None
+#
+#         # Update all players and ball
+#         for obj in self.players + [self.ball]:
+#             obj.update()
+#
+#         owner = self.ball.owner
+#
+#         for team_num in range(2):
+#             team_obj = self.teams[team_num]
+#
+#             # Manual player switching when space is pressed
+#             if team_obj.human() and team_obj.controls.shoot():
+#                 # Find nearest player to the ball on our team
+#                 # If the ball has an owner (who must be on the other team because if not, control would have
+#                 # automatically switched to the ball owner and we wouldn't need to manually switch), we weight the
+#                 # choice in favour of players who are upfield (towards our goal), since such players may be better
+#                 # placed to intercept the ball owner.
+#                 # The function dist_key_weighted is equivalent to the dist_key function earlier in the code, but with
+#                 # this weighting added. We use this function as the key for the min function, which will choose
+#                 # the player who results in the lowest value when passed as an argument to dist_key_weighted.
+#                 def dist_key_weighted(p):
+#                     dist_to_ball = (p.vpos - self.ball.vpos).length()
+#                     # Thonny gives a warning about the following line, relating to closures (an advanced topic), but
+#                     # in this case there is not actually a problem as the closure is only called within the loop
+#                     goal_dir = (2 * team_num - 1)
+#                     if owner and (p.vpos.y - self.ball.vpos.y) * goal_dir < 0:
+#                         return dist_to_ball / 2
+#                     else:
+#                         return dist_to_ball
+#
+#                 self.teams[team_num].active_control_player = min([p for p in game.players if p.team == team_num],
+#                                                                  key = dist_key_weighted)
+#
+#         # Get vector between current camera pos and ball pos
+#         camera_ball_vec, distance = safe_normalise(self.camera_focus - self.ball.vpos)
+#         if distance > 0:
+#             # Move camera towards ball, at no more than 8 pixels per frame
+#             self.camera_focus -= camera_ball_vec * min(distance, 8)
 
     def draw(self):
 #         # For the purpose of scrolling, all objects will be drawn with these offsets

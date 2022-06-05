@@ -11,7 +11,7 @@ pub struct Difficulty {
     //# the ball owner. Those players will have their 'lead' attributes set to a number indicating how far ahead of the
     //# ball they should try to run. (If they tried to go to where the ball is currently, they'd always trail behind)
     //# This attribute determines whether there should be one or two lead players
-    second_lead_enabled: bool,
+    pub second_lead_enabled: bool,
     //# Speed boost to apply to CPU-team players in certain circumstances
     speed_boost: f32,
     //# Hold-off timer limits rate at which computer-controlled players can pass the ball

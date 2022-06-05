@@ -34,4 +34,8 @@ impl Ball {
             shadow,
         }
     }
+
+    pub fn update(&mut self) {
+        // WRITEME
+    }
 }

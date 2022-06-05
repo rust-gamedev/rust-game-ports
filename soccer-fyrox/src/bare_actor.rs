@@ -1,6 +1,7 @@
 use crate::prelude::*;
 
 #[my_actor_based]
+#[derive(Clone)]
 pub struct BareActor {}
 
 impl BareActor {
