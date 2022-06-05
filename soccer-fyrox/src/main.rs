@@ -61,6 +61,26 @@ pub mod prelude {
 
     pub const HALF_PITCH_W: i16 = 442;
     pub const HALF_PITCH_H: i16 = 622;
+
+    // The below are specific to the port; drawing sequence doesn't work in 3d-based engines; actually,
+    // using z-depth is more convenient, since draw calls can happen in any order.
+    // The priority on some sprites is based on their coordinates, so we use a min/max.
+
+    pub const CAMERA_NEAR_Z: f32 = -1.0;
+    pub const CAMERA_FAR_Z: f32 = 16.0;
+
+    pub const DRAW_MENU_Z: f32 = -1.0;
+
+    pub const DRAW_GAME_HUD_Z: f32 = 0.0;
+    pub const DRAW_GAME_SCORES_Z: f32 = -1.0; // need to override the top bar
+    pub const DRAW_PITCH_Z: f32 = 16.0;
+    pub const DRAW_GOAL_0_Z: f32 = 15.0;
+    pub const DRAW_PLAYERS_Z: (f32, f32) = (14.0, 13.0); // includes the ball
+    pub const DRAW_SHADOWS_Z: (f32, f32) = (12.0, 11.0); // includes the ball (shadow)
+    pub const DRAW_GOAL_1_Z: f32 = 10.0;
+    pub const DRAW_ARROWS_Z: f32 = 9.0;
+
+    pub const DRAW_GAME_OVER_Z: f32 = -1.0;
 }
 
 use fyrox::engine::framework::Framework;
