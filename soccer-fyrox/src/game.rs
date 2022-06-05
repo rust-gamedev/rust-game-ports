@@ -344,7 +344,7 @@ impl Game {
 
     pub fn draw(&self, scene: &mut Scene, media: &mut Media) {
         //# For the purpose of scrolling, all objects will be drawn with these offsets
-        let offset_x = (self.camera_focus.x - WIDTH / 2).clamp(0, LEVEL_W - WIDTH); // max(0, min(LEVEL_W - WIDTH, self.camera_focus.x - WIDTH / 2));
+        let offset_x = (self.camera_focus.x - WIDTH / 2).clamp(0, LEVEL_W - WIDTH);
         let offset_y = (self.camera_focus.y - HEIGHT / 2).clamp(0, LEVEL_H - HEIGHT);
         let offset = Vector2::new(offset_x, offset_y);
 
