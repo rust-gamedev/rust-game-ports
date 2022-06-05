@@ -19,8 +19,8 @@ pub fn my_actor_based(args: TokenStream, input: TokenStream) -> TokenStream {
     }) = &mut ast.data
     {
         let fields_tokens = vec![
-            quote! { img_base: &'static str },
-            quote! { img_indexes: Vec<u8> },
+            quote! { pub img_base: &'static str },
+            quote! { pub img_indexes: Vec<u8> },
             quote! { pub vpos: Vector2<i16> },
             quote! { anchor: Anchor },
         ];

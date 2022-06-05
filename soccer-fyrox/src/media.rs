@@ -201,7 +201,7 @@ impl Media {
     }
 
     fn image<S: AsRef<str> + Display>(&self, base: S, indexes: &[u8]) -> Texture {
-        if indexes.len() > 2 {
+        if indexes.len() > 3 {
             panic!();
         }
 
