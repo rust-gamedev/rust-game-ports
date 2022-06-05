@@ -19,3 +19,17 @@ pub fn dist_key(vpos1: &Vector2<i16>, vpos2: &Vector2<i16>, pos: Vector2<i16>) -
 
     p1_norm.partial_cmp(&p2_norm).unwrap()
 }
+
+//# Turn a vector into a unit vector - i.e. a vector with length 1
+//# We also return the original length, before normalisation.
+//# We check for zero length, as trying to normalise a zero-length vector results in an error
+pub fn safe_normalise(vec: &Vector2<i16>) -> (Vector2<f32>, f32) {
+    let vec = Vector2::new(vec.x as f32, vec.y as f32);
+    let length = vec.norm();
+
+    if length == 0.0 {
+        (Vector2::new(0.0, 0.0), 0.0)
+    } else {
+        (vec.normalize(), length)
+    }
+}
