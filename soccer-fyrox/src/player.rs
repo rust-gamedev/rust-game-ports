@@ -5,13 +5,13 @@ const ANCHOR: Vector2<i16> = Vector2::new(25, 37);
 #[my_actor_based]
 pub struct Player {
     pub peer: Handle<Player>,
-    pub mark: Handle<Player>,
+    pub mark: Target,
     pub lead: Option<Handle<Player>>,
     home: Vector2<i16>,
     pub team: u8,
     dir: u8,
     anim_frame: i8,
-    timer: i32,
+    pub timer: i32,
     pub shadow: BareActor,
 }
 
@@ -33,7 +33,7 @@ impl Player {
         let img_indexes = vec![];
 
         let peer = Handle::NONE;
-        let mark = Handle::NONE;
+        let mark = Target::None;
         let lead = None;
 
         //# Remember home position, where we'll stand by default if we're not active (i.e. far from the ball)

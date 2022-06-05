@@ -801,19 +801,19 @@ class Game:
 #
 #                 # Set the ball owner's peer to mark whoever the goalie was marking, then set the goalie to mark the goal
 #                 o.peer.mark = nearest.mark
-                nearest.mark = owners_target_goal
-
-            # Choose one or two lead players to spearhead the attack on the ball owner
-            # Create a list of players who are on the opposite team from the ball owner, are allowed to acquire
-            # the ball (their hold-off timer must not be positive), are not currently being controlled by a human,
-            # and are not currently assigned to be the goalie. The list is sorted based on distance from the ball owner.
-            l = sorted([p for p in self.players
-                        if p.team != team
-                        and p.timer <= 0
-                        and (not self.teams[other_team].human() or p != self.teams[other_team].active_control_player)
-                        and not isinstance(p.mark, Goal)],
-                       key = dist_key(pos))
-
+#                 nearest.mark = owners_target_goal
+#
+#             # Choose one or two lead players to spearhead the attack on the ball owner
+#             # Create a list of players who are on the opposite team from the ball owner, are allowed to acquire
+#             # the ball (their hold-off timer must not be positive), are not currently being controlled by a human,
+#             # and are not currently assigned to be the goalie. The list is sorted based on distance from the ball owner.
+#             l = sorted([p for p in self.players
+#                         if p.team != team
+#                         and p.timer <= 0
+#                         and (not self.teams[other_team].human() or p != self.teams[other_team].active_control_player)
+#                         and not isinstance(p.mark, Goal)],
+#                        key = dist_key(pos))
+#
             # a is a list of players from l who are upfield of the ball owner (i.e. towards our own goal, away from the
             # direction of the goal the ball owner is trying to score in). b is all the other players. It's possible for
             # one of these to be empty, as there might not be any players in the relevant direction.

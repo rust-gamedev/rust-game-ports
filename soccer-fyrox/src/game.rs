@@ -19,12 +19,13 @@ pub struct Game {
     pub score_timer: i32,
     scoring_team: u8,
     players: Vec<Handle<Player>>,
-    goals: Vec<Goal>,
+    goals: Vec<Handle<Goal>>,
     kickoff_player: Option<Handle<Player>>,
     ball: Ball,
     camera_focus: Vector2<i16>,
 
     players_pool: Pool<Player>,
+    goals_pool: Pool<Goal>,
 }
 
 impl Game {
@@ -65,6 +66,7 @@ impl Game {
         let camera_focus = ball.vpos.clone();
 
         let players_pool = Pool::new();
+        let goals_pool = Pool::new();
 
         let mut instance = Self {
             teams,
@@ -77,6 +79,7 @@ impl Game {
             ball,
             camera_focus,
             players_pool,
+            goals_pool,
         };
 
         instance.reset();
@@ -120,7 +123,10 @@ impl Game {
         }
 
         //# Create two goals
-        self.goals = (0..2).into_iter().map(|i| Goal::new(i)).collect();
+        self.goals = (0..2)
+            .into_iter()
+            .map(|i| self.goals_pool.spawn(Goal::new(i)))
+            .collect();
 
         //# The current active player under control by each team, indicated by arrows over their heads
         //# Choose first two players to begin with
@@ -162,30 +168,66 @@ impl Game {
         //# Each frame, reset mark and lead of each player
         for b in &self.players {
             let b = self.players_pool.borrow_mut(*b);
-            b.mark = b.peer;
+            b.mark = Target::Player(b.peer);
             b.lead = None;
         }
 
         if let Some(o) = &self.ball.owner {
+            // This part requires considerable BCK gymnastics, because of the multiple borrows; several
+            // statements had to be moved around.
+
             //# Ball has an owner (above is equivalent to s.ball.owner != None, or s.ball.owner is not None)
             //# Assign some shorthand variables
-            let o = self.players_pool.borrow(*o);
-            let (pos, team) = (o.vpos, o.team);
-            let owners_target_goal = &self.goals[team as usize];
+            let (pos, team, peer) = {
+                let o = self.players_pool.borrow(*o);
+                (o.vpos, o.team, o.peer)
+            };
             let other_team = if team == 0 { 1 } else { 1 };
 
             if self.difficulty.goalie_enabled {
-                //# Find the nearest opposing team player to the goal, and make them mark the goal
-                let nearest = self
-                    .players
-                    .iter()
-                    .map(|p| self.players_pool.borrow(*p))
-                    .filter(|p| p.team != team)
-                    .min_by(|p1, p2| dist_key(p1, p2, owners_target_goal.vpos))
-                    .unwrap();
+                let previous_nearest_mark = {
+                    let owners_target_goal_h = self.goals[team as usize];
+                    let owners_target_goal_vpos = self.goals_pool.borrow(owners_target_goal_h).vpos;
+
+                    //# Find the nearest opposing team player to the goal, and make them mark the goal
+                    let nearest = self
+                        .players_pool
+                        .iter_mut()
+                        .filter(|p| p.team != team)
+                        .min_by(|p1, p2| dist_key(p1, p2, owners_target_goal_vpos))
+                        .unwrap();
+
+                    // See comment below this block; this part is described as "then..." (in the source
+                    // project, this statement was after).
+                    std::mem::replace(&mut nearest.mark, Target::Goal(self.goals[team as usize]))
+                };
 
                 //# Set the ball owner's peer to mark whoever the goalie was marking, then set the goalie to mark the goal
-                self.players_pool.borrow_mut(o.peer).mark = nearest.mark;
+                self.players_pool.borrow_mut(peer).mark = previous_nearest_mark;
+
+                //# Choose one or two lead players to spearhead the attack on the ball owner
+                //# Create a list of players who are on the opposite team from the ball owner, are allowed to acquire
+                //# the ball (their hold-off timer must not be positive), are not currently being controlled by a human,
+                //# and are not currently assigned to be the goalie. The list is sorted based on distance from the ball owner.
+                let sorted_players = self
+                    .players
+                    .iter()
+                    .filter_map(|p_h| {
+                        let p = self.players_pool.borrow(*p_h);
+
+                        let other_active_p = self.teams[other_team]
+                            .active_control_player
+                            .unwrap_or(Handle::NONE);
+
+                        let is_p_match = p.team != team
+                            && p.timer <= 0
+                            && (!self.teams[other_team].human() || *p_h != other_active_p)
+                            && !p.mark.is_goal();
+
+                        is_p_match.then_some(p)
+                    })
+                    .min_by(|p1, p2| dist_key(p1, p2, pos))
+                    .unwrap();
 
                 // WRITEME
             }
@@ -218,7 +260,9 @@ impl Game {
         // testing the index.
         // Note that we could simplify and just draw players+shadows on a single cycle.
 
-        self.goals[0].draw(scene, media, offset_x, offset_y);
+        self.goals_pool
+            .borrow(self.goals[0])
+            .draw(scene, media, offset_x, offset_y);
 
         let mut sorted_players = self
             .players
@@ -256,7 +300,9 @@ impl Game {
             }
         }
 
-        self.goals[1].draw(scene, media, offset_x, offset_y);
+        self.goals_pool
+            .borrow(self.goals[1])
+            .draw(scene, media, offset_x, offset_y);
 
         //# Show active players
         for t in 0..2 {
