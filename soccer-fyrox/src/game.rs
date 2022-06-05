@@ -239,7 +239,7 @@ impl Game {
                 //
                 // The direct translation of the source logic is not trivial in Rust, due to Player
                 // not supporting equality, but luckily, the partition() API will do even better :)
-                let (a, b): (Vec<_>, Vec<_>) = l.into_iter().partition(|(p_h, p_vpos)| {
+                let (a, b): (Vec<_>, Vec<_>) = l.into_iter().partition(|(_, p_vpos)| {
                     if team == 0 {
                         p_vpos.y > pos.y
                     } else {
@@ -263,7 +263,7 @@ impl Game {
                     .into_iter()
                     .map(|s| Some(s))
                     .chain([None, None].into_iter());
-                let _zipped = a
+                let zipped = a
                     .zip(b)
                     .map(|(s, t)| [s, t])
                     .flatten()
@@ -272,11 +272,18 @@ impl Game {
 
                 //# Either one or two players (depending on difficulty settings) follow the ball owner, one from up-field and
                 //# one from down-field of the owner
-                // zipped[0].lead = Some(LEAD_DISTANCE_1);
-                // if self.difficulty.second_lead_enabled {
-                //     zipped[1].lead = Some(LEAD_DISTANCE_2);
-                // }
+                self.players_pool.borrow_mut(*zipped[0].0).lead = Some(LEAD_DISTANCE_1);
+                if self.difficulty.second_lead_enabled {
+                    self.players_pool.borrow_mut(*zipped[1].0).lead = Some(LEAD_DISTANCE_2);
+                }
+
+                //# If the ball has an owner, kick-off must have taken place, so unset the kickoff player
+                //# Of course, kick-off might have already taken place a while ago, in which case kick-off_player will already
+                //# be None, and will remain None
+                self.kickoff_player = None;
             }
+
+            todo!("WRITEME")
         }
     }
 

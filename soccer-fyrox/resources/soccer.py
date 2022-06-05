@@ -834,11 +834,11 @@ class Game:
 #             if self.difficulty.second_lead_enabled:
 #                 zipped[1].lead = LEAD_DISTANCE_2
 #
-            # If the ball has an owner, kick-off must have taken place, so unset the kickoff player
-            # Of course, kick-off might have already taken place a while ago, in which case kick-off_player will already
-            # be None, and will remain None
-            self.kickoff_player = None
-
+#             # If the ball has an owner, kick-off must have taken place, so unset the kickoff player
+#             # Of course, kick-off might have already taken place a while ago, in which case kick-off_player will already
+#             # be None, and will remain None
+#             self.kickoff_player = None
+#
         # Update all players and ball
         for obj in self.players + [self.ball]:
             obj.update()
