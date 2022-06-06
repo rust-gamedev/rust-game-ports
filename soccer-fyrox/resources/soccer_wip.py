@@ -439,10 +439,10 @@ class Ball(MyActor):
 #
 #     return result, pos
 
-class Player(MyActor):
+# class Player(MyActor):
 #     ANCHOR = (25,37)
-
-    def __init__(self, x, y, team):
+#
+#     def __init__(self, x, y, team):
 #         # Player objects are recreated each time there is a kickoff
 #         # Team will be 0 or 1
 #         # The x and y values supplied represent our 'home' position - the place we'll return to by default when not near
@@ -472,17 +472,17 @@ class Player(MyActor):
 #         self.timer = 0
 #
 #         self.shadow = MyActor("blank", 0, 0, Player.ANCHOR)
-
-        # Used when DEBUG_SHOW_TARGETS is on
-        self.debug_target = Vector2(0, 0)
-
+#
+#         # Used when DEBUG_SHOW_TARGETS is on
+#         self.debug_target = Vector2(0, 0)
+#
 #     def active(self):
 #         # Is ball within 400 pixels on the Y axis? If so I'll be considered active, meaning I'm currently doing
 #         # something useful in the game like trying to get the ball. If I'm not active, I'll either mark another player,
 #         # or just stay at my home position
 #         return abs(game.ball.vpos.y - self.home.y) < 400
 #
-    def update(self):
+#     def update(self):
 #         # decrement holdoff timer
 #         self.timer -= 1
 #
@@ -641,8 +641,8 @@ class Player(MyActor):
 #         # vec[0] and vec[1] will be the x and y components of the vector
 #         vec, distance = safe_normalise(target - self.vpos)
 #
-        self.debug_target = Vector2(target)
-
+#         self.debug_target = Vector2(target)
+#
 #         # Check to see if we're already at the target position
 #         if distance > 0:
 #             # Limit movement to our max speed
@@ -681,8 +681,8 @@ class Player(MyActor):
 #
 #         # Update shadow position to track player
 #         self.shadow.vpos = Vector2(self.vpos)
-
-
+#
+#
 # class Team:
 #     def __init__(self, controls):
 #         self.controls = controls
@@ -691,9 +691,9 @@ class Player(MyActor):
 #
 #     def human(self):
 #         return self.controls != None
-
-
-class Game:
+#
+#
+# class Game:
 #     def __init__(self, p1_controls=None, p2_controls=None, difficulty=2):
 #         self.teams = [Team(p1_controls), Team(p2_controls)]
 #         self.difficulty = DIFFICULTY[difficulty]
@@ -716,7 +716,7 @@ class Game:
 #
 #         self.reset()
 #
-    def reset(self):
+#     def reset(self):
 #         # Called at game start, and after a goal has been scored
 #
 #         # Set up players list/positions
@@ -761,10 +761,10 @@ class Game:
 #
 #         # Focus camera on ball - copy ball pos
 #         self.camera_focus = Vector2(self.ball.vpos)
-
-        self.debug_shoot_target = None
-
-    def update(self):
+#
+#         self.debug_shoot_target = None
+#
+#     def update(self):
 #         self.score_timer -= 1
 #
 #         if self.score_timer == 0:
@@ -782,11 +782,11 @@ class Game:
 #         for b in self.players:
 #             b.mark = b.peer
 #             b.lead = None
-            b.debug_target = None
-
-        # Reset debug shoot target
-        self.debug_shoot_target = None
-
+#             b.debug_target = None
+#
+#         # Reset debug shoot target
+#         self.debug_shoot_target = None
+#
 #         if self.ball.owner:
 #             # Ball has an owner (above is equivalent to s.ball.owner != None, or s.ball.owner is not None)
 #             # Assign some shorthand variables
@@ -876,8 +876,8 @@ class Game:
 #         if distance > 0:
 #             # Move camera towards ball, at no more than 8 pixels per frame
 #             self.camera_focus -= camera_ball_vec * min(distance, 8)
-
-    def draw(self):
+#
+#     def draw(self):
 #         # For the purpose of scrolling, all objects will be drawn with these offsets
 #         offset_x = max(0, min(LEVEL_W - WIDTH, self.camera_focus.x - WIDTH / 2))
 #         offset_y = max(0, min(LEVEL_H - HEIGHT, self.camera_focus.y - HEIGHT / 2))
@@ -905,40 +905,40 @@ class Game:
 #             if self.teams[t].human():
 #                 arrow_pos = self.teams[t].active_control_player.vpos - offset - Vector2(11, 45)
 #                 screen.blit("arrow" + str(t), arrow_pos)
-
-        if DEBUG_SHOW_LEADS:
-            for p in self.players:
-                if game.ball.owner and p.lead:
-                    line_start = game.ball.owner.vpos - offset
-                    line_end = p.vpos - offset
-                    pygame.draw.line(screen.surface, (0,0,0), line_start, line_end)
-
-        if DEBUG_SHOW_TARGETS:
-            for p in self.players:
-                line_start = p.debug_target - offset
-                line_end = p.vpos - offset
-                pygame.draw.line(screen.surface, (255,0,0), line_start, line_end)
-
-        if DEBUG_SHOW_PEERS:
-            for p in self.players:
-                line_start = p.peer.vpos - offset
-                line_end = p.vpos - offset
-                pygame.draw.line(screen.surface, (0,0,255), line_start, line_end)
-
-        if DEBUG_SHOW_SHOOT_TARGET:
-            if self.debug_shoot_target and self.ball.owner:
-                line_start = self.ball.owner.vpos - offset
-                line_end = self.debug_shoot_target - offset
-                pygame.draw.line(screen.surface, (255,0,255), line_start, line_end)
-
-        if DEBUG_SHOW_COSTS and self.ball.owner:
-            for x in range(0,LEVEL_W,60):
-                for y in range(0, LEVEL_H, 26):
-                    c = cost(Vector2(x,y), self.ball.owner.team)[0]
-                    screen_pos = Vector2(x,y)-offset
-                    screen_pos = (screen_pos.x,screen_pos.y)    # draw.text can't reliably take a Vector2
-                    screen.draw.text("{0:.0f}".format(c), center=screen_pos)
-
+#
+#         if DEBUG_SHOW_LEADS:
+#             for p in self.players:
+#                 if game.ball.owner and p.lead:
+#                     line_start = game.ball.owner.vpos - offset
+#                     line_end = p.vpos - offset
+#                     pygame.draw.line(screen.surface, (0,0,0), line_start, line_end)
+#
+#         if DEBUG_SHOW_TARGETS:
+#             for p in self.players:
+#                 line_start = p.debug_target - offset
+#                 line_end = p.vpos - offset
+#                 pygame.draw.line(screen.surface, (255,0,0), line_start, line_end)
+#
+#         if DEBUG_SHOW_PEERS:
+#             for p in self.players:
+#                 line_start = p.peer.vpos - offset
+#                 line_end = p.vpos - offset
+#                 pygame.draw.line(screen.surface, (0,0,255), line_start, line_end)
+#
+#         if DEBUG_SHOW_SHOOT_TARGET:
+#             if self.debug_shoot_target and self.ball.owner:
+#                 line_start = self.ball.owner.vpos - offset
+#                 line_end = self.debug_shoot_target - offset
+#                 pygame.draw.line(screen.surface, (255,0,255), line_start, line_end)
+#
+#         if DEBUG_SHOW_COSTS and self.ball.owner:
+#             for x in range(0,LEVEL_W,60):
+#                 for y in range(0, LEVEL_H, 26):
+#                     c = cost(Vector2(x,y), self.ball.owner.team)[0]
+#                     screen_pos = Vector2(x,y)-offset
+#                     screen_pos = (screen_pos.x,screen_pos.y)    # draw.text can't reliably take a Vector2
+#                     screen.draw.text("{0:.0f}".format(c), center=screen_pos)
+#
 #     def play_sound(self, name, c):
 #         # Only play sounds if we're not in the menu state
 #         if state != State.MENU:

@@ -173,7 +173,11 @@ impl Game {
             let b = self.players_pool.borrow_mut(*b);
             b.mark = Target::Player(b.peer);
             b.lead = None;
+            //b.debug_target = None
         }
+
+        //# Reset debug shoot target
+        //self.debug_shoot_target = None
 
         if let Some(o) = &self.ball.owner {
             // This part requires considerable BCK gymnastics, because of the multiple borrows; several
@@ -431,5 +435,38 @@ impl Game {
                 );
             }
         }
+
+        //if DEBUG_SHOW_LEADS:
+        //    for p in self.players:
+        //        if game.ball.owner and p.lead:
+        //            line_start = game.ball.owner.vpos - offset
+        //            line_end = p.vpos - offset
+        //            pygame.draw.line(screen.surface, (0,0,0), line_start, line_end)
+        //
+        //if DEBUG_SHOW_TARGETS:
+        //    for p in self.players:
+        //        line_start = p.debug_target - offset
+        //        line_end = p.vpos - offset
+        //        pygame.draw.line(screen.surface, (255,0,0), line_start, line_end)
+        //
+        //if DEBUG_SHOW_PEERS:
+        //    for p in self.players:
+        //        line_start = p.peer.vpos - offset
+        //        line_end = p.vpos - offset
+        //        pygame.draw.line(screen.surface, (0,0,255), line_start, line_end)
+        //
+        //if DEBUG_SHOW_SHOOT_TARGET:
+        //    if self.debug_shoot_target and self.ball.owner:
+        //        line_start = self.ball.owner.vpos - offset
+        //        line_end = self.debug_shoot_target - offset
+        //        pygame.draw.line(screen.surface, (255,0,255), line_start, line_end)
+        //
+        //if DEBUG_SHOW_COSTS and self.ball.owner:
+        //    for x in range(0,LEVEL_W,60):
+        //        for y in range(0, LEVEL_H, 26):
+        //            c = cost(Vector2(x,y), self.ball.owner.team)[0]
+        //            screen_pos = Vector2(x,y)-offset
+        //            screen_pos = (screen_pos.x,screen_pos.y)    # draw.text can't reliably take a Vector2
+        //            screen.draw.text("{0:.0f}".format(c), center=screen_pos)
     }
 }

@@ -113,6 +113,9 @@ impl Player {
 
         let shadow = BareActor::new(BLANK_IMAGE, Anchor::Custom(ANCHOR));
 
+        //# Used when DEBUG_SHOW_TARGETS is on
+        //self.debug_target = Vector2(0, 0)
+
         Self {
             vpos,
             img_base,
@@ -328,6 +331,8 @@ impl Player {
         //# Get direction vector and distance beteen current pos and target pos
         //# vec[0] and vec[1] will be the x and y components of the vector
         let (vek, mut distance) = safe_normalise(&(target - self.vpos));
+
+        //self.debug_target = Vector2(target)
 
         let target_dir;
 
