@@ -201,7 +201,7 @@ impl Player {
                 //# for the comparisons.
                 //# When min finds the tuple with the minimum cost value, we extract the target pos (which is what we
                 //# actually care about) and discard the actual cost value - hence the '_' dummy variable
-                let target = costs
+                target = costs
                     .map(|(_, pos)| pos)
                     .min_by(|pos1, pos2| pos1[0].partial_cmp(&pos2[0]).unwrap())
                     .unwrap();
@@ -252,7 +252,7 @@ impl Player {
                     target = ball.vpos.clone();
                 } else {
                     //# Get vector between the ball and whatever we're marking
-                    let (nvec, length) =
+                    let (nvec, mut length) =
                         safe_normalise(&(ball.vpos - self.mark.vpos(players_pool, goals_pool)));
 
                     //# Alter length to choose a position in between the ball and whatever we're marking
