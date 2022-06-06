@@ -45,7 +45,8 @@ impl Controls {
             dx = -1.;
         } else if input.is_key_pressed(Right) {
             dx = 1.;
-        } else if input.is_key_pressed(Up) {
+        }
+        if input.is_key_pressed(Up) {
             dy = -1.;
         } else if input.is_key_pressed(Down) {
             dy = 1.;
