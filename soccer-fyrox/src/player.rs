@@ -14,7 +14,6 @@ pub const CPU_PLAYER_WITH_BALL_BASE_SPEED: f32 = 2.6;
 pub const PLAYER_INTERCEPT_BALL_SPEED: f32 = 2.75;
 pub const LEAD_PLAYER_BASE_SPEED: f32 = 2.9;
 pub const HUMAN_PLAYER_WITH_BALL_SPEED: f32 = 3.0;
-pub const HUMAN_PLAYER_WITHOUT_BALL_SPEED: f32 = 3.3;
 
 //# Generate a score for a given position, where lower numbers are considered to be better.
 //# This is called when a computer-controlled player with the ball is working out which direction to run in, or whether

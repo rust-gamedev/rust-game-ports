@@ -1,5 +1,28 @@
 use crate::prelude::*;
 
+const PITCH_BOUNDS_X: (f32, f32) = (HALF_LEVEL_W - HALF_PITCH_W, HALF_LEVEL_W + HALF_PITCH_W);
+const PITCH_BOUNDS_Y: (f32, f32) = (HALF_LEVEL_H - HALF_PITCH_H, HALF_LEVEL_H + HALF_PITCH_H);
+
+const GOAL_BOUNDS_X: (f32, f32) = (HALF_LEVEL_W - HALF_GOAL_W, HALF_LEVEL_W + HALF_GOAL_W);
+const GOAL_BOUNDS_Y: (f32, f32) = (
+    HALF_LEVEL_H - HALF_PITCH_H - GOAL_DEPTH,
+    HALF_LEVEL_H + HALF_PITCH_H + GOAL_DEPTH,
+);
+
+const PITCH_RECT: Rect = Rect::new(
+    PITCH_BOUNDS_X.0,
+    PITCH_BOUNDS_Y.0,
+    HALF_PITCH_W * 2.,
+    HALF_PITCH_H * 2.,
+);
+const GOAL_0_RECT: Rect = Rect::new(GOAL_BOUNDS_X.0, GOAL_BOUNDS_Y.0, GOAL_WIDTH, GOAL_DEPTH);
+const GOAL_1_RECT: Rect = Rect::new(
+    GOAL_BOUNDS_X.0,
+    GOAL_BOUNDS_Y.1 - GOAL_DEPTH,
+    GOAL_WIDTH,
+    GOAL_DEPTH,
+);
+
 #[my_actor_based]
 pub struct Ball {
     pub vel: Vector2<f32>,

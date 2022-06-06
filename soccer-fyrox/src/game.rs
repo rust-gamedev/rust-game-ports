@@ -16,6 +16,12 @@ pub const PLAYER_START_POS: [(f32, f32); 7] = [
 pub const LEAD_DISTANCE_1: f32 = 10.;
 pub const LEAD_DISTANCE_2: f32 = 50.;
 
+//DEBUG_SHOW_LEADS = False
+//DEBUG_SHOW_TARGETS = False
+//DEBUG_SHOW_PEERS = False
+//DEBUG_SHOW_SHOOT_TARGET = False
+//DEBUG_SHOW_COSTS = False
+
 pub struct Game {
     pub teams: Vec<Team>,
     pub difficulty: Difficulty,
