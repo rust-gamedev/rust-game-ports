@@ -18,17 +18,17 @@ pub const LEAD_DISTANCE_2: f32 = 50.;
 
 pub struct Game {
     pub teams: Vec<Team>,
-    difficulty: Difficulty,
+    pub difficulty: Difficulty,
     pub score_timer: i32,
     scoring_team: u8,
     players: Vec<Handle<Player>>,
     goals: Vec<Handle<Goal>>,
-    kickoff_player: Option<Handle<Player>>,
-    ball: Ball,
+    pub kickoff_player: Option<Handle<Player>>,
+    pub ball: Ball,
     camera_focus: Vector2<f32>,
 
-    players_pool: Pool<Player>,
-    goals_pool: Pool<Goal>,
+    pub players_pool: Pool<Player>,
+    pub goals_pool: Pool<Goal>,
 }
 
 impl Game {
@@ -173,7 +173,11 @@ impl Game {
             let b = self.players_pool.borrow_mut(*b);
             b.mark = Target::Player(b.peer);
             b.lead = None;
+            //b.debug_target = None
         }
+
+        //# Reset debug shoot target
+        //self.debug_shoot_target = None
 
         if let Some(o) = &self.ball.owner {
             // This part requires considerable BCK gymnastics, because of the multiple borrows; several
@@ -286,19 +290,11 @@ impl Game {
         }
 
         //# Update all players and ball
-        for obj_h in &self.players {
-            let pool_clone = self.players_pool.clone();
-
-            let obj = self.players_pool.borrow_mut(*obj_h);
-            obj.update(
-                &self.teams,
-                self.kickoff_player,
-                *obj_h,
-                &self.ball,
-                &input,
-                &pool_clone,
-                &self.difficulty,
-            );
+        for obj_h in &self.players.clone() {
+            // If we borrow, player_pool is in turn locked.
+            let (obj_ticket, mut obj) = self.players_pool.take_reserve(*obj_h);
+            obj.update(*obj_h, self, input);
+            self.players_pool.put_back(obj_ticket, obj);
         }
         self.ball.update();
 
@@ -439,5 +435,38 @@ impl Game {
                 );
             }
         }
+
+        //if DEBUG_SHOW_LEADS:
+        //    for p in self.players:
+        //        if game.ball.owner and p.lead:
+        //            line_start = game.ball.owner.vpos - offset
+        //            line_end = p.vpos - offset
+        //            pygame.draw.line(screen.surface, (0,0,0), line_start, line_end)
+        //
+        //if DEBUG_SHOW_TARGETS:
+        //    for p in self.players:
+        //        line_start = p.debug_target - offset
+        //        line_end = p.vpos - offset
+        //        pygame.draw.line(screen.surface, (255,0,0), line_start, line_end)
+        //
+        //if DEBUG_SHOW_PEERS:
+        //    for p in self.players:
+        //        line_start = p.peer.vpos - offset
+        //        line_end = p.vpos - offset
+        //        pygame.draw.line(screen.surface, (0,0,255), line_start, line_end)
+        //
+        //if DEBUG_SHOW_SHOOT_TARGET:
+        //    if self.debug_shoot_target and self.ball.owner:
+        //        line_start = self.ball.owner.vpos - offset
+        //        line_end = self.debug_shoot_target - offset
+        //        pygame.draw.line(screen.surface, (255,0,255), line_start, line_end)
+        //
+        //if DEBUG_SHOW_COSTS and self.ball.owner:
+        //    for x in range(0,LEVEL_W,60):
+        //        for y in range(0, LEVEL_H, 26):
+        //            c = cost(Vector2(x,y), self.ball.owner.team)[0]
+        //            screen_pos = Vector2(x,y)-offset
+        //            screen_pos = (screen_pos.x,screen_pos.y)    # draw.text can't reliably take a Vector2
+        //            screen.draw.text("{0:.0f}".format(c), center=screen_pos)
     }
 }

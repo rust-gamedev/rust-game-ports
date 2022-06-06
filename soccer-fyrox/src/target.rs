@@ -25,23 +25,18 @@ impl Target {
     // a mixed Pool type should be implemented (it's farly easy), otherwise, all the borrows require
     // downcasting (from Any), which is, again, very polluting.
     //
-    pub fn vpos(&self, players_pool: &Pool<Player>, goals_pool: &Pool<Goal>) -> Vector2<f32> {
+    pub fn vpos(&self, game: &Game) -> Vector2<f32> {
         match self {
-            Self::Player(handle) => players_pool.borrow(*handle).vpos,
-            Self::Goal(handle) => goals_pool.borrow(*handle).vpos,
+            Self::Player(handle) => game.players_pool.borrow(*handle).vpos,
+            Self::Goal(handle) => game.goals_pool.borrow(*handle).vpos,
             Self::None => panic!(),
         }
     }
 
-    pub fn active(
-        &self,
-        players_pool: &Pool<Player>,
-        goals_pool: &Pool<Goal>,
-        ball: &Ball,
-    ) -> bool {
+    pub fn active(&self, game: &Game) -> bool {
         match self {
-            Self::Player(handle) => players_pool.borrow(*handle).active(ball),
-            Self::Goal(handle) => goals_pool.borrow(*handle).active(ball),
+            Self::Player(handle) => game.players_pool.borrow(*handle).active(&game.ball),
+            Self::Goal(handle) => game.goals_pool.borrow(*handle).active(&game.ball),
             Self::None => panic!(),
         }
     }

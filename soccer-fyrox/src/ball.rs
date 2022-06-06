@@ -2,7 +2,7 @@ use crate::prelude::*;
 
 #[my_actor_based]
 pub struct Ball {
-    vel: Vector2<f32>,
+    pub vel: Vector2<f32>,
     pub owner: Option<Handle<Player>>,
     timer: i32,
     pub shadow: BareActor,
