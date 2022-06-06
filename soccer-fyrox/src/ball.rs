@@ -52,15 +52,20 @@ fn steps(mut distance: f32) -> u16 {
 
 //# Calculate if player 'target' is a good target for a pass from player 'source'
 //# target can also be a goal
-fn targetable(target: &Player, source: &Player, game: &Game) -> bool {
+fn targetable(
+    target: &Player,
+    source: &Player,
+    teams: &[Team],
+    players_pool: &Pool<Player>,
+) -> bool {
     //# Find normalised (unit) vector v0 and distance d0 from source to target
     let (v0, d0) = safe_normalise(&(target.vpos - source.vpos));
 
     //# If source player is on a computer-controlled team, avoid passes which are likely to be intercepted
     //# (If source is player-controlled, that's the player's job)
-    if !game.teams[source.team as usize].human() {
+    if !teams[source.team as usize].human() {
         //# For each player p
-        for p in game.players_pool.iter() {
+        for p in players_pool.iter() {
             //# Find normalised vector v1 and distance d1 from source to p
             let (v1, d1) = safe_normalise(&(p.vpos - source.vpos));
 
