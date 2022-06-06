@@ -16,6 +16,7 @@ mod media;
 mod menu_state;
 mod my_actor;
 mod player;
+mod rect;
 mod state;
 mod target;
 mod team;
@@ -43,6 +44,7 @@ pub mod prelude {
     pub use crate::menu_state::MenuState;
     pub use crate::my_actor::MyActor;
     pub use crate::player::Player;
+    pub use crate::rect::Rect;
     pub use crate::state::State;
     pub use crate::target::Target;
     pub use crate::team::Team;
