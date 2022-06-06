@@ -156,9 +156,11 @@ impl Player {
 
             //# Find target by calling the controller for the player's team todo comment
             target = self.vpos + my_team.controls.as_ref().unwrap().move_player(speed, input);
-        } else if game.ball.owner.is_some() {
+        } else if let Some(ball_owner_h) = game.ball.owner {
+            let ball_owner = game.players_pool.borrow(ball_owner_h);
+
             //# Someone has the ball - is it me?
-            if game.ball.owner == Some(self_h) {
+            if ball_owner_h == self_h {
                 //# We are the owner, and are computer-controlled (otherwise we would have taken the other arm
                 //# of the top-level if statement)
 
@@ -202,7 +204,7 @@ impl Player {
 
                 //# speed depends on difficulty
                 speed = CPU_PLAYER_WITH_BALL_BASE_SPEED + game.difficulty.speed_boost
-            } else if game.players_pool.borrow(game.ball.owner.unwrap()).team == self.team {
+            } else if ball_owner.team == self.team {
                 //# Ball is owned by another player on our team
                 if self.active(&game.ball) {
                     //# If I'm near enough to the ball, try to run somewhere useful, and unique to this player - we
@@ -215,9 +217,13 @@ impl Player {
                 }
                 //# If we're not active, we'll do the default action of moving towards our home position
             } else {
+                let mark_active =
+                    self.mark
+                        .active(&game.players_pool, &game.goals_pool, &game.ball);
+                let mark_vpos = self.mark.vpos(&game.players_pool, &game.goals_pool);
+
                 //# Ball is owned by a player on the opposite team
                 if self.lead.is_some() {
-                    let ball_owner = game.players_pool.borrow(game.ball.owner.unwrap());
                     //# We are one of the players chosen to pursue the owner
 
                     //# Target a position in front of the ball's owner, the distance based on the value of lead, while
@@ -234,10 +240,7 @@ impl Player {
                     if game.teams[other_team].human() {
                         speed += game.difficulty.speed_boost;
                     }
-                } else if self
-                    .mark
-                    .active(&game.players_pool, &game.goals_pool, &game.ball)
-                {
+                } else if mark_active {
                     //# The player or goal we've been chosen to mark is active
 
                     if my_team.human() {
@@ -248,10 +251,7 @@ impl Player {
                         target = game.ball.vpos.clone();
                     } else {
                         //# Get vector between the ball and whatever we're marking
-                        let (nvec, mut length) = safe_normalise(
-                            &(game.ball.vpos
-                                - self.mark.vpos(&game.players_pool, &game.goals_pool)),
-                        );
+                        let (nvec, mut length) = safe_normalise(&(game.ball.vpos - mark_vpos));
 
                         //# Alter length to choose a position in between the ball and whatever we're marking
                         //# We don't apply this behaviour for human teams - in that case we just run straight at the ball
@@ -264,8 +264,7 @@ impl Player {
                             length /= 2.;
                         }
 
-                        target =
-                            self.mark.vpos(&game.players_pool, &game.goals_pool) + nvec * length
+                        target = mark_vpos + nvec * length
                     }
                 }
             }
