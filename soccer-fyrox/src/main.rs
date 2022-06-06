@@ -29,6 +29,7 @@ pub mod prelude {
         event::VirtualKeyCode,
         scene::{base::BaseBuilder, node::Node, transform::TransformBuilder, Scene},
     };
+    pub use rand::{thread_rng, Rng};
 
     pub use crate::anchor::Anchor;
     pub use crate::ball::Ball;

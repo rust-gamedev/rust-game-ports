@@ -1,5 +1,3 @@
-use rand::{thread_rng, Rng};
-
 use crate::prelude::*;
 
 pub const DEFAULT_DIFFICULTY: u8 = 2;
