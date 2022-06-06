@@ -120,17 +120,11 @@ impl Player {
         (ball.vpos.y - self.home.y).abs() < 400.
     }
 
-    pub fn update(
-        &mut self,
-        teams: &[Team],
-        kickoff_player: Option<Handle<Player>>,
-        self_handle: Handle<Player>,
-        ball: &Ball,
-        input: &InputController,
-        players_pool: &Pool<Player>,
-        goals_pool: &Pool<Goal>,
-        difficulty: &Difficulty,
-    ) {
+    // An option is to pass all the Game fields individually, but this is simpler.
+    //
+    // this implementation is the simplest (no tickets passed around), but 1. is also a simple alternative.
+    //
+    pub fn update(&mut self, self_h: Handle<Player>, game: &mut Game, input: &InputController) {
         //# decrement holdoff timer
         self.timer -= 1;
 
@@ -140,21 +134,21 @@ impl Player {
         let mut speed = PLAYER_DEFAULT_SPEED;
 
         //# Some shorthand variables to make the code below a bit easier to follow
-        let my_team = &teams[self.team as usize];
-        let pre_kickoff = kickoff_player.is_some();
-        let i_am_kickoff_player = Some(self_handle) == kickoff_player;
+        let my_team = &game.teams[self.team as usize];
+        let pre_kickoff = game.kickoff_player.is_some();
+        let i_am_kickoff_player = Some(self_h) == game.kickoff_player;
 
-        if Some(self_handle) == teams[self.team as usize].active_control_player
+        if Some(self_h) == game.teams[self.team as usize].active_control_player
             && my_team.human()
             && (!pre_kickoff || i_am_kickoff_player)
         {
             //# This player is the currently active player for its team, and is player-controlled, and either we're not
-            //# currently waiting for kickoff, or this player is the designated kickoff player.
+            //# currently waiting for kickoff, or this player is the designated kickoff self.
             //# The last part of the condition ensures that in a 2 player game, player 2 can't make their active player
             //# run around while waiting for player 1 to do the kickoff (and vice versa)
 
             //# A player with the ball runs slightly more slowly than one without
-            speed = if ball.owner == Some(self_handle) {
+            speed = if game.ball.owner == Some(self_h) {
                 HUMAN_PLAYER_WITH_BALL_SPEED
             } else {
                 HUMAN_PLAYER_WITHOUT_BALL_SPEED
@@ -162,9 +156,9 @@ impl Player {
 
             //# Find target by calling the controller for the player's team todo comment
             target = self.vpos + my_team.controls.as_ref().unwrap().move_player(speed, input);
-        } else if ball.owner.is_some() {
+        } else if game.ball.owner.is_some() {
             //# Someone has the ball - is it me?
-            if ball.owner == Some(self_handle) {
+            if game.ball.owner == Some(self_h) {
                 //# We are the owner, and are computer-controlled (otherwise we would have taken the other arm
                 //# of the top-level if statement)
 
@@ -185,7 +179,7 @@ impl Player {
                         self.vpos + angle_to_vec((self.dir as i8 + d) as u8) * 3.,
                         self.team,
                         d.abs() as u8,
-                        &players_pool,
+                        &game.players_pool,
                     )
                 });
 
@@ -207,24 +201,24 @@ impl Player {
                     .unwrap();
 
                 //# speed depends on difficulty
-                speed = CPU_PLAYER_WITH_BALL_BASE_SPEED + difficulty.speed_boost
+                speed = CPU_PLAYER_WITH_BALL_BASE_SPEED + game.difficulty.speed_boost
             }
-        } else if players_pool.borrow(ball.owner.unwrap()).team == self.team {
+        } else if game.players_pool.borrow(game.ball.owner.unwrap()).team == self.team {
             //# Ball is owned by another player on our team
-            if self.active(ball) {
+            if self.active(&game.ball) {
                 //# If I'm near enough to the ball, try to run somewhere useful, and unique to this player - we
                 //# don't want all players running to the same place. Target is halfway between home and a point
                 //# 400 pixels ahead of the ball. Team 0 are trying to score in the goal at the top of the
                 //# pitch, team 1 the goal at the bottom
                 let direction = if self.team == 0 { -1. } else { 1. };
-                target.x = (ball.vpos.x + target.x) / 2.;
-                target.y = (ball.vpos.y + 400. * direction + target.y) / 2.;
+                target.x = (game.ball.vpos.x + target.x) / 2.;
+                target.y = (game.ball.vpos.y + 400. * direction + target.y) / 2.;
             }
             //# If we're not active, we'll do the default action of moving towards our home position
         } else {
             //# Ball is owned by a player on the opposite team
             if self.lead.is_some() {
-                let ball_owner = players_pool.borrow(ball.owner.unwrap());
+                let ball_owner = game.players_pool.borrow(game.ball.owner.unwrap());
                 //# We are one of the players chosen to pursue the owner
 
                 //# Target a position in front of the ball's owner, the distance based on the value of lead, while
@@ -238,10 +232,13 @@ impl Player {
                 // Bug here, fixed (was: `other_team = 1 if self.team == 0 else 1`)
                 let other_team = if self.team == 0 { 1 } else { 0 };
                 speed = LEAD_PLAYER_BASE_SPEED;
-                if teams[other_team].human() {
-                    speed += difficulty.speed_boost;
+                if game.teams[other_team].human() {
+                    speed += game.difficulty.speed_boost;
                 }
-            } else if self.mark.active(players_pool, goals_pool, ball) {
+            } else if self
+                .mark
+                .active(&game.players_pool, &game.goals_pool, &game.ball)
+            {
                 //# The player or goal we've been chosen to mark is active
 
                 if my_team.human() {
@@ -249,24 +246,25 @@ impl Player {
                     //# We don't do the marking behaviour below for human teams for a number of reasons. Try changing
                     //# the code to see how the game feels when marking behaviour applies to both human and computer
                     //# teams.
-                    target = ball.vpos.clone();
+                    target = game.ball.vpos.clone();
                 } else {
                     //# Get vector between the ball and whatever we're marking
-                    let (nvec, mut length) =
-                        safe_normalise(&(ball.vpos - self.mark.vpos(players_pool, goals_pool)));
+                    let (nvec, mut length) = safe_normalise(
+                        &(game.ball.vpos - self.mark.vpos(&game.players_pool, &game.goals_pool)),
+                    );
 
                     //# Alter length to choose a position in between the ball and whatever we're marking
                     //# We don't apply this behaviour for human teams - in that case we just run straight at the ball
                     if self.mark.is_goal() {
                         //# If I'm currently the goalie, get in between the ball and goal, and don't get too far
                         //# from the goal
-                        length = 150_f32.min(length)
+                        length = 150_f32.min(length);
                     } else {
                         //# Otherwise, just get halfway between the ball and whoever I'm marking
                         length /= 2.;
                     }
 
-                    target = self.mark.vpos(players_pool, goals_pool) + nvec * length
+                    target = self.mark.vpos(&game.players_pool, &game.goals_pool) + nvec * length
                 }
             }
         }

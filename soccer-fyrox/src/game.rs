@@ -18,17 +18,17 @@ pub const LEAD_DISTANCE_2: f32 = 50.;
 
 pub struct Game {
     pub teams: Vec<Team>,
-    difficulty: Difficulty,
+    pub difficulty: Difficulty,
     pub score_timer: i32,
     scoring_team: u8,
     players: Vec<Handle<Player>>,
     goals: Vec<Handle<Goal>>,
-    kickoff_player: Option<Handle<Player>>,
-    ball: Ball,
+    pub kickoff_player: Option<Handle<Player>>,
+    pub ball: Ball,
     camera_focus: Vector2<f32>,
 
-    players_pool: Pool<Player>,
-    goals_pool: Pool<Goal>,
+    pub players_pool: Pool<Player>,
+    pub goals_pool: Pool<Goal>,
 }
 
 impl Game {
@@ -286,20 +286,11 @@ impl Game {
         }
 
         //# Update all players and ball
-        for obj_h in &self.players {
-            let pool_clone = self.players_pool.clone();
-
-            let obj = self.players_pool.borrow_mut(*obj_h);
-            obj.update(
-                &self.teams,
-                self.kickoff_player,
-                *obj_h,
-                &self.ball,
-                &input,
-                &pool_clone,
-                &self.goals_pool,
-                &self.difficulty,
-            );
+        for obj_h in &self.players.clone() {
+            // If we borrow, player_pool is in turn locked.
+            let (obj_ticket, mut obj) = self.players_pool.take_reserve(*obj_h);
+            obj.update(*obj_h, self, input);
+            self.players_pool.put_back(obj_ticket, obj);
         }
         self.ball.update();
 
