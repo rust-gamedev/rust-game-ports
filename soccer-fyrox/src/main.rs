@@ -1,6 +1,4 @@
-// #![allow(unused_imports)]
-// #![allow(unused_variables)]
-#![allow(dead_code)]
+#![feature(is_some_with)]
 
 mod anchor;
 mod ball;
