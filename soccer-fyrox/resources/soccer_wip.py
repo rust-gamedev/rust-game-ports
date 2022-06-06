@@ -247,76 +247,76 @@ class Ball(MyActor):
 #         return p.timer < 0 and (p.vpos - self.vpos).length() <= DRIBBLE_DIST_X
 
     def update(self):
-        self.timer -= 1
-
-        # If the ball has an owner, it's being dribbled, so its position is
-        # based on its owner's position
-        if self.owner:
-            # Calculate new ball position for dribbling
-            # Our target position will be a point just ahead of our owner. However, we don't want to just snap to that
-            # position straight away. We want to transition to it over several frames, so we take the average of our
-            # current position and the target position. We also use slightly different offsets for the X and Y axes,
-            # to reflect that that the game's perspective is not completely top-down - so the positions the ball can
-            # take in relation to the player should form an ellipse instead of a circle.
-            # todo explain maths
-            new_x = avg(self.vpos.x, self.owner.vpos.x + DRIBBLE_DIST_X * sin(self.owner.dir))
-            new_y = avg(self.vpos.y, self.owner.vpos.y - DRIBBLE_DIST_Y * cos(self.owner.dir))
-
-            if on_pitch(new_x, new_y):
-                # New position is on the pitch, so update
-                self.vpos = Vector2(new_x, new_y)
-            else:
-                # New position is off the pitch, so player loses the ball
-                # Set hold-off timer so player can't immediately reacquire the ball
-                self.owner.timer = 60
-
-                # Give ball small velocity in player's direction of travel
-                self.vel = angle_to_vec(self.owner.dir) * 3
-
-                # Un-set owner
-                self.owner = None
-        else:
-            # Run physics, one axis at a time
-
-            # If ball is vertically inside the goal, it can only go as far as the
-            # sides of the goal - otherwise it can go all the way to the sides of
-            # the pitch
-            if abs(self.vpos.y - HALF_LEVEL_H) > HALF_PITCH_H:
-                bounds_x = GOAL_BOUNDS_X
-            else:
-                bounds_x = PITCH_BOUNDS_X
-
-            # If ball is horizontally inside the goal, it can go all the way to
-            # the back of the net - otherwise it can only go up to the end of
-            # the pitch
-            if abs(self.vpos.x - HALF_LEVEL_W) < HALF_GOAL_W:
-                bounds_y = GOAL_BOUNDS_Y
-            else:
-                bounds_y = PITCH_BOUNDS_Y
-
-            self.vpos.x, self.vel.x = ball_physics(self.vpos.x, self.vel.x, bounds_x)
-            self.vpos.y, self.vel.y = ball_physics(self.vpos.y, self.vel.y, bounds_y)
-
-        # Update shadow position to track ball
-        self.shadow.vpos = Vector2(self.vpos)
-
-        # Search for a player that can acquire the ball
-        for target in game.players:
-            # A player can acquire the ball if the ball has no owner, or the player is on the other team
-            # from the owner, and collides with the ball
-            if (not self.owner or self.owner.team != target.team) and self.collide(target):
-                if self.owner:
-                    # New player is taking the ball from previous owner
-                    # Set hold-off timer so previous owner can't immediately reacquire the ball
-                    self.owner.timer = 60
-
-                # Set hold-off timer (dependent on difficulty) to limit rate at which
-                # computer-controlled players can pass the ball
-                self.timer = game.difficulty.holdoff_timer
-
-                # Update owner, and controllable player for player's team, to player
-                game.teams[target.team].active_control_player = self.owner = target
-
+#         self.timer -= 1
+#
+#         # If the ball has an owner, it's being dribbled, so its position is
+#         # based on its owner's position
+#         if self.owner:
+#             # Calculate new ball position for dribbling
+#             # Our target position will be a point just ahead of our owner. However, we don't want to just snap to that
+#             # position straight away. We want to transition to it over several frames, so we take the average of our
+#             # current position and the target position. We also use slightly different offsets for the X and Y axes,
+#             # to reflect that that the game's perspective is not completely top-down - so the positions the ball can
+#             # take in relation to the player should form an ellipse instead of a circle.
+#             # todo explain maths
+#             new_x = avg(self.vpos.x, self.owner.vpos.x + DRIBBLE_DIST_X * sin(self.owner.dir))
+#             new_y = avg(self.vpos.y, self.owner.vpos.y - DRIBBLE_DIST_Y * cos(self.owner.dir))
+#
+#             if on_pitch(new_x, new_y):
+#                 # New position is on the pitch, so update
+#                 self.vpos = Vector2(new_x, new_y)
+#             else:
+#                 # New position is off the pitch, so player loses the ball
+#                 # Set hold-off timer so player can't immediately reacquire the ball
+#                 self.owner.timer = 60
+#
+#                 # Give ball small velocity in player's direction of travel
+#                 self.vel = angle_to_vec(self.owner.dir) * 3
+#
+#                 # Un-set owner
+#                 self.owner = None
+#         else:
+#             # Run physics, one axis at a time
+#
+#             # If ball is vertically inside the goal, it can only go as far as the
+#             # sides of the goal - otherwise it can go all the way to the sides of
+#             # the pitch
+#             if abs(self.vpos.y - HALF_LEVEL_H) > HALF_PITCH_H:
+#                 bounds_x = GOAL_BOUNDS_X
+#             else:
+#                 bounds_x = PITCH_BOUNDS_X
+#
+#             # If ball is horizontally inside the goal, it can go all the way to
+#             # the back of the net - otherwise it can only go up to the end of
+#             # the pitch
+#             if abs(self.vpos.x - HALF_LEVEL_W) < HALF_GOAL_W:
+#                 bounds_y = GOAL_BOUNDS_Y
+#             else:
+#                 bounds_y = PITCH_BOUNDS_Y
+#
+#             self.vpos.x, self.vel.x = ball_physics(self.vpos.x, self.vel.x, bounds_x)
+#             self.vpos.y, self.vel.y = ball_physics(self.vpos.y, self.vel.y, bounds_y)
+#
+#         # Update shadow position to track ball
+#         self.shadow.vpos = Vector2(self.vpos)
+#
+#         # Search for a player that can acquire the ball
+#         for target in game.players:
+#             # A player can acquire the ball if the ball has no owner, or the player is on the other team
+#             # from the owner, and collides with the ball
+#             if (not self.owner or self.owner.team != target.team) and self.collide(target):
+#                 if self.owner:
+#                     # New player is taking the ball from previous owner
+#                     # Set hold-off timer so previous owner can't immediately reacquire the ball
+#                     self.owner.timer = 60
+#
+#                 # Set hold-off timer (dependent on difficulty) to limit rate at which
+#                 # computer-controlled players can pass the ball
+#                 self.timer = game.difficulty.holdoff_timer
+#
+#                 # Update owner, and controllable player for player's team, to player
+#                 game.teams[target.team].active_control_player = self.owner = target
+#
         # If the ball has an owner, it's time to decide whether to kick it
         if self.owner:
             team = game.teams[self.owner.team]

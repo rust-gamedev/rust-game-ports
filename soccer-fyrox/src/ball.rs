@@ -146,7 +146,100 @@ impl Ball {
         p.timer < 0 && (p.vpos - self.vpos).norm() <= DRIBBLE_DIST_X
     }
 
-    pub fn update(&mut self) {
+    // We can't pass `&mut game.ball` and `&mut game` at the same time, so we just just make this a
+    // function, and call it a day :)
+    pub fn update(game: &mut Game) {
+        let ball = &mut game.ball;
+        ball.timer -= 1;
+
+        //# If the ball has an owner, it's being dribbled, so its position is
+        //# based on its owner's position
+        if let Some(owner_h) = ball.owner {
+            let owner = game.players_pool.borrow_mut(owner_h);
+            //# Calculate new ball position for dribbling
+            //# Our target position will be a point just ahead of our owner. However, we don't want to just snap to that
+            //# position straight away. We want to transition to it over several frames, so we take the average of our
+            //# current position and the target position. We also use slightly different offsets for the X and Y axes,
+            //# to reflect that that the game's perspective is not completely top-down - so the positions the ball can
+            //# take in relation to the player should form an ellipse instead of a circle.
+            //# todo explain maths
+            let new_x = avg(ball.vpos.x, owner.vpos.x + DRIBBLE_DIST_X * sin(owner.dir));
+            let new_y = avg(ball.vpos.y, owner.vpos.y - DRIBBLE_DIST_Y * cos(owner.dir));
+
+            if on_pitch(new_x, new_y) {
+                //# New position is on the pitch, so update
+                ball.vpos = Vector2::new(new_x, new_y);
+            } else {
+                //# New position is off the pitch, so player loses the ball
+                //# Set hold-off timer so player can't immediately reacquire the ball
+                owner.timer = 60;
+
+                //# Give ball small velocity in player's direction of travel
+                ball.vel = angle_to_vec(owner.dir) * 3.;
+
+                //# Un-set owner
+                ball.owner = None;
+            }
+        } else {
+            //# Run physics, one axis at a time
+
+            //# If ball is vertically inside the goal, it can only go as far as the
+            //# sides of the goal - otherwise it can go all the way to the sides of
+            //# the pitch
+            let bounds_x = if (ball.vpos.y - HALF_LEVEL_H).abs() > HALF_PITCH_H {
+                GOAL_BOUNDS_X
+            } else {
+                PITCH_BOUNDS_X
+            };
+
+            //# If ball is horizontally inside the goal, it can go all the way to
+            //# the back of the net - otherwise it can only go up to the end of
+            //# the pitch
+            let bounds_y = if (ball.vpos.x - HALF_LEVEL_W).abs() < HALF_GOAL_W {
+                GOAL_BOUNDS_Y
+            } else {
+                PITCH_BOUNDS_Y
+            };
+
+            (ball.vpos.x, ball.vel.x) = ball_physics(ball.vpos.x, ball.vel.x, bounds_x);
+            (ball.vpos.y, ball.vel.y) = ball_physics(ball.vpos.y, ball.vel.y, bounds_y);
+        }
+
+        //# Update shadow position to track ball
+        ball.shadow.vpos = ball.vpos.clone();
+
+        let mut ball_owner_r = ball
+            .owner
+            .map(|owner_h| game.players_pool.take_reserve(owner_h));
+
+        //# Search for a player that can acquire the ball
+        for target in game.players_pool.iter() {
+            //# A player can acquire the ball if the ball has no owner, or the player is on the other team
+            //# from the owner, and collides with the ball
+            // Restructured the condition, in order to accommodate the Rust approach.
+            if !ball_owner_r.is_some_and(|(_, ball_owner)| ball_owner.team == target.team)
+                && ball.collide(target)
+            {
+                if let Some((ball_owner_t, ball_owner)) = &mut ball_owner_r {
+                    //# New player is taking the ball from previous owner
+                    //# Set hold-off timer so previous owner can't immediately reacquire the ball
+                    ball_owner.timer = 60;
+                }
+
+                //# Set hold-off timer (dependent on difficulty) to limit rate at which
+                //# computer-controlled players can pass the ball
+                ball.timer = game.difficulty.holdoff_timer as i32;
+
+                //# Update owner, and controllable player for player's team, to player
+                ball.owner = Some(game.players_pool.handle_of(target));
+                game.teams[target.team as usize].active_control_player = ball.owner;
+            }
+        }
+
+        if let Some((ball_owner_t, ball_owner)) = ball_owner_r {
+            game.players_pool.put_back(ball_owner_t, ball_owner);
+        }
+
         // WRITEME
     }
 }

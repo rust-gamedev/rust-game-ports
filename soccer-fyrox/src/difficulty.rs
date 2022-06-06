@@ -15,7 +15,7 @@ pub struct Difficulty {
     //# Speed boost to apply to CPU-team players in certain circumstances
     pub speed_boost: f32,
     //# Hold-off timer limits rate at which computer-controlled players can pass the ball
-    holdoff_timer: u32,
+    pub holdoff_timer: u32,
 }
 
 impl Difficulty {
