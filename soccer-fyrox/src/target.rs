@@ -18,6 +18,14 @@ impl Target {
         }
     }
 
+    pub fn is_player(&self) -> bool {
+        match self {
+            Self::Player(_) => true,
+            Self::Goal(_) => false,
+            Self::None => panic!(),
+        }
+    }
+
     // There's no trivial solution to this - instantiating each variant with the respective pool is
     // a nice idea, but requires either Rc's, that pollute the program with borrow()'s, or references,
     // which pollute the program with lifetimes.
