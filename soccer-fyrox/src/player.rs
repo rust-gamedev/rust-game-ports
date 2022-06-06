@@ -202,69 +202,71 @@ impl Player {
 
                 //# speed depends on difficulty
                 speed = CPU_PLAYER_WITH_BALL_BASE_SPEED + game.difficulty.speed_boost
-            }
-        } else if game.players_pool.borrow(game.ball.owner.unwrap()).team == self.team {
-            //# Ball is owned by another player on our team
-            if self.active(&game.ball) {
-                //# If I'm near enough to the ball, try to run somewhere useful, and unique to this player - we
-                //# don't want all players running to the same place. Target is halfway between home and a point
-                //# 400 pixels ahead of the ball. Team 0 are trying to score in the goal at the top of the
-                //# pitch, team 1 the goal at the bottom
-                let direction = if self.team == 0 { -1. } else { 1. };
-                target.x = (game.ball.vpos.x + target.x) / 2.;
-                target.y = (game.ball.vpos.y + 400. * direction + target.y) / 2.;
-            }
-            //# If we're not active, we'll do the default action of moving towards our home position
-        } else {
-            //# Ball is owned by a player on the opposite team
-            if self.lead.is_some() {
-                let ball_owner = game.players_pool.borrow(game.ball.owner.unwrap());
-                //# We are one of the players chosen to pursue the owner
-
-                //# Target a position in front of the ball's owner, the distance based on the value of lead, while
-                //# making sure we keep just inside the pitch
-                target = ball_owner.vpos + angle_to_vec(ball_owner.dir) * self.lead.unwrap();
-
-                //# Stay on the pitch
-                target.x = target.x.clamp(AI_MIN_X, AI_MAX_X);
-                target.y = target.y.clamp(AI_MIN_Y, AI_MAX_Y);
-
-                // Bug here, fixed (was: `other_team = 1 if self.team == 0 else 1`)
-                let other_team = if self.team == 0 { 1 } else { 0 };
-                speed = LEAD_PLAYER_BASE_SPEED;
-                if game.teams[other_team].human() {
-                    speed += game.difficulty.speed_boost;
+            } else if game.players_pool.borrow(game.ball.owner.unwrap()).team == self.team {
+                //# Ball is owned by another player on our team
+                if self.active(&game.ball) {
+                    //# If I'm near enough to the ball, try to run somewhere useful, and unique to this player - we
+                    //# don't want all players running to the same place. Target is halfway between home and a point
+                    //# 400 pixels ahead of the ball. Team 0 are trying to score in the goal at the top of the
+                    //# pitch, team 1 the goal at the bottom
+                    let direction = if self.team == 0 { -1. } else { 1. };
+                    target.x = (game.ball.vpos.x + target.x) / 2.;
+                    target.y = (game.ball.vpos.y + 400. * direction + target.y) / 2.;
                 }
-            } else if self
-                .mark
-                .active(&game.players_pool, &game.goals_pool, &game.ball)
-            {
-                //# The player or goal we've been chosen to mark is active
+                //# If we're not active, we'll do the default action of moving towards our home position
+            } else {
+                //# Ball is owned by a player on the opposite team
+                if self.lead.is_some() {
+                    let ball_owner = game.players_pool.borrow(game.ball.owner.unwrap());
+                    //# We are one of the players chosen to pursue the owner
 
-                if my_team.human() {
-                    //# If I'm on a human team, just run towards the ball.
-                    //# We don't do the marking behaviour below for human teams for a number of reasons. Try changing
-                    //# the code to see how the game feels when marking behaviour applies to both human and computer
-                    //# teams.
-                    target = game.ball.vpos.clone();
-                } else {
-                    //# Get vector between the ball and whatever we're marking
-                    let (nvec, mut length) = safe_normalise(
-                        &(game.ball.vpos - self.mark.vpos(&game.players_pool, &game.goals_pool)),
-                    );
+                    //# Target a position in front of the ball's owner, the distance based on the value of lead, while
+                    //# making sure we keep just inside the pitch
+                    target = ball_owner.vpos + angle_to_vec(ball_owner.dir) * self.lead.unwrap();
 
-                    //# Alter length to choose a position in between the ball and whatever we're marking
-                    //# We don't apply this behaviour for human teams - in that case we just run straight at the ball
-                    if self.mark.is_goal() {
-                        //# If I'm currently the goalie, get in between the ball and goal, and don't get too far
-                        //# from the goal
-                        length = 150_f32.min(length);
-                    } else {
-                        //# Otherwise, just get halfway between the ball and whoever I'm marking
-                        length /= 2.;
+                    //# Stay on the pitch
+                    target.x = target.x.clamp(AI_MIN_X, AI_MAX_X);
+                    target.y = target.y.clamp(AI_MIN_Y, AI_MAX_Y);
+
+                    // Bug here, fixed (was: `other_team = 1 if self.team == 0 else 1`)
+                    let other_team = if self.team == 0 { 1 } else { 0 };
+                    speed = LEAD_PLAYER_BASE_SPEED;
+                    if game.teams[other_team].human() {
+                        speed += game.difficulty.speed_boost;
                     }
+                } else if self
+                    .mark
+                    .active(&game.players_pool, &game.goals_pool, &game.ball)
+                {
+                    //# The player or goal we've been chosen to mark is active
 
-                    target = self.mark.vpos(&game.players_pool, &game.goals_pool) + nvec * length
+                    if my_team.human() {
+                        //# If I'm on a human team, just run towards the ball.
+                        //# We don't do the marking behaviour below for human teams for a number of reasons. Try changing
+                        //# the code to see how the game feels when marking behaviour applies to both human and computer
+                        //# teams.
+                        target = game.ball.vpos.clone();
+                    } else {
+                        //# Get vector between the ball and whatever we're marking
+                        let (nvec, mut length) = safe_normalise(
+                            &(game.ball.vpos
+                                - self.mark.vpos(&game.players_pool, &game.goals_pool)),
+                        );
+
+                        //# Alter length to choose a position in between the ball and whatever we're marking
+                        //# We don't apply this behaviour for human teams - in that case we just run straight at the ball
+                        if self.mark.is_goal() {
+                            //# If I'm currently the goalie, get in between the ball and goal, and don't get too far
+                            //# from the goal
+                            length = 150_f32.min(length);
+                        } else {
+                            //# Otherwise, just get halfway between the ball and whoever I'm marking
+                            length /= 2.;
+                        }
+
+                        target =
+                            self.mark.vpos(&game.players_pool, &game.goals_pool) + nvec * length
+                    }
                 }
             }
         }
