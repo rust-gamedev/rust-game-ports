@@ -300,7 +300,7 @@ impl Game {
             obj.update(*obj_h, self, input);
             self.players_pool.put_back(obj_ticket, obj);
         }
-        Ball::update(self);
+        Ball::update(self, input, scene, media);
 
         let owner = self.ball.owner;
 

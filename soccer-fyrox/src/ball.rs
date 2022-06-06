@@ -148,7 +148,7 @@ impl Ball {
 
     // We can't pass `&mut game.ball` and `&mut game` at the same time, so we just just make this a
     // function, and call it a day :)
-    pub fn update(game: &mut Game) {
+    pub fn update(game: &mut Game, input: &InputController, scene: &mut Scene, media: &Media) {
         let ball = &mut game.ball;
         ball.timer -= 1;
 
