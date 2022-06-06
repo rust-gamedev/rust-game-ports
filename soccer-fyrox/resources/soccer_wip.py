@@ -148,31 +148,31 @@
 # # Ball physics model parameters
 # KICK_STRENGTH = 11.5
 # DRAG = 0.98
-
-# ball physics for one axis
-def ball_physics(pos, vel, bounds):
-    # Add velocity to position
-    pos += vel
-
-    # Check if ball is out of bounds, and bounce if so
-    if pos < bounds[0] or pos > bounds[1]:
-        pos, vel = pos - vel, -vel
-
-    # Return new position and velocity, applying drag
-    return pos, vel * DRAG
-
-# Work out number of physics steps for ball to travel given distance
-def steps(distance):
-    # Initialize step count and initial velocity
-    steps, vel = 0, KICK_STRENGTH
-
-    # Run physics until distance reached or ball is nearly stopped
-    while distance > 0 and vel > 0.25:
-        distance, steps, vel = distance - vel, steps + 1, vel * DRAG
-
-    return steps
-
-class Goal(MyActor):
+#
+# # ball physics for one axis
+# def ball_physics(pos, vel, bounds):
+#     # Add velocity to position
+#     pos += vel
+#
+#     # Check if ball is out of bounds, and bounce if so
+#     if pos < bounds[0] or pos > bounds[1]:
+#         pos, vel = pos - vel, -vel
+#
+#     # Return new position and velocity, applying drag
+#     return pos, vel * DRAG
+#
+# # Work out number of physics steps for ball to travel given distance
+# def steps(distance):
+#     # Initialize step count and initial velocity
+#     steps, vel = 0, KICK_STRENGTH
+#
+#     # Run physics until distance reached or ball is nearly stopped
+#     while distance > 0 and vel > 0.25:
+#         distance, steps, vel = distance - vel, steps + 1, vel * DRAG
+#
+#     return steps
+#
+# class Goal(MyActor):
 #     def __init__(self, team):
 #         x = HALF_LEVEL_W
 #         y = 0 if team == 0 else LEVEL_H
@@ -183,51 +183,51 @@ class Goal(MyActor):
 #     def active(self):
 #         # Is ball within 500 pixels on the Y axis?
 #         return abs(game.ball.vpos.y - self.vpos.y) < 500
-
-# Calculate if player 'target' is a good target for a pass from player 'source'
-# target can also be a goal
-def targetable(target, source):
-    # Find normalised (unit) vector v0 and distance d0 from source to target
-    v0, d0 = safe_normalise(target.vpos - source.vpos)
-
-    # If source player is on a computer-controlled team, avoid passes which are likely to be intercepted
-    # (If source is player-controlled, that's the player's job)
-    if not game.teams[source.team].human():
-        # For each player p
-        for p in game.players:
-            # Find normalised vector v1 and distance d1 from source to p
-            v1, d1 = safe_normalise(p.vpos - source.vpos)
-
-            # If p is on the other team, and between source and target, and at a similiar
-            # angular position, target is not a good target
-            # Multiplying two vectors together invokes an operation known as dot product. It is calculated by
-            # multiplying the X components of each vector, then multiplying the Y components, then adding the two
-            # resulting numbers. When each of the input vectors is a unit vector (i.e. with a length of 1, as returned
-            # from the safe_normalise function), the result of which is a number between -1 and 1. In this case we use
-            # the result to determine whether player 'p' (vector v1) is in roughly the same direction as player 'target'
-            # (vector v0), from the point of view of player 'source'.
-            if p.team != target.team and d1 > 0 and d1 < d0 and v0*v1 > 0.8:
-                return False
-
-    # If target is on the same team, and ahead of source, and not too far away, and source is facing
-    # approximately towards target (another dot product operation), then target is a good target.
-    # The dot product operation (multiplying two unit vectors) is used to determine whether (and to what extent) the
-    # source player is facing towards the target player. A value of 1 means target is directly ahead of source; -1
-    # means they are directly behind; 0 means they are directly to the left or right.
-    # See above for more explanation of dot product
-    return target.team == source.team and d0 > 0 and d0 < 300 and v0 * angle_to_vec(source.dir) > 0.8
-
-# Get average of two numbers; if the difference between the two is less than 1,
-# snap to the second number. Used in Ball.update()
-def avg(a, b):
-    return b if abs(b-a) < 1 else (a+b)/2
-
-def on_pitch(x, y):
-    # Only used when dribbling
-    return PITCH_RECT.collidepoint(x,y) \
-           or GOAL_0_RECT.collidepoint(x,y) \
-           or GOAL_1_RECT.collidepoint(x,y)
-
+#
+# # Calculate if player 'target' is a good target for a pass from player 'source'
+# # target can also be a goal
+# def targetable(target, source):
+#     # Find normalised (unit) vector v0 and distance d0 from source to target
+#     v0, d0 = safe_normalise(target.vpos - source.vpos)
+#
+#     # If source player is on a computer-controlled team, avoid passes which are likely to be intercepted
+#     # (If source is player-controlled, that's the player's job)
+#     if not game.teams[source.team].human():
+#         # For each player p
+#         for p in game.players:
+#             # Find normalised vector v1 and distance d1 from source to p
+#             v1, d1 = safe_normalise(p.vpos - source.vpos)
+#
+#             # If p is on the other team, and between source and target, and at a similiar
+#             # angular position, target is not a good target
+#             # Multiplying two vectors together invokes an operation known as dot product. It is calculated by
+#             # multiplying the X components of each vector, then multiplying the Y components, then adding the two
+#             # resulting numbers. When each of the input vectors is a unit vector (i.e. with a length of 1, as returned
+#             # from the safe_normalise function), the result of which is a number between -1 and 1. In this case we use
+#             # the result to determine whether player 'p' (vector v1) is in roughly the same direction as player 'target'
+#             # (vector v0), from the point of view of player 'source'.
+#             if p.team != target.team and d1 > 0 and d1 < d0 and v0*v1 > 0.8:
+#                 return False
+#
+#     # If target is on the same team, and ahead of source, and not too far away, and source is facing
+#     # approximately towards target (another dot product operation), then target is a good target.
+#     # The dot product operation (multiplying two unit vectors) is used to determine whether (and to what extent) the
+#     # source player is facing towards the target player. A value of 1 means target is directly ahead of source; -1
+#     # means they are directly behind; 0 means they are directly to the left or right.
+#     # See above for more explanation of dot product
+#     return target.team == source.team and d0 > 0 and d0 < 300 and v0 * angle_to_vec(source.dir) > 0.8
+#
+# # Get average of two numbers; if the difference between the two is less than 1,
+# # snap to the second number. Used in Ball.update()
+# def avg(a, b):
+#     return b if abs(b-a) < 1 else (a+b)/2
+#
+# def on_pitch(x, y):
+#     # Only used when dribbling
+#     return PITCH_RECT.collidepoint(x,y) \
+#            or GOAL_0_RECT.collidepoint(x,y) \
+#            or GOAL_1_RECT.collidepoint(x,y)
+#
 class Ball(MyActor):
 #     def __init__(self):
 #         super().__init__("ball", HALF_LEVEL_W, HALF_LEVEL_H)
@@ -239,12 +239,12 @@ class Ball(MyActor):
 #         self.timer = 0
 #
 #         self.shadow = MyActor("balls")
-
-    # Check for collision with player p
-    def collide(self, p):
-        # The ball collides with p if p's hold-off timer has expired
-        # and it is DRIBBLE_DIST_X or fewer pixels away
-        return p.timer < 0 and (p.vpos - self.vpos).length() <= DRIBBLE_DIST_X
+#
+#     # Check for collision with player p
+#     def collide(self, p):
+#         # The ball collides with p if p's hold-off timer has expired
+#         # and it is DRIBBLE_DIST_X or fewer pixels away
+#         return p.timer < 0 and (p.vpos - self.vpos).length() <= DRIBBLE_DIST_X
 
     def update(self):
         self.timer -= 1

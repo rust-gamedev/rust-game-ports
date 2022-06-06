@@ -72,7 +72,7 @@ pub struct Player {
     pub lead: Option<f32>,
     home: Vector2<f32>,
     pub team: u8,
-    dir: u8,
+    pub dir: u8,
     anim_frame: i8,
     pub timer: i32,
     pub shadow: BareActor,
