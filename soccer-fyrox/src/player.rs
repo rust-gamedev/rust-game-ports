@@ -48,6 +48,23 @@ fn cost(
     (result, pos)
 }
 
+//# Return True if the given position is inside the level area, otherwise False
+//# Takes the goals into account so you can't run through them
+fn allow_movement(x: f32, y: f32) -> bool {
+    if (x - HALF_LEVEL_W).abs() > HALF_LEVEL_W {
+        //# Trying to walk off the left or right side of the level
+        false
+    } else if (x - HALF_LEVEL_W).abs() < HALF_GOAL_W + 20. {
+        //# Player is within the bounds of the goals on the X axis, don't let them walk into, through or behind the goal
+        //# +20 takes with of player sprite into account
+        (y - HALF_LEVEL_H).abs() < HALF_PITCH_H
+    } else {
+        //# Player is outside the bounds of the goals on the X axis, so they can walk off the pitch and to the edge
+        //# of the level
+        (y - HALF_LEVEL_H).abs() < HALF_LEVEL_H
+    }
+}
+
 #[my_actor_based]
 #[derive(Clone)]
 pub struct Player {
@@ -268,9 +285,87 @@ impl Player {
                     }
                 }
             }
+        } else {
+            //# No-one has the ball
+
+            //# If we’re pre-kickoff and I’m the kickoff player, OR if we’re not pre-kickoff and I’m active
+            if (pre_kickoff && i_am_kickoff_player) || (!pre_kickoff && self.active(&game.ball)) {
+                //# Try to intercept the ball
+                //# Deciding where to go to achieve this is harder than you might think. You can't target the ball's
+                //# current location, because (assuming it's moving) by the time you get there it'll have moved on, so
+                //# you'll always be trailing behind it. And you can't target where it's going to end up after rolling to
+                //# a halt, because you might end up getting there before it and just be standing around waiting for it to
+                //# get there. What we want to do is find a target which allows us to intercept the ball along its path in
+                //# the minimum possible time and distance.
+                //# The code below simulates the ball's movement over a series of frames, working out where it would be
+                //# after each frame. We also work out how far the player could have moved at each frame, and whether
+                //# that distance would be enough to reach the currently simulated location of the ball.
+                let mut target = game.ball.vpos.clone(); //# current simulated location of ball
+                let mut vel = game.ball.vel.clone(); //# ball velocity - slows down each frame due to friction
+                let mut frame = 0;
+
+                //# DRIBBLE_DIST_X is the distance at which a player can gain control of the ball.
+                //# vel.length() > 0.5 ensures we don't keep simulating frames for longer than necessary - once the ball
+                //# is moving that slowly, it's not going to move much further, so there's no point in simulating dozens
+                //# more frames of very tiny movements. If you experience a decreased frame rate when no one has the ball,
+                //# try increasing 0.5 to a higher number.
+                while (target - self.vpos).norm()
+                    > PLAYER_INTERCEPT_BALL_SPEED * frame as f32 + DRIBBLE_DIST_X
+                    && vel.norm() > 0.5
+                {
+                    target += vel;
+                    vel *= DRAG;
+                    frame += 1;
+                }
+
+                speed = PLAYER_INTERCEPT_BALL_SPEED;
+            } else if pre_kickoff {
+                //# Waiting for kick-off, but we're not the kickoff player
+                //# Just stay where we are. Without this we'd run to our home position, but that is different from
+                //# our position at kickoff (where all players are on their team's side of the pitch)
+                target.y = self.vpos.y;
+            }
         }
 
-        // WRITEME
+        //# Get direction vector and distance beteen current pos and target pos
+        //# vec[0] and vec[1] will be the x and y components of the vector
+        let (vek, mut distance) = safe_normalise(&(target - self.vpos));
+
+        let target_dir;
+
+        //# Check to see if we're already at the target position
+        if distance > 0. {
+            //# Limit movement to our max speed
+            distance = distance.min(speed);
+
+            //# Set facing direction based on the direction we're moving
+            target_dir = vec_to_angle(vek);
+
+            //# Update the x and y components of the player's position - but don't allow them to go off the edge of the
+            //# level. Processing the x and y components separately allows the player to slide along the edge when trying
+            //# to move diagonally off the edge of the level.
+            if allow_movement(self.vpos.x + vek.x * distance, self.vpos.y) {
+                self.vpos.x += vek.x * distance;
+            }
+            if allow_movement(self.vpos.x, self.vpos.y + vek.y * distance) {
+                self.vpos.y += vek.y * distance;
+            }
+
+            //# todo
+            self.anim_frame = ((self.anim_frame as f32 + distance.max(1.5)) % 72.) as i8;
+        } else {
+            //# Already at target position - just turn to face the ball
+            target_dir = vec_to_angle(game.ball.vpos - self.vpos);
+            self.anim_frame = -1;
+        }
+
+        //# Update facing direction - each frame, move one step towards the target direction
+        //# This code essentially says that if the target direction is the same as the current direction, there should
+        //# be no change; if target is between 1 and 4 steps clockwise from current, we should rotate one step clockwise,
+        //# and if it's between 1 and 3 steps anticlockwise (which can also be thought of as 5 to 7 steps clockwise), we
+        //# should rotate one step anticlockwise - which is equivalent to stepping 7 steps clockwise
+        let dir_diff = (target_dir - self.dir) as usize;
+        self.dir = (self.dir + [0, 1, 1, 1, 1, 7, 7, 7][dir_diff % 8]) % 8;
 
         let suffix0 = self.dir;
         let suffix1 = (self.anim_frame.div_euclid(18) + 1) as u8; //# todo

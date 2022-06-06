@@ -62,6 +62,17 @@ pub mod prelude {
     pub const HALF_PITCH_W: f32 = 442.;
     pub const HALF_PITCH_H: f32 = 622.;
 
+    const GOAL_WIDTH: f32 = 186.;
+    const GOAL_DEPTH: f32 = 20.;
+    pub const HALF_GOAL_W: f32 = GOAL_WIDTH / 2.;
+
+    pub const DRIBBLE_DIST_X: f32 = 18.;
+    pub const DRIBBLE_DIST_Y: f32 = 16.;
+
+    //# Ball physics model parameters
+    pub const KICK_STRENGTH: f32 = 11.5;
+    pub const DRAG: f32 = 0.98;
+
     // The below are specific to the port; drawing sequence doesn't work in 3d-based engines; actually,
     // using z-depth is more convenient, since draw calls can happen in any order.
     // The priority on some sprites is based on their coordinates, so we use a min/max.

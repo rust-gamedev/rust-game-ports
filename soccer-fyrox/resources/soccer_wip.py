@@ -58,9 +58,9 @@ GOAL_1_RECT = pygame.rect.Rect(GOAL_BOUNDS_X[0], GOAL_BOUNDS_Y[1] - GOAL_DEPTH, 
 #
 # LEAD_DISTANCE_1 = 10
 # LEAD_DISTANCE_2 = 50
-
-DRIBBLE_DIST_X, DRIBBLE_DIST_Y = 18, 16
-
+#
+# DRIBBLE_DIST_X, DRIBBLE_DIST_Y = 18, 16
+#
 # # Speeds for players in various situations. Speeds including 'BASE' can be boosted by the speed_boost difficulty
 # # setting (only for players on a computer-controlled team)
 # PLAYER_DEFAULT_SPEED = 2
@@ -144,10 +144,10 @@ DEBUG_SHOW_COSTS = False
 #         # Set Actor's screen pos
 #         self.pos = (self.vpos.x - offset_x, self.vpos.y - offset_y)
 #         super().draw()
-
-# Ball physics model parameters
-KICK_STRENGTH = 11.5
-DRAG = 0.98
+#
+# # Ball physics model parameters
+# KICK_STRENGTH = 11.5
+# DRAG = 0.98
 
 # ball physics for one axis
 def ball_physics(pos, vel, bounds):
@@ -399,23 +399,23 @@ class Ball(MyActor):
                 # We no longer have an owner
                 self.owner = None
 
-# Return True if the given position is inside the level area, otherwise False
-# Takes the goals into account so you can't run through them
-def allow_movement(x, y):
-    if abs(x - HALF_LEVEL_W) > HALF_LEVEL_W:
-        # Trying to walk off the left or right side of the level
-        return False
-
-    elif abs(x - HALF_LEVEL_W) < HALF_GOAL_W + 20:
-        # Player is within the bounds of the goals on the X axis, don't let them walk into, through or behind the goal
-        # +20 takes with of player sprite into account
-        return abs(y - HALF_LEVEL_H) < HALF_PITCH_H
-
-    else:
-        # Player is outside the bounds of the goals on the X axis, so they can walk off the pitch and to the edge
-        # of the level
-        return abs(y - HALF_LEVEL_H) < HALF_LEVEL_H
-
+# # Return True if the given position is inside the level area, otherwise False
+# # Takes the goals into account so you can't run through them
+# def allow_movement(x, y):
+#     if abs(x - HALF_LEVEL_W) > HALF_LEVEL_W:
+#         # Trying to walk off the left or right side of the level
+#         return False
+#
+#     elif abs(x - HALF_LEVEL_W) < HALF_GOAL_W + 20:
+#         # Player is within the bounds of the goals on the X axis, don't let them walk into, through or behind the goal
+#         # +20 takes with of player sprite into account
+#         return abs(y - HALF_LEVEL_H) < HALF_PITCH_H
+#
+#     else:
+#         # Player is outside the bounds of the goals on the X axis, so they can walk off the pitch and to the edge
+#         # of the level
+#         return abs(y - HALF_LEVEL_H) < HALF_LEVEL_H
+#
 # # Generate a score for a given position, where lower numbers are considered to be better.
 # # This is called when a computer-controlled player with the ball is working out which direction to run in, or whether
 # # to pass the ball to another player, or kick it into the goal.
@@ -600,80 +600,80 @@ class Player(MyActor):
 #                             length /= 2
 #
 #                         target = self.mark.vpos + vec * length
-        else:
-            # No-one has the ball
-
-            # If we’re pre-kickoff and I’m the kickoff player, OR if we’re not pre-kickoff and I’m active
-            if (pre_kickoff and i_am_kickoff_player) or (not pre_kickoff and self.active()):
-                # Try to intercept the ball
-                # Deciding where to go to achieve this is harder than you might think. You can't target the ball's
-                # current location, because (assuming it's moving) by the time you get there it'll have moved on, so
-                # you'll always be trailing behind it. And you can't target where it's going to end up after rolling to
-                # a halt, because you might end up getting there before it and just be standing around waiting for it to
-                # get there. What we want to do is find a target which allows us to intercept the ball along its path in
-                # the minimum possible time and distance.
-                # The code below simulates the ball's movement over a series of frames, working out where it would be
-                # after each frame. We also work out how far the player could have moved at each frame, and whether
-                # that distance would be enough to reach the currently simulated location of the ball.
-                target = Vector2(ball.vpos)     # current simulated location of ball
-                vel = Vector2(ball.vel)         # ball velocity - slows down each frame due to friction
-                frame = 0
-
-                # DRIBBLE_DIST_X is the distance at which a player can gain control of the ball.
-                # vel.length() > 0.5 ensures we don't keep simulating frames for longer than necessary - once the ball
-                # is moving that slowly, it's not going to move much further, so there's no point in simulating dozens
-                # more frames of very tiny movements. If you experience a decreased frame rate when no one has the ball,
-                # try increasing 0.5 to a higher number.
-                while (target - self.vpos).length() > PLAYER_INTERCEPT_BALL_SPEED * frame + DRIBBLE_DIST_X and vel.length() > 0.5:
-                    target += vel
-                    vel *= DRAG
-                    frame += 1
-
-                speed = PLAYER_INTERCEPT_BALL_SPEED
-
-            elif pre_kickoff:
-                # Waiting for kick-off, but we're not the kickoff player
-                # Just stay where we are. Without this we'd run to our home position, but that is different from
-                # our position at kickoff (where all players are on their team's side of the pitch)
-                target.y = self.vpos.y
-
-        # Get direction vector and distance beteen current pos and target pos
-        # vec[0] and vec[1] will be the x and y components of the vector
-        vec, distance = safe_normalise(target - self.vpos)
-
+#         else:
+#             # No-one has the ball
+#
+#             # If we’re pre-kickoff and I’m the kickoff player, OR if we’re not pre-kickoff and I’m active
+#             if (pre_kickoff and i_am_kickoff_player) or (not pre_kickoff and self.active()):
+#                 # Try to intercept the ball
+#                 # Deciding where to go to achieve this is harder than you might think. You can't target the ball's
+#                 # current location, because (assuming it's moving) by the time you get there it'll have moved on, so
+#                 # you'll always be trailing behind it. And you can't target where it's going to end up after rolling to
+#                 # a halt, because you might end up getting there before it and just be standing around waiting for it to
+#                 # get there. What we want to do is find a target which allows us to intercept the ball along its path in
+#                 # the minimum possible time and distance.
+#                 # The code below simulates the ball's movement over a series of frames, working out where it would be
+#                 # after each frame. We also work out how far the player could have moved at each frame, and whether
+#                 # that distance would be enough to reach the currently simulated location of the ball.
+#                 target = Vector2(ball.vpos)     # current simulated location of ball
+#                 vel = Vector2(ball.vel)         # ball velocity - slows down each frame due to friction
+#                 frame = 0
+#
+#                 # DRIBBLE_DIST_X is the distance at which a player can gain control of the ball.
+#                 # vel.length() > 0.5 ensures we don't keep simulating frames for longer than necessary - once the ball
+#                 # is moving that slowly, it's not going to move much further, so there's no point in simulating dozens
+#                 # more frames of very tiny movements. If you experience a decreased frame rate when no one has the ball,
+#                 # try increasing 0.5 to a higher number.
+#                 while (target - self.vpos).length() > PLAYER_INTERCEPT_BALL_SPEED * frame + DRIBBLE_DIST_X and vel.length() > 0.5:
+#                     target += vel
+#                     vel *= DRAG
+#                     frame += 1
+#
+#                 speed = PLAYER_INTERCEPT_BALL_SPEED
+#
+#             elif pre_kickoff:
+#                 # Waiting for kick-off, but we're not the kickoff player
+#                 # Just stay where we are. Without this we'd run to our home position, but that is different from
+#                 # our position at kickoff (where all players are on their team's side of the pitch)
+#                 target.y = self.vpos.y
+#
+#         # Get direction vector and distance beteen current pos and target pos
+#         # vec[0] and vec[1] will be the x and y components of the vector
+#         vec, distance = safe_normalise(target - self.vpos)
+#
         self.debug_target = Vector2(target)
 
-        # Check to see if we're already at the target position
-        if distance > 0:
-            # Limit movement to our max speed
-            distance = min(distance, speed)
-
-            # Set facing direction based on the direction we're moving
-            target_dir = vec_to_angle(vec)
-
-            # Update the x and y components of the player's position - but don't allow them to go off the edge of the
-            # level. Processing the x and y components separately allows the player to slide along the edge when trying
-            # to move diagonally off the edge of the level.
-            if allow_movement(self.vpos.x + vec.x * distance, self.vpos.y):
-                self.vpos.x += vec.x * distance
-            if allow_movement(self.vpos.x, self.vpos.y + vec.y * distance):
-                self.vpos.y += vec.y * distance
-
-            # todo
-            self.anim_frame = (self.anim_frame + max(distance, 1.5)) % 72
-        else:
-            # Already at target position - just turn to face the ball
-            target_dir = vec_to_angle(ball.vpos - self.vpos)
-            self.anim_frame = -1
-
-        # Update facing direction - each frame, move one step towards the target direction
-        # This code essentially says that if the target direction is the same as the current direction, there should
-        # be no change; if target is between 1 and 4 steps clockwise from current, we should rotate one step clockwise,
-        # and if it's between 1 and 3 steps anticlockwise (which can also be thought of as 5 to 7 steps clockwise), we
-        # should rotate one step anticlockwise - which is equivalent to stepping 7 steps clockwise
-        dir_diff = (target_dir - self.dir)
-        self.dir = (self.dir + [0, 1, 1, 1, 1, 7, 7, 7][dir_diff % 8]) % 8
-
+#         # Check to see if we're already at the target position
+#         if distance > 0:
+#             # Limit movement to our max speed
+#             distance = min(distance, speed)
+#
+#             # Set facing direction based on the direction we're moving
+#             target_dir = vec_to_angle(vec)
+#
+#             # Update the x and y components of the player's position - but don't allow them to go off the edge of the
+#             # level. Processing the x and y components separately allows the player to slide along the edge when trying
+#             # to move diagonally off the edge of the level.
+#             if allow_movement(self.vpos.x + vec.x * distance, self.vpos.y):
+#                 self.vpos.x += vec.x * distance
+#             if allow_movement(self.vpos.x, self.vpos.y + vec.y * distance):
+#                 self.vpos.y += vec.y * distance
+#
+#             # todo
+#             self.anim_frame = (self.anim_frame + max(distance, 1.5)) % 72
+#         else:
+#             # Already at target position - just turn to face the ball
+#             target_dir = vec_to_angle(ball.vpos - self.vpos)
+#             self.anim_frame = -1
+#
+#         # Update facing direction - each frame, move one step towards the target direction
+#         # This code essentially says that if the target direction is the same as the current direction, there should
+#         # be no change; if target is between 1 and 4 steps clockwise from current, we should rotate one step clockwise,
+#         # and if it's between 1 and 3 steps anticlockwise (which can also be thought of as 5 to 7 steps clockwise), we
+#         # should rotate one step anticlockwise - which is equivalent to stepping 7 steps clockwise
+#         dir_diff = (target_dir - self.dir)
+#         self.dir = (self.dir + [0, 1, 1, 1, 1, 7, 7, 7][dir_diff % 8]) % 8
+#
 #         suffix = str(self.dir) + str((int(self.anim_frame) // 18) + 1) # todo
 #
 #         self.image = "player" + str(self.team) + suffix
