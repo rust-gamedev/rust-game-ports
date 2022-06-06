@@ -297,6 +297,7 @@ impl Game {
                 &self.ball,
                 &input,
                 &pool_clone,
+                &self.goals_pool,
                 &self.difficulty,
             );
         }
