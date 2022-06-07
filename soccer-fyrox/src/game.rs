@@ -300,10 +300,7 @@ impl Game {
 
         //# Update all players and ball
         for obj_h in &self.players.clone() {
-            // If we borrow, player_pool is in turn locked.
-            let (obj_ticket, mut obj) = self.pools.players.take_reserve(*obj_h);
-            obj.update(*obj_h, self, input);
-            self.pools.players.put_back(obj_ticket, obj);
+            Player::update(*obj_h, self, input);
         }
         Ball::update(self, input, scene, media);
 
