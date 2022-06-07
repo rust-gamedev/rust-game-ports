@@ -26,6 +26,14 @@ impl Target {
         }
     }
 
+    pub fn load<'a>(&self, pools: &'a Pools) -> &'a dyn Targetable {
+        match self {
+            Self::Player(handle) => pools.players.borrow(*handle),
+            Self::Goal(handle) => pools.goals.borrow(*handle),
+            Self::None => panic!(),
+        }
+    }
+
     // There's no trivial solution to this - instantiating each variant with the respective pool is
     // a nice idea, but requires either Rc's, that pollute the program with borrow()'s, or references,
     // which pollute the program with lifetimes.
@@ -34,18 +42,10 @@ impl Target {
     // downcasting (from Any), which is, again, very polluting.
     //
     pub fn vpos(&self, pools: &Pools) -> Vector2<f32> {
-        match self {
-            Self::Player(handle) => pools.players.borrow(*handle).vpos,
-            Self::Goal(handle) => pools.goals.borrow(*handle).vpos,
-            Self::None => panic!(),
-        }
+        self.load(pools).vpos()
     }
 
     pub fn active(&self, pools: &Pools, ball: &Ball) -> bool {
-        match self {
-            Self::Player(handle) => pools.players.borrow(*handle).active(ball),
-            Self::Goal(handle) => pools.goals.borrow(*handle).active(ball),
-            Self::None => panic!(),
-        }
+        self.load(pools).active(ball)
     }
 }
