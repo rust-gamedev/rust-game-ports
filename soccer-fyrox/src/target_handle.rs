@@ -29,7 +29,7 @@ impl TargetHandle {
         }
     }
 
-    pub fn load<'a>(&self, pools: &'a Pools) -> &'a dyn Targetable {
+    pub fn load<'a>(&self, pools: &'a Pools) -> &'a dyn Target {
         match self {
             Self::Player(handle) => pools.players.borrow(*handle),
             Self::Goal(handle) => pools.goals.borrow(*handle),

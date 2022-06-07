@@ -24,7 +24,7 @@ impl Goal {
     }
 }
 
-impl Targetable for Goal {
+impl Target for Goal {
     fn active(&self, ball: &Ball) -> bool {
         //# Is ball within 500 pixels on the Y axis?
         (ball.vpos.y - self.vpos.y).abs() < 500.

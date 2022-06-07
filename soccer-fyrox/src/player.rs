@@ -345,7 +345,7 @@ impl Player {
     }
 }
 
-impl Targetable for Player {
+impl Target for Player {
     fn active(&self, ball: &Ball) -> bool {
         //# Is ball within 400 pixels on the Y axis? If so I'll be considered active, meaning I'm currently doing
         //# something useful in the game like trying to get the ball. If I'm not active, I'll either mark another player,

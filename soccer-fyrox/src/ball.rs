@@ -56,7 +56,7 @@ fn steps(mut distance: f32) -> u16 {
 //# target can also be a goal
 // The source project has a mistake - 'target' can also be a Goal.
 fn targetable(
-    target: &dyn Targetable,
+    target: &dyn Target,
     source: &Player,
     teams: &[Team],
     players_pool: &Pool<Player>,
