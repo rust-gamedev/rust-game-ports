@@ -54,14 +54,15 @@ fn steps(mut distance: f32) -> u16 {
 
 //# Calculate if player 'target' is a good target for a pass from player 'source'
 //# target can also be a goal
+// The source project has a mistake - 'target' can also be a Goal.
 fn targetable(
-    target: &Player,
+    target: &dyn Targetable,
     source: &Player,
     teams: &[Team],
     players_pool: &Pool<Player>,
 ) -> bool {
     //# Find normalised (unit) vector v0 and distance d0 from source to target
-    let (v0, d0) = safe_normalise(&(target.vpos - source.vpos));
+    let (v0, d0) = safe_normalise(&(target.vpos() - source.vpos));
 
     //# If source player is on a computer-controlled team, avoid passes which are likely to be intercepted
     //# (If source is player-controlled, that's the player's job)
@@ -79,7 +80,7 @@ fn targetable(
             //# from the safe_normalise function), the result of which is a number between -1 and 1. In this case we use
             //# the result to determine whether player 'p' (vector v1) is in roughly the same direction as player 'target'
             //# (vector v0), from the point of view of player 'source'.
-            if p.team != target.team && d1 > 0. && d1 < d0 && v0.dot(&v1) > 0.8 {
+            if p.team != target.team() && d1 > 0. && d1 < d0 && v0.dot(&v1) > 0.8 {
                 return false;
             }
         }
@@ -91,7 +92,7 @@ fn targetable(
     //# source player is facing towards the target player. A value of 1 means target is directly ahead of source; -1
     //# means they are directly behind; 0 means they are directly to the left or right.
     //# See above for more explanation of dot product
-    target.team == source.team && d0 > 0. && d0 < 300. && v0.dot(&angle_to_vec(source.dir)) > 0.8
+    target.team() == source.team && d0 > 0. && d0 < 300. && v0.dot(&angle_to_vec(source.dir)) > 0.8
 }
 
 //# Get average of two numbers; if the difference between the two is less than 1,
@@ -255,23 +256,27 @@ impl Ball {
             //# Find the closest targetable player or goal (could be None)
             //# First we create a list of all players/goals which can be targeted
 
-            let targetable_players = game
+            let mut targetable_players = game
                 .pools
                 .players
                 .iter()
                 .filter(|p| {
                     p.team == ball_owner.team
-                        && targetable(p, ball_owner, &game.teams, &game.pools.players)
+                        && targetable(*p, ball_owner, &game.teams, &game.pools.players)
                 })
                 .map(|p| Target::Player(game.pools.players.handle_of(p)))
                 .collect::<Vec<_>>();
-            // WRITEME: targetable must be updated to accept Goals
-            // targetable_players = [p for p in game.players + game.goals if p.team == ball_owner.team and targetable(p, ball_owner)];
-            // targetable_players.extend(
-            //     game.goals_pool
-            //         .iter()
-            //         .map(|p| Target::Goal(game.goals_pool.handle_of(p))),
-            // );
+
+            targetable_players.extend(
+                game.pools
+                    .goals
+                    .iter()
+                    .filter(|p| {
+                        p.team() == ball_owner.team
+                            && targetable(*p, ball_owner, &game.teams, &game.pools.players)
+                    })
+                    .map(|p| Target::Goal(game.pools.goals.handle_of(p))),
+            );
 
             let target = if targetable_players.len() > 0 {
                 //# Choose the nearest one
