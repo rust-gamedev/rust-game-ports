@@ -334,8 +334,8 @@ impl Player {
         //# be no change; if target is between 1 and 4 steps clockwise from current, we should rotate one step clockwise,
         //# and if it's between 1 and 3 steps anticlockwise (which can also be thought of as 5 to 7 steps clockwise), we
         //# should rotate one step anticlockwise - which is equivalent to stepping 7 steps clockwise
-        let dir_diff = (target_dir - self.dir) as usize;
-        self.dir = (self.dir + [0, 1, 1, 1, 1, 7, 7, 7][dir_diff % 8]) % 8;
+        let dir_diff = target_dir as i8 - self.dir as i8;
+        self.dir = (self.dir + [0, 1, 1, 1, 1, 7, 7, 7][dir_diff.rem_euclid(8) as usize]) % 8;
 
         let suffix0 = self.dir;
         let suffix1 = (self.anim_frame.div_euclid(18) + 1) as u8; //# todo
