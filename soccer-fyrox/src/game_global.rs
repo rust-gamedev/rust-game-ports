@@ -12,7 +12,6 @@ use crate::prelude::*;
 pub struct GameGlobal {
     media: Media,
     scene: Handle<Scene>,
-    camera: Handle<Node>,
     input: InputController,
     game: Game,
     state: State,
@@ -27,7 +26,7 @@ impl GameState for GameGlobal {
 
         let mut scene = Scene::new();
 
-        let camera = Self::build_camera(&mut scene);
+        Self::add_camera(&mut scene);
 
         let mut media = Media::new(&engine.resource_manager, &mut scene);
 
@@ -42,7 +41,7 @@ impl GameState for GameGlobal {
         Self {
             media,
             scene: scene_h,
-            camera,
+            // camera,
             input,
             game,
             state,
@@ -242,9 +241,7 @@ impl GameGlobal {
         }
     }
 
-    // Returns (scene, camera, root node)
-    //
-    fn build_camera(scene: &mut Scene) -> Handle<Node> {
+    fn add_camera(scene: &mut Scene) -> Handle<Node> {
         CameraBuilder::new(BaseBuilder::new())
             .with_projection(Projection::Orthographic(OrthographicProjection {
                 z_near: CAMERA_NEAR_Z,
