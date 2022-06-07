@@ -269,7 +269,7 @@ impl Player {
                 //# The code below simulates the ball's movement over a series of frames, working out where it would be
                 //# after each frame. We also work out how far the player could have moved at each frame, and whether
                 //# that distance would be enough to reach the currently simulated location of the ball.
-                let mut target = game.ball.vpos.clone(); //# current simulated location of ball
+                target = game.ball.vpos.clone(); //# current simulated location of ball
                 let mut vel = game.ball.vel.clone(); //# ball velocity - slows down each frame due to friction
                 let mut frame = 0;
 
