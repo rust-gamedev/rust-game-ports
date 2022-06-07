@@ -156,7 +156,6 @@ impl Player {
                 //# First, create a list of costs for each of the 5 tested positions - a lower number is better. Each
                 //# element is a tuple containing the cost and the position that cost relates to.
                 let costs = (-2..3).map(|d| {
-                    // TODO (port): verify that self.dir is always > 2, since angle_to_vec expects the range 0..=7.
                     cost(
                         player.vpos + angle_to_vec((player.dir as i8 + d) as u8) * 3.,
                         player.team,
