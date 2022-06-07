@@ -111,21 +111,23 @@ impl Player {
     //
     // this implementation is the simplest (no tickets passed around), but 1. is also a simple alternative.
     //
-    pub fn update(&mut self, self_h: Handle<Player>, game: &mut Game, input: &InputController) {
-        //# decrement holdoff timer
-        self.timer -= 1;
+    pub fn update(player_h: Handle<Player>, game: &mut Game, input: &InputController) {
+        // Can't keep mutably borrowed over the whole function; mutably reborrowed at the end.
+        game.pools.players.borrow_mut(player_h).timer -= 1;
+
+        let player = game.pools.players.borrow(player_h);
 
         //# One of the main jobs of this method is to decide where the player will run to, and at what speed.
         //# The default is to run slowly towards home position, but target and speed may be overwritten in the code below
-        let mut target = self.home.clone(); //# Take a copy of home position
+        let mut target = player.home.clone(); //# Take a copy of home position
         let mut speed = PLAYER_DEFAULT_SPEED;
 
         //# Some shorthand variables to make the code below a bit easier to follow
-        let my_team = &game.teams[self.team as usize];
+        let my_team = &game.teams[player.team as usize];
         let pre_kickoff = game.kickoff_player.is_some();
-        let i_am_kickoff_player = Some(self_h) == game.kickoff_player;
+        let i_am_kickoff_player = Some(player_h) == game.kickoff_player;
 
-        if Some(self_h) == game.teams[self.team as usize].active_control_player
+        if Some(player_h) == game.teams[player.team as usize].active_control_player
             && my_team.human()
             && (!pre_kickoff || i_am_kickoff_player)
         {
@@ -135,19 +137,19 @@ impl Player {
             //# run around while waiting for player 1 to do the kickoff (and vice versa)
 
             //# A player with the ball runs slightly more slowly than one without
-            speed = if game.ball.owner == Some(self_h) {
+            speed = if game.ball.owner == Some(player_h) {
                 HUMAN_PLAYER_WITH_BALL_SPEED
             } else {
                 HUMAN_PLAYER_WITHOUT_BALL_SPEED
             };
 
             //# Find target by calling the controller for the player's team todo comment
-            target = self.vpos + my_team.controls.as_ref().unwrap().move_player(speed, input);
+            target = player.vpos + my_team.controls.as_ref().unwrap().move_player(speed, input);
         } else if let Some(ball_owner_h) = game.ball.owner {
             let ball_owner = game.pools.players.borrow(ball_owner_h);
 
             //# Someone has the ball - is it me?
-            if ball_owner_h == self_h {
+            if ball_owner_h == player_h {
                 //# We are the owner, and are computer-controlled (otherwise we would have taken the other arm
                 //# of the top-level if statement)
 
@@ -165,8 +167,8 @@ impl Player {
                     let d = d as i8 - 2;
                     // TODO (port): verify that self.dir is always > 2, since angle_to_vec expects the range 0..=7.
                     cost(
-                        self.vpos + angle_to_vec((self.dir as i8 + d) as u8) * 3.,
-                        self.team,
+                        player.vpos + angle_to_vec((player.dir as i8 + d) as u8) * 3.,
+                        player.team,
                         d.abs() as u8,
                         &game.pools.players,
                     )
@@ -184,43 +186,42 @@ impl Player {
                 //# for the comparisons.
                 //# When min finds the tuple with the minimum cost value, we extract the target pos (which is what we
                 //# actually care about) and discard the actual cost value - hence the '_' dummy variable
-                target = costs
-                    .map(|(_, pos)| pos)
-                    .min_by(|pos1, pos2| pos1[0].partial_cmp(&pos2[0]).unwrap())
+                (_, target) = costs
+                    .min_by(|cost1, cost2| cost1.0.partial_cmp(&cost2.0).unwrap())
                     .unwrap();
 
                 //# speed depends on difficulty
                 speed = CPU_PLAYER_WITH_BALL_BASE_SPEED + game.difficulty.speed_boost
-            } else if ball_owner.team == self.team {
+            } else if ball_owner.team == player.team {
                 //# Ball is owned by another player on our team
-                if self.active(&game.ball) {
+                if player.active(&game.ball) {
                     //# If I'm near enough to the ball, try to run somewhere useful, and unique to this player - we
                     //# don't want all players running to the same place. Target is halfway between home and a point
                     //# 400 pixels ahead of the ball. Team 0 are trying to score in the goal at the top of the
                     //# pitch, team 1 the goal at the bottom
-                    let direction = if self.team == 0 { -1. } else { 1. };
+                    let direction = if player.team == 0 { -1. } else { 1. };
                     target.x = (game.ball.vpos.x + target.x) / 2.;
                     target.y = (game.ball.vpos.y + 400. * direction + target.y) / 2.;
                 }
                 //# If we're not active, we'll do the default action of moving towards our home position
             } else {
-                let mark_active = self.mark.active(&game.pools, &game.ball);
-                let mark_vpos = self.mark.vpos(&game.pools);
+                let mark_active = player.mark.active(&game.pools, &game.ball);
+                let mark_vpos = player.mark.vpos(&game.pools);
 
                 //# Ball is owned by a player on the opposite team
-                if self.lead.is_some() {
+                if player.lead.is_some() {
                     //# We are one of the players chosen to pursue the owner
 
                     //# Target a position in front of the ball's owner, the distance based on the value of lead, while
                     //# making sure we keep just inside the pitch
-                    target = ball_owner.vpos + angle_to_vec(ball_owner.dir) * self.lead.unwrap();
+                    target = ball_owner.vpos + angle_to_vec(ball_owner.dir) * player.lead.unwrap();
 
                     //# Stay on the pitch
                     target.x = target.x.clamp(AI_MIN_X, AI_MAX_X);
                     target.y = target.y.clamp(AI_MIN_Y, AI_MAX_Y);
 
-                    // Bug here, fixed (was: `other_team = 1 if self.team == 0 else 1`)
-                    let other_team = if self.team == 0 { 1 } else { 0 };
+                    // Bug here, fixed (was: `other_team = 1 if player.team == 0 else 1`)
+                    let other_team = if player.team == 0 { 1 } else { 0 };
                     speed = LEAD_PLAYER_BASE_SPEED;
                     if game.teams[other_team].human() {
                         speed += game.difficulty.speed_boost;
@@ -240,7 +241,7 @@ impl Player {
 
                         //# Alter length to choose a position in between the ball and whatever we're marking
                         //# We don't apply this behaviour for human teams - in that case we just run straight at the ball
-                        if self.mark.is_goal() {
+                        if player.mark.is_goal() {
                             //# If I'm currently the goalie, get in between the ball and goal, and don't get too far
                             //# from the goal
                             length = 150_f32.min(length);
@@ -257,7 +258,7 @@ impl Player {
             //# No-one has the ball
 
             //# If we’re pre-kickoff and I’m the kickoff player, OR if we’re not pre-kickoff and I’m active
-            if (pre_kickoff && i_am_kickoff_player) || (!pre_kickoff && self.active(&game.ball)) {
+            if (pre_kickoff && i_am_kickoff_player) || (!pre_kickoff && player.active(&game.ball)) {
                 //# Try to intercept the ball
                 //# Deciding where to go to achieve this is harder than you might think. You can't target the ball's
                 //# current location, because (assuming it's moving) by the time you get there it'll have moved on, so
@@ -268,7 +269,7 @@ impl Player {
                 //# The code below simulates the ball's movement over a series of frames, working out where it would be
                 //# after each frame. We also work out how far the player could have moved at each frame, and whether
                 //# that distance would be enough to reach the currently simulated location of the ball.
-                let mut target = game.ball.vpos.clone(); //# current simulated location of ball
+                target = game.ball.vpos.clone(); //# current simulated location of ball
                 let mut vel = game.ball.vel.clone(); //# ball velocity - slows down each frame due to friction
                 let mut frame = 0;
 
@@ -277,7 +278,7 @@ impl Player {
                 //# is moving that slowly, it's not going to move much further, so there's no point in simulating dozens
                 //# more frames of very tiny movements. If you experience a decreased frame rate when no one has the ball,
                 //# try increasing 0.5 to a higher number.
-                while (target - self.vpos).norm()
+                while (target - player.vpos).norm()
                     > PLAYER_INTERCEPT_BALL_SPEED * frame as f32 + DRIBBLE_DIST_X
                     && vel.norm() > 0.5
                 {
@@ -291,17 +292,19 @@ impl Player {
                 //# Waiting for kick-off, but we're not the kickoff player
                 //# Just stay where we are. Without this we'd run to our home position, but that is different from
                 //# our position at kickoff (where all players are on their team's side of the pitch)
-                target.y = self.vpos.y;
+                target.y = player.vpos.y;
             }
         }
 
         //# Get direction vector and distance beteen current pos and target pos
         //# vec[0] and vec[1] will be the x and y components of the vector
-        let (vek, mut distance) = safe_normalise(&(target - self.vpos));
+        let (vek, mut distance) = safe_normalise(&(target - player.vpos));
 
         //self.debug_target = Vector2(target)
 
         let target_dir;
+
+        let player = game.pools.players.borrow_mut(player_h);
 
         //# Check to see if we're already at the target position
         if distance > 0. {
@@ -314,19 +317,19 @@ impl Player {
             //# Update the x and y components of the player's position - but don't allow them to go off the edge of the
             //# level. Processing the x and y components separately allows the player to slide along the edge when trying
             //# to move diagonally off the edge of the level.
-            if allow_movement(self.vpos.x + vek.x * distance, self.vpos.y) {
-                self.vpos.x += vek.x * distance;
+            if allow_movement(player.vpos.x + vek.x * distance, player.vpos.y) {
+                player.vpos.x += vek.x * distance;
             }
-            if allow_movement(self.vpos.x, self.vpos.y + vek.y * distance) {
-                self.vpos.y += vek.y * distance;
+            if allow_movement(player.vpos.x, player.vpos.y + vek.y * distance) {
+                player.vpos.y += vek.y * distance;
             }
 
             //# todo
-            self.anim_frame = ((self.anim_frame as f32 + distance.max(1.5)) % 72.) as i8;
+            player.anim_frame = ((player.anim_frame as f32 + distance.max(1.5)) % 72.) as i8;
         } else {
             //# Already at target position - just turn to face the ball
-            target_dir = vec_to_angle(game.ball.vpos - self.vpos);
-            self.anim_frame = -1;
+            target_dir = vec_to_angle(game.ball.vpos - player.vpos);
+            player.anim_frame = -1;
         }
 
         //# Update facing direction - each frame, move one step towards the target direction
@@ -334,18 +337,18 @@ impl Player {
         //# be no change; if target is between 1 and 4 steps clockwise from current, we should rotate one step clockwise,
         //# and if it's between 1 and 3 steps anticlockwise (which can also be thought of as 5 to 7 steps clockwise), we
         //# should rotate one step anticlockwise - which is equivalent to stepping 7 steps clockwise
-        let dir_diff = target_dir as i8 - self.dir as i8;
-        self.dir = (self.dir + [0, 1, 1, 1, 1, 7, 7, 7][dir_diff.rem_euclid(8) as usize]) % 8;
+        let dir_diff = target_dir as i8 - player.dir as i8;
+        player.dir = (player.dir + [0, 1, 1, 1, 1, 7, 7, 7][dir_diff.rem_euclid(8) as usize]) % 8;
 
-        let suffix0 = self.dir;
-        let suffix1 = (self.anim_frame.div_euclid(18) + 1) as u8; //# todo
+        let suffix0 = player.dir;
+        let suffix1 = (player.anim_frame.div_euclid(18) + 1) as u8; //# todo
 
-        self.img_base = "player";
-        self.img_indexes = vec![self.team, suffix0, suffix1];
-        self.shadow.img_base = "players";
-        self.shadow.img_indexes = vec![suffix0, suffix1];
+        player.img_base = "player";
+        player.img_indexes = vec![player.team, suffix0, suffix1];
+        player.shadow.img_base = "players";
+        player.shadow.img_indexes = vec![suffix0, suffix1];
 
         //# Update shadow position to track player
-        self.shadow.vpos = self.vpos.clone();
+        player.shadow.vpos = player.vpos.clone();
     }
 }
