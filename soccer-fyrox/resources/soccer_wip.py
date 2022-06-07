@@ -33,22 +33,22 @@
 #
 # HALF_PITCH_W = 442
 # HALF_PITCH_H = 622
-
-GOAL_WIDTH = 186
-GOAL_DEPTH = 20
-HALF_GOAL_W = GOAL_WIDTH // 2
-
-PITCH_BOUNDS_X = (HALF_LEVEL_W - HALF_PITCH_W, HALF_LEVEL_W + HALF_PITCH_W)
-PITCH_BOUNDS_Y = (HALF_LEVEL_H - HALF_PITCH_H, HALF_LEVEL_H + HALF_PITCH_H)
-
-GOAL_BOUNDS_X = (HALF_LEVEL_W - HALF_GOAL_W, HALF_LEVEL_W + HALF_GOAL_W)
-GOAL_BOUNDS_Y = (HALF_LEVEL_H - HALF_PITCH_H - GOAL_DEPTH,
-                 HALF_LEVEL_H + HALF_PITCH_H + GOAL_DEPTH)
-
-PITCH_RECT = pygame.rect.Rect(PITCH_BOUNDS_X[0], PITCH_BOUNDS_Y[0], HALF_PITCH_W * 2, HALF_PITCH_H * 2)
-GOAL_0_RECT = pygame.rect.Rect(GOAL_BOUNDS_X[0], GOAL_BOUNDS_Y[0], GOAL_WIDTH, GOAL_DEPTH)
-GOAL_1_RECT = pygame.rect.Rect(GOAL_BOUNDS_X[0], GOAL_BOUNDS_Y[1] - GOAL_DEPTH, GOAL_WIDTH, GOAL_DEPTH)
-
+#
+# GOAL_WIDTH = 186
+# GOAL_DEPTH = 20
+# HALF_GOAL_W = GOAL_WIDTH // 2
+#
+# PITCH_BOUNDS_X = (HALF_LEVEL_W - HALF_PITCH_W, HALF_LEVEL_W + HALF_PITCH_W)
+# PITCH_BOUNDS_Y = (HALF_LEVEL_H - HALF_PITCH_H, HALF_LEVEL_H + HALF_PITCH_H)
+#
+# GOAL_BOUNDS_X = (HALF_LEVEL_W - HALF_GOAL_W, HALF_LEVEL_W + HALF_GOAL_W)
+# GOAL_BOUNDS_Y = (HALF_LEVEL_H - HALF_PITCH_H - GOAL_DEPTH,
+#                  HALF_LEVEL_H + HALF_PITCH_H + GOAL_DEPTH)
+#
+# PITCH_RECT = pygame.rect.Rect(PITCH_BOUNDS_X[0], PITCH_BOUNDS_Y[0], HALF_PITCH_W * 2, HALF_PITCH_H * 2)
+# GOAL_0_RECT = pygame.rect.Rect(GOAL_BOUNDS_X[0], GOAL_BOUNDS_Y[0], GOAL_WIDTH, GOAL_DEPTH)
+# GOAL_1_RECT = pygame.rect.Rect(GOAL_BOUNDS_X[0], GOAL_BOUNDS_Y[1] - GOAL_DEPTH, GOAL_WIDTH, GOAL_DEPTH)
+#
 # AI_MIN_X = 78
 # AI_MAX_X = LEVEL_W - 78
 # AI_MIN_Y = 98
@@ -69,13 +69,13 @@ GOAL_1_RECT = pygame.rect.Rect(GOAL_BOUNDS_X[0], GOAL_BOUNDS_Y[1] - GOAL_DEPTH, 
 # LEAD_PLAYER_BASE_SPEED = 2.9
 # HUMAN_PLAYER_WITH_BALL_SPEED = 3
 # HUMAN_PLAYER_WITHOUT_BALL_SPEED = 3.3
-
-DEBUG_SHOW_LEADS = False
-DEBUG_SHOW_TARGETS = False
-DEBUG_SHOW_PEERS = False
-DEBUG_SHOW_SHOOT_TARGET = False
-DEBUG_SHOW_COSTS = False
-
+#
+# DEBUG_SHOW_LEADS = False
+# DEBUG_SHOW_TARGETS = False
+# DEBUG_SHOW_PEERS = False
+# DEBUG_SHOW_SHOOT_TARGET = False
+# DEBUG_SHOW_COSTS = False
+#
 # class Difficulty:
 #     def __init__(self, goalie_enabled, second_lead_enabled, speed_boost, holdoff_timer):
 #         self.goalie_enabled = goalie_enabled
@@ -148,31 +148,31 @@ DEBUG_SHOW_COSTS = False
 # # Ball physics model parameters
 # KICK_STRENGTH = 11.5
 # DRAG = 0.98
-
-# ball physics for one axis
-def ball_physics(pos, vel, bounds):
-    # Add velocity to position
-    pos += vel
-
-    # Check if ball is out of bounds, and bounce if so
-    if pos < bounds[0] or pos > bounds[1]:
-        pos, vel = pos - vel, -vel
-
-    # Return new position and velocity, applying drag
-    return pos, vel * DRAG
-
-# Work out number of physics steps for ball to travel given distance
-def steps(distance):
-    # Initialize step count and initial velocity
-    steps, vel = 0, KICK_STRENGTH
-
-    # Run physics until distance reached or ball is nearly stopped
-    while distance > 0 and vel > 0.25:
-        distance, steps, vel = distance - vel, steps + 1, vel * DRAG
-
-    return steps
-
-class Goal(MyActor):
+#
+# # ball physics for one axis
+# def ball_physics(pos, vel, bounds):
+#     # Add velocity to position
+#     pos += vel
+#
+#     # Check if ball is out of bounds, and bounce if so
+#     if pos < bounds[0] or pos > bounds[1]:
+#         pos, vel = pos - vel, -vel
+#
+#     # Return new position and velocity, applying drag
+#     return pos, vel * DRAG
+#
+# # Work out number of physics steps for ball to travel given distance
+# def steps(distance):
+#     # Initialize step count and initial velocity
+#     steps, vel = 0, KICK_STRENGTH
+#
+#     # Run physics until distance reached or ball is nearly stopped
+#     while distance > 0 and vel > 0.25:
+#         distance, steps, vel = distance - vel, steps + 1, vel * DRAG
+#
+#     return steps
+#
+# class Goal(MyActor):
 #     def __init__(self, team):
 #         x = HALF_LEVEL_W
 #         y = 0 if team == 0 else LEVEL_H
@@ -183,51 +183,51 @@ class Goal(MyActor):
 #     def active(self):
 #         # Is ball within 500 pixels on the Y axis?
 #         return abs(game.ball.vpos.y - self.vpos.y) < 500
-
-# Calculate if player 'target' is a good target for a pass from player 'source'
-# target can also be a goal
-def targetable(target, source):
-    # Find normalised (unit) vector v0 and distance d0 from source to target
-    v0, d0 = safe_normalise(target.vpos - source.vpos)
-
-    # If source player is on a computer-controlled team, avoid passes which are likely to be intercepted
-    # (If source is player-controlled, that's the player's job)
-    if not game.teams[source.team].human():
-        # For each player p
-        for p in game.players:
-            # Find normalised vector v1 and distance d1 from source to p
-            v1, d1 = safe_normalise(p.vpos - source.vpos)
-
-            # If p is on the other team, and between source and target, and at a similiar
-            # angular position, target is not a good target
-            # Multiplying two vectors together invokes an operation known as dot product. It is calculated by
-            # multiplying the X components of each vector, then multiplying the Y components, then adding the two
-            # resulting numbers. When each of the input vectors is a unit vector (i.e. with a length of 1, as returned
-            # from the safe_normalise function), the result of which is a number between -1 and 1. In this case we use
-            # the result to determine whether player 'p' (vector v1) is in roughly the same direction as player 'target'
-            # (vector v0), from the point of view of player 'source'.
-            if p.team != target.team and d1 > 0 and d1 < d0 and v0*v1 > 0.8:
-                return False
-
-    # If target is on the same team, and ahead of source, and not too far away, and source is facing
-    # approximately towards target (another dot product operation), then target is a good target.
-    # The dot product operation (multiplying two unit vectors) is used to determine whether (and to what extent) the
-    # source player is facing towards the target player. A value of 1 means target is directly ahead of source; -1
-    # means they are directly behind; 0 means they are directly to the left or right.
-    # See above for more explanation of dot product
-    return target.team == source.team and d0 > 0 and d0 < 300 and v0 * angle_to_vec(source.dir) > 0.8
-
-# Get average of two numbers; if the difference between the two is less than 1,
-# snap to the second number. Used in Ball.update()
-def avg(a, b):
-    return b if abs(b-a) < 1 else (a+b)/2
-
-def on_pitch(x, y):
-    # Only used when dribbling
-    return PITCH_RECT.collidepoint(x,y) \
-           or GOAL_0_RECT.collidepoint(x,y) \
-           or GOAL_1_RECT.collidepoint(x,y)
-
+#
+# # Calculate if player 'target' is a good target for a pass from player 'source'
+# # target can also be a goal
+# def targetable(target, source):
+#     # Find normalised (unit) vector v0 and distance d0 from source to target
+#     v0, d0 = safe_normalise(target.vpos - source.vpos)
+#
+#     # If source player is on a computer-controlled team, avoid passes which are likely to be intercepted
+#     # (If source is player-controlled, that's the player's job)
+#     if not game.teams[source.team].human():
+#         # For each player p
+#         for p in game.players:
+#             # Find normalised vector v1 and distance d1 from source to p
+#             v1, d1 = safe_normalise(p.vpos - source.vpos)
+#
+#             # If p is on the other team, and between source and target, and at a similiar
+#             # angular position, target is not a good target
+#             # Multiplying two vectors together invokes an operation known as dot product. It is calculated by
+#             # multiplying the X components of each vector, then multiplying the Y components, then adding the two
+#             # resulting numbers. When each of the input vectors is a unit vector (i.e. with a length of 1, as returned
+#             # from the safe_normalise function), the result of which is a number between -1 and 1. In this case we use
+#             # the result to determine whether player 'p' (vector v1) is in roughly the same direction as player 'target'
+#             # (vector v0), from the point of view of player 'source'.
+#             if p.team != target.team and d1 > 0 and d1 < d0 and v0*v1 > 0.8:
+#                 return False
+#
+#     # If target is on the same team, and ahead of source, and not too far away, and source is facing
+#     # approximately towards target (another dot product operation), then target is a good target.
+#     # The dot product operation (multiplying two unit vectors) is used to determine whether (and to what extent) the
+#     # source player is facing towards the target player. A value of 1 means target is directly ahead of source; -1
+#     # means they are directly behind; 0 means they are directly to the left or right.
+#     # See above for more explanation of dot product
+#     return target.team == source.team and d0 > 0 and d0 < 300 and v0 * angle_to_vec(source.dir) > 0.8
+#
+# # Get average of two numbers; if the difference between the two is less than 1,
+# # snap to the second number. Used in Ball.update()
+# def avg(a, b):
+#     return b if abs(b-a) < 1 else (a+b)/2
+#
+# def on_pitch(x, y):
+#     # Only used when dribbling
+#     return PITCH_RECT.collidepoint(x,y) \
+#            or GOAL_0_RECT.collidepoint(x,y) \
+#            or GOAL_1_RECT.collidepoint(x,y)
+#
 class Ball(MyActor):
 #     def __init__(self):
 #         super().__init__("ball", HALF_LEVEL_W, HALF_LEVEL_H)
@@ -239,166 +239,166 @@ class Ball(MyActor):
 #         self.timer = 0
 #
 #         self.shadow = MyActor("balls")
-
-    # Check for collision with player p
-    def collide(self, p):
-        # The ball collides with p if p's hold-off timer has expired
-        # and it is DRIBBLE_DIST_X or fewer pixels away
-        return p.timer < 0 and (p.vpos - self.vpos).length() <= DRIBBLE_DIST_X
+#
+#     # Check for collision with player p
+#     def collide(self, p):
+#         # The ball collides with p if p's hold-off timer has expired
+#         # and it is DRIBBLE_DIST_X or fewer pixels away
+#         return p.timer < 0 and (p.vpos - self.vpos).length() <= DRIBBLE_DIST_X
 
     def update(self):
-        self.timer -= 1
-
-        # If the ball has an owner, it's being dribbled, so its position is
-        # based on its owner's position
-        if self.owner:
-            # Calculate new ball position for dribbling
-            # Our target position will be a point just ahead of our owner. However, we don't want to just snap to that
-            # position straight away. We want to transition to it over several frames, so we take the average of our
-            # current position and the target position. We also use slightly different offsets for the X and Y axes,
-            # to reflect that that the game's perspective is not completely top-down - so the positions the ball can
-            # take in relation to the player should form an ellipse instead of a circle.
-            # todo explain maths
-            new_x = avg(self.vpos.x, self.owner.vpos.x + DRIBBLE_DIST_X * sin(self.owner.dir))
-            new_y = avg(self.vpos.y, self.owner.vpos.y - DRIBBLE_DIST_Y * cos(self.owner.dir))
-
-            if on_pitch(new_x, new_y):
-                # New position is on the pitch, so update
-                self.vpos = Vector2(new_x, new_y)
-            else:
-                # New position is off the pitch, so player loses the ball
-                # Set hold-off timer so player can't immediately reacquire the ball
-                self.owner.timer = 60
-
-                # Give ball small velocity in player's direction of travel
-                self.vel = angle_to_vec(self.owner.dir) * 3
-
-                # Un-set owner
-                self.owner = None
-        else:
-            # Run physics, one axis at a time
-
-            # If ball is vertically inside the goal, it can only go as far as the
-            # sides of the goal - otherwise it can go all the way to the sides of
-            # the pitch
-            if abs(self.vpos.y - HALF_LEVEL_H) > HALF_PITCH_H:
-                bounds_x = GOAL_BOUNDS_X
-            else:
-                bounds_x = PITCH_BOUNDS_X
-
-            # If ball is horizontally inside the goal, it can go all the way to
-            # the back of the net - otherwise it can only go up to the end of
-            # the pitch
-            if abs(self.vpos.x - HALF_LEVEL_W) < HALF_GOAL_W:
-                bounds_y = GOAL_BOUNDS_Y
-            else:
-                bounds_y = PITCH_BOUNDS_Y
-
-            self.vpos.x, self.vel.x = ball_physics(self.vpos.x, self.vel.x, bounds_x)
-            self.vpos.y, self.vel.y = ball_physics(self.vpos.y, self.vel.y, bounds_y)
-
-        # Update shadow position to track ball
-        self.shadow.vpos = Vector2(self.vpos)
-
-        # Search for a player that can acquire the ball
-        for target in game.players:
-            # A player can acquire the ball if the ball has no owner, or the player is on the other team
-            # from the owner, and collides with the ball
-            if (not self.owner or self.owner.team != target.team) and self.collide(target):
-                if self.owner:
-                    # New player is taking the ball from previous owner
-                    # Set hold-off timer so previous owner can't immediately reacquire the ball
-                    self.owner.timer = 60
-
-                # Set hold-off timer (dependent on difficulty) to limit rate at which
-                # computer-controlled players can pass the ball
-                self.timer = game.difficulty.holdoff_timer
-
-                # Update owner, and controllable player for player's team, to player
-                game.teams[target.team].active_control_player = self.owner = target
-
-        # If the ball has an owner, it's time to decide whether to kick it
-        if self.owner:
-            team = game.teams[self.owner.team]
-
-            # Find the closest targetable player or goal (could be None)
-            # First we create a list of all players/goals which can be targeted
-            targetable_players = [p for p in game.players + game.goals if p.team == self.owner.team and targetable(p, self.owner)]
-
-            if len(targetable_players) > 0:
-                # Choose the nearest one
-                # dist_key returns a function which gets the distance of the ball owner from whichever player or goal (p)
-                # the sorted function is currently assessing
-                target = min(targetable_players, key=dist_key(self.owner.vpos))
-                game.debug_shoot_target = target.vpos
-            else:
-                target = None
-
-            if team.human():
-                # If the owner is player-controlled, we kick if the player hits their kick key
-                do_shoot = team.controls.shoot()
-            else:
-                # If the owner is computer-controlled, we kick if the ball's hold-off timer has expired
-                # and there is a targetable player or goal, and the targetable player or goal is in a more
-                # favourable location (according to cost()) than the owner's location
-                do_shoot = self.timer <= 0 and target and cost(target.vpos, self.owner.team) < cost(self.owner.vpos, self.owner.team)
-
-            if do_shoot:
-                # play a random kick effect
-                game.play_sound("kick", 4)
-
-                if target:
-                    # If there is a targetable player or goal, kick towards it
-
-                    # If the owner is player-controlled, we assume the player will continue to hold the same direction
-                    # keys down after the pass, so the target  will start moving in the same direction as the
-                    # current owner; on this assumption, we will kick the ball slightly ahead of the target player's
-                    # current position,  through a process of iterative refinement
-
-                    # If the owner is computer-controlled, or the target is a goal, we only execute the loop once and
-                    # so do not apply lead, as there are no keys being held down and goals don't move.
-
-                    r = 0
-
-                    # Decide how many times we're going to go through the loop - the more times, the more accurate
-                    iterations = 8 if team.human() and isinstance(target, Player) else 1
-
-                    for i in range(iterations):
-                        # In the first loop, t will simply be the position of the targeted player or goal.
-                        # In subsequent loops (if there are any), it will represent a position which is at the
-                        # target's feet plus a bit further in whichever direction the player is currently pressing.
-                        t = target.vpos + angle_to_vec(self.owner.dir) * r
-
-                        # Get direction vector and distance between target pos and us
-                        vec, length = safe_normalise(t - self.vpos)
-
-                        # The steps function works out the number of physics steps the ball will take to travel
-                        # the given distance
-                        # todo r
-                        r = HUMAN_PLAYER_WITHOUT_BALL_SPEED * steps(length)
-                else:
-                    # We're not targeting a player or goal, so just kick the ball straight ahead
-
-                    # Get direction vector
-                    vec = angle_to_vec(self.owner.dir)
-
-                    # Make a rough guess at which player the ball might end up closest to so, we can set them as the new
-                    # active player. Pick a point 250 pixels ahead and find the nearest player to that.
-                    target = min([p for p in game.players if p.team == self.owner.team],
-                                 key=dist_key(self.vpos + (vec * 250)))
-
-                if isinstance(target, Player):
-                    # If we just kicked the ball towards a player, make that player the new active player for this team
-                    game.teams[self.owner.team].active_control_player = target
-
-                self.owner.timer = 10  # Owner can't regain the ball for at least 10 frames
-
-                # Set velocity
-                self.vel = vec * KICK_STRENGTH
-
-                # We no longer have an owner
-                self.owner = None
-
+#         self.timer -= 1
+#
+#         # If the ball has an owner, it's being dribbled, so its position is
+#         # based on its owner's position
+#         if self.owner:
+#             # Calculate new ball position for dribbling
+#             # Our target position will be a point just ahead of our owner. However, we don't want to just snap to that
+#             # position straight away. We want to transition to it over several frames, so we take the average of our
+#             # current position and the target position. We also use slightly different offsets for the X and Y axes,
+#             # to reflect that that the game's perspective is not completely top-down - so the positions the ball can
+#             # take in relation to the player should form an ellipse instead of a circle.
+#             # todo explain maths
+#             new_x = avg(self.vpos.x, self.owner.vpos.x + DRIBBLE_DIST_X * sin(self.owner.dir))
+#             new_y = avg(self.vpos.y, self.owner.vpos.y - DRIBBLE_DIST_Y * cos(self.owner.dir))
+#
+#             if on_pitch(new_x, new_y):
+#                 # New position is on the pitch, so update
+#                 self.vpos = Vector2(new_x, new_y)
+#             else:
+#                 # New position is off the pitch, so player loses the ball
+#                 # Set hold-off timer so player can't immediately reacquire the ball
+#                 self.owner.timer = 60
+#
+#                 # Give ball small velocity in player's direction of travel
+#                 self.vel = angle_to_vec(self.owner.dir) * 3
+#
+#                 # Un-set owner
+#                 self.owner = None
+#         else:
+#             # Run physics, one axis at a time
+#
+#             # If ball is vertically inside the goal, it can only go as far as the
+#             # sides of the goal - otherwise it can go all the way to the sides of
+#             # the pitch
+#             if abs(self.vpos.y - HALF_LEVEL_H) > HALF_PITCH_H:
+#                 bounds_x = GOAL_BOUNDS_X
+#             else:
+#                 bounds_x = PITCH_BOUNDS_X
+#
+#             # If ball is horizontally inside the goal, it can go all the way to
+#             # the back of the net - otherwise it can only go up to the end of
+#             # the pitch
+#             if abs(self.vpos.x - HALF_LEVEL_W) < HALF_GOAL_W:
+#                 bounds_y = GOAL_BOUNDS_Y
+#             else:
+#                 bounds_y = PITCH_BOUNDS_Y
+#
+#             self.vpos.x, self.vel.x = ball_physics(self.vpos.x, self.vel.x, bounds_x)
+#             self.vpos.y, self.vel.y = ball_physics(self.vpos.y, self.vel.y, bounds_y)
+#
+#         # Update shadow position to track ball
+#         self.shadow.vpos = Vector2(self.vpos)
+#
+#         # Search for a player that can acquire the ball
+#         for target in game.players:
+#             # A player can acquire the ball if the ball has no owner, or the player is on the other team
+#             # from the owner, and collides with the ball
+#             if (not self.owner or self.owner.team != target.team) and self.collide(target):
+#                 if self.owner:
+#                     # New player is taking the ball from previous owner
+#                     # Set hold-off timer so previous owner can't immediately reacquire the ball
+#                     self.owner.timer = 60
+#
+#                 # Set hold-off timer (dependent on difficulty) to limit rate at which
+#                 # computer-controlled players can pass the ball
+#                 self.timer = game.difficulty.holdoff_timer
+#
+#                 # Update owner, and controllable player for player's team, to player
+#                 game.teams[target.team].active_control_player = self.owner = target
+#
+#         # If the ball has an owner, it's time to decide whether to kick it
+#         if self.owner:
+#             team = game.teams[self.owner.team]
+#
+#             # Find the closest targetable player or goal (could be None)
+#             # First we create a list of all players/goals which can be targeted
+#             targetable_players = [p for p in game.players + game.goals if p.team == self.owner.team and targetable(p, self.owner)]
+#
+#             if len(targetable_players) > 0:
+#                 # Choose the nearest one
+#                 # dist_key returns a function which gets the distance of the ball owner from whichever player or goal (p)
+#                 # the sorted function is currently assessing
+#                 target = min(targetable_players, key=dist_key(self.owner.vpos))
+#                 game.debug_shoot_target = target.vpos
+#             else:
+#                 target = None
+#
+#             if team.human():
+#                 # If the owner is player-controlled, we kick if the player hits their kick key
+#                 do_shoot = team.controls.shoot()
+#             else:
+#                 # If the owner is computer-controlled, we kick if the ball's hold-off timer has expired
+#                 # and there is a targetable player or goal, and the targetable player or goal is in a more
+#                 # favourable location (according to cost()) than the owner's location
+#                 do_shoot = self.timer <= 0 and target and cost(target.vpos, self.owner.team) < cost(self.owner.vpos, self.owner.team)
+#
+#             if do_shoot:
+#                 # play a random kick effect
+#                 game.play_sound("kick", 4)
+#
+#                 if target:
+#                     # If there is a targetable player or goal, kick towards it
+#
+#                     # If the owner is player-controlled, we assume the player will continue to hold the same direction
+#                     # keys down after the pass, so the target  will start moving in the same direction as the
+#                     # current owner; on this assumption, we will kick the ball slightly ahead of the target player's
+#                     # current position,  through a process of iterative refinement
+#
+#                     # If the owner is computer-controlled, or the target is a goal, we only execute the loop once and
+#                     # so do not apply lead, as there are no keys being held down and goals don't move.
+#
+#                     r = 0
+#
+#                     # Decide how many times we're going to go through the loop - the more times, the more accurate
+#                     iterations = 8 if team.human() and isinstance(target, Player) else 1
+#
+#                     for i in range(iterations):
+#                         # In the first loop, t will simply be the position of the targeted player or goal.
+#                         # In subsequent loops (if there are any), it will represent a position which is at the
+#                         # target's feet plus a bit further in whichever direction the player is currently pressing.
+#                         t = target.vpos + angle_to_vec(self.owner.dir) * r
+#
+#                         # Get direction vector and distance between target pos and us
+#                         vec, length = safe_normalise(t - self.vpos)
+#
+#                         # The steps function works out the number of physics steps the ball will take to travel
+#                         # the given distance
+#                         # todo r
+#                         r = HUMAN_PLAYER_WITHOUT_BALL_SPEED * steps(length)
+#                 else:
+#                     # We're not targeting a player or goal, so just kick the ball straight ahead
+#
+#                     # Get direction vector
+#                     vec = angle_to_vec(self.owner.dir)
+#
+#                     # Make a rough guess at which player the ball might end up closest to so, we can set them as the new
+#                     # active player. Pick a point 250 pixels ahead and find the nearest player to that.
+#                     target = min([p for p in game.players if p.team == self.owner.team],
+#                                  key=dist_key(self.vpos + (vec * 250)))
+#
+#                 if isinstance(target, Player):
+#                     # If we just kicked the ball towards a player, make that player the new active player for this team
+#                     game.teams[self.owner.team].active_control_player = target
+#
+#                 self.owner.timer = 10  # Owner can't regain the ball for at least 10 frames
+#
+#                 # Set velocity
+#                 self.vel = vec * KICK_STRENGTH
+#
+#                 # We no longer have an owner
+#                 self.owner = None
+#
 # # Return True if the given position is inside the level area, otherwise False
 # # Takes the goals into account so you can't run through them
 # def allow_movement(x, y):

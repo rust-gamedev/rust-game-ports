@@ -1,6 +1,4 @@
-// #![allow(unused_imports)]
-// #![allow(unused_variables)]
-#![allow(dead_code)]
+#![feature(is_some_with)]
 
 mod anchor;
 mod ball;
@@ -16,6 +14,9 @@ mod media;
 mod menu_state;
 mod my_actor;
 mod player;
+mod pools;
+mod position_utils;
+mod rect;
 mod state;
 mod target;
 mod team;
@@ -29,6 +30,7 @@ pub mod prelude {
         event::VirtualKeyCode,
         scene::{base::BaseBuilder, node::Node, transform::TransformBuilder, Scene},
     };
+    pub use rand::{thread_rng, Rng};
 
     pub use crate::anchor::Anchor;
     pub use crate::ball::Ball;
@@ -43,6 +45,9 @@ pub mod prelude {
     pub use crate::menu_state::MenuState;
     pub use crate::my_actor::MyActor;
     pub use crate::player::Player;
+    pub use crate::pools::Pools;
+    pub use crate::position_utils::*;
+    pub use crate::rect::Rect;
     pub use crate::state::State;
     pub use crate::target::Target;
     pub use crate::team::Team;
@@ -62,12 +67,20 @@ pub mod prelude {
     pub const HALF_PITCH_W: f32 = 442.;
     pub const HALF_PITCH_H: f32 = 622.;
 
-    const GOAL_WIDTH: f32 = 186.;
-    const GOAL_DEPTH: f32 = 20.;
+    pub const GOAL_WIDTH: f32 = 186.;
+    pub const GOAL_DEPTH: f32 = 20.;
     pub const HALF_GOAL_W: f32 = GOAL_WIDTH / 2.;
 
     pub const DRIBBLE_DIST_X: f32 = 18.;
     pub const DRIBBLE_DIST_Y: f32 = 16.;
+
+    pub const HUMAN_PLAYER_WITHOUT_BALL_SPEED: f32 = 3.3;
+
+    //DEBUG_SHOW_LEADS = False
+    //DEBUG_SHOW_TARGETS = False
+    //DEBUG_SHOW_PEERS = False
+    //DEBUG_SHOW_SHOOT_TARGET = False
+    //DEBUG_SHOW_COSTS = False
 
     //# Ball physics model parameters
     pub const KICK_STRENGTH: f32 = 11.5;

@@ -14,39 +14,6 @@ pub const CPU_PLAYER_WITH_BALL_BASE_SPEED: f32 = 2.6;
 pub const PLAYER_INTERCEPT_BALL_SPEED: f32 = 2.75;
 pub const LEAD_PLAYER_BASE_SPEED: f32 = 2.9;
 pub const HUMAN_PLAYER_WITH_BALL_SPEED: f32 = 3.0;
-pub const HUMAN_PLAYER_WITHOUT_BALL_SPEED: f32 = 3.3;
-
-//# Generate a score for a given position, where lower numbers are considered to be better.
-//# This is called when a computer-controlled player with the ball is working out which direction to run in, or whether
-//# to pass the ball to another player, or kick it into the goal.
-//# Several things make up the final score:
-//# - the distance to our own goal – further away is better
-//# - the proximity of players on the other team – we want to get the ball away from them as much as possible
-//# - a quadratic equation (don’t panic too much!) causing the player to favour the centre of the pitch and their opponents goal
-//# - an optional handicap value which can bias the result towards or away from a particular position
-fn cost(
-    pos: Vector2<f32>,
-    team: u8,
-    handicap: u8,
-    players_pool: &Pool<Player>,
-) -> (f32, Vector2<f32>) {
-    //# Get pos of our own goal. We do it this way rather than getting the pos of the actual goal object
-    //# because this way gives us the pos of the goal's entrance, whereas the actual goal sprites are not anchored based
-    //# on the entrances.
-    let own_goal_pos = Vector2::new(HALF_LEVEL_W, if team == 1 { 78. } else { LEVEL_H - 78. });
-    let inverse_own_goal_distance = 3500. / (pos - own_goal_pos).norm();
-
-    let result = inverse_own_goal_distance
-        + players_pool
-            .iter()
-            .filter(|p| p.team != team)
-            .map(|p| 4000. / 24_f32.max((p.vpos - pos).norm()))
-            .sum::<f32>()
-        + ((pos.x - HALF_LEVEL_W).powi(2) / 200. - pos.y * (4. * team as f32 - 2.))
-        + handicap as f32;
-
-    (result, pos)
-}
 
 //# Return True if the given position is inside the level area, otherwise False
 //# Takes the goals into account so you can't run through them
@@ -73,7 +40,7 @@ pub struct Player {
     pub lead: Option<f32>,
     home: Vector2<f32>,
     pub team: u8,
-    dir: u8,
+    pub dir: u8,
     anim_frame: i8,
     pub timer: i32,
     pub shadow: BareActor,
@@ -177,7 +144,7 @@ impl Player {
             //# Find target by calling the controller for the player's team todo comment
             target = self.vpos + my_team.controls.as_ref().unwrap().move_player(speed, input);
         } else if let Some(ball_owner_h) = game.ball.owner {
-            let ball_owner = game.players_pool.borrow(ball_owner_h);
+            let ball_owner = game.pools.players.borrow(ball_owner_h);
 
             //# Someone has the ball - is it me?
             if ball_owner_h == self_h {
@@ -201,7 +168,7 @@ impl Player {
                         self.vpos + angle_to_vec((self.dir as i8 + d) as u8) * 3.,
                         self.team,
                         d.abs() as u8,
-                        &game.players_pool,
+                        &game.pools.players,
                     )
                 });
 
@@ -237,8 +204,8 @@ impl Player {
                 }
                 //# If we're not active, we'll do the default action of moving towards our home position
             } else {
-                let mark_active = self.mark.active(&game);
-                let mark_vpos = self.mark.vpos(&game);
+                let mark_active = self.mark.active(&game.pools, &game.ball);
+                let mark_vpos = self.mark.vpos(&game.pools);
 
                 //# Ball is owned by a player on the opposite team
                 if self.lead.is_some() {
@@ -367,8 +334,8 @@ impl Player {
         //# be no change; if target is between 1 and 4 steps clockwise from current, we should rotate one step clockwise,
         //# and if it's between 1 and 3 steps anticlockwise (which can also be thought of as 5 to 7 steps clockwise), we
         //# should rotate one step anticlockwise - which is equivalent to stepping 7 steps clockwise
-        let dir_diff = (target_dir - self.dir) as usize;
-        self.dir = (self.dir + [0, 1, 1, 1, 1, 7, 7, 7][dir_diff % 8]) % 8;
+        let dir_diff = target_dir as i8 - self.dir as i8;
+        self.dir = (self.dir + [0, 1, 1, 1, 1, 7, 7, 7][dir_diff.rem_euclid(8) as usize]) % 8;
 
         let suffix0 = self.dir;
         let suffix1 = (self.anim_frame.div_euclid(18) + 1) as u8; //# todo

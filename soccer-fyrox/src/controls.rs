@@ -37,18 +37,16 @@ impl Controls {
     // Can't name `move`, which is a reserved keyword.
     //
     pub fn move_player(&self, speed: f32, input: &InputController) -> Vector2<f32> {
-        use VirtualKeyCode::*;
-
         let (mut dx, mut dy) = (0., 0.);
 
-        if input.is_key_pressed(Left) {
+        if input.is_key_pressed(self.key_left) {
             dx = -1.;
-        } else if input.is_key_pressed(Right) {
+        } else if input.is_key_pressed(self.key_right) {
             dx = 1.;
         }
-        if input.is_key_pressed(Up) {
+        if input.is_key_pressed(self.key_up) {
             dy = -1.;
-        } else if input.is_key_pressed(Down) {
+        } else if input.is_key_pressed(self.key_down) {
             dy = 1.;
         }
 
