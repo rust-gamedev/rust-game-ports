@@ -9,14 +9,22 @@ The completed ports are:
 - Code the Classics Vol. 1/Boing: ported to [ggez](https://github.com/ggez/ggez)
 - Code the Classics Vol. 1/Cavern: ported to [Macroquad](https://github.com/not-fl3/macroquad) (without using experimental features)
 - Hands-on Rust: Effective Learning.../Rusty Roguelike: ported to [Bevy](https://github.com/bevyengine/bevy)
-
-Work in progress:
-
-- Code the Classics Vol. 1/Soccer: porting to [Fyrox](https://github.com/FyroxEngine/Fyrox)
+- Code the Classics Vol. 1/Soccer: ported to [Fyrox](https://github.com/FyroxEngine/Fyrox) (see dedicated section)
 
 ## Book!
 
 The Rusty Roguelike port is now the subject of my work-in-progress mini book ["Learn Bevy's ECS by ripping off someone else's project"](https://saveriomiroddi.github.io/learn_bevy_ecs_by_ripping_off)!
+
+## Soccer/Fyrox
+
+The published revision of the game hasn't been designed to fully use the engine APIs:
+
+- there should be multiple scenes, instead of one;
+- the camera should be used for panning, instead of manually computing the visible area.
+
+The port has been nonetheless carefully designed and implemented.
+
+While porting the game, I've found experenced two Fyrox bugs, reported [here](https://github.com/FyroxEngine/Fyrox/issues/320) and [here](https://github.com/FyroxEngine/Fyrox/issues/324).
 
 ## Source Projects
 
