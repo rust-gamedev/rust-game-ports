@@ -317,88 +317,88 @@ class Ball(MyActor):
 #                 # Update owner, and controllable player for player's team, to player
 #                 game.teams[target.team].active_control_player = self.owner = target
 #
-        # If the ball has an owner, it's time to decide whether to kick it
-        if self.owner:
-            team = game.teams[self.owner.team]
-
-            # Find the closest targetable player or goal (could be None)
-            # First we create a list of all players/goals which can be targeted
-            targetable_players = [p for p in game.players + game.goals if p.team == self.owner.team and targetable(p, self.owner)]
-
-            if len(targetable_players) > 0:
-                # Choose the nearest one
-                # dist_key returns a function which gets the distance of the ball owner from whichever player or goal (p)
-                # the sorted function is currently assessing
-                target = min(targetable_players, key=dist_key(self.owner.vpos))
-                game.debug_shoot_target = target.vpos
-            else:
-                target = None
-
-            if team.human():
-                # If the owner is player-controlled, we kick if the player hits their kick key
-                do_shoot = team.controls.shoot()
-            else:
-                # If the owner is computer-controlled, we kick if the ball's hold-off timer has expired
-                # and there is a targetable player or goal, and the targetable player or goal is in a more
-                # favourable location (according to cost()) than the owner's location
-                do_shoot = self.timer <= 0 and target and cost(target.vpos, self.owner.team) < cost(self.owner.vpos, self.owner.team)
-
-            if do_shoot:
-                # play a random kick effect
-                game.play_sound("kick", 4)
-
-                if target:
-                    # If there is a targetable player or goal, kick towards it
-
-                    # If the owner is player-controlled, we assume the player will continue to hold the same direction
-                    # keys down after the pass, so the target  will start moving in the same direction as the
-                    # current owner; on this assumption, we will kick the ball slightly ahead of the target player's
-                    # current position,  through a process of iterative refinement
-
-                    # If the owner is computer-controlled, or the target is a goal, we only execute the loop once and
-                    # so do not apply lead, as there are no keys being held down and goals don't move.
-
-                    r = 0
-
-                    # Decide how many times we're going to go through the loop - the more times, the more accurate
-                    iterations = 8 if team.human() and isinstance(target, Player) else 1
-
-                    for i in range(iterations):
-                        # In the first loop, t will simply be the position of the targeted player or goal.
-                        # In subsequent loops (if there are any), it will represent a position which is at the
-                        # target's feet plus a bit further in whichever direction the player is currently pressing.
-                        t = target.vpos + angle_to_vec(self.owner.dir) * r
-
-                        # Get direction vector and distance between target pos and us
-                        vec, length = safe_normalise(t - self.vpos)
-
-                        # The steps function works out the number of physics steps the ball will take to travel
-                        # the given distance
-                        # todo r
-                        r = HUMAN_PLAYER_WITHOUT_BALL_SPEED * steps(length)
-                else:
-                    # We're not targeting a player or goal, so just kick the ball straight ahead
-
-                    # Get direction vector
-                    vec = angle_to_vec(self.owner.dir)
-
-                    # Make a rough guess at which player the ball might end up closest to so, we can set them as the new
-                    # active player. Pick a point 250 pixels ahead and find the nearest player to that.
-                    target = min([p for p in game.players if p.team == self.owner.team],
-                                 key=dist_key(self.vpos + (vec * 250)))
-
-                if isinstance(target, Player):
-                    # If we just kicked the ball towards a player, make that player the new active player for this team
-                    game.teams[self.owner.team].active_control_player = target
-
-                self.owner.timer = 10  # Owner can't regain the ball for at least 10 frames
-
-                # Set velocity
-                self.vel = vec * KICK_STRENGTH
-
-                # We no longer have an owner
-                self.owner = None
-
+#         # If the ball has an owner, it's time to decide whether to kick it
+#         if self.owner:
+#             team = game.teams[self.owner.team]
+#
+#             # Find the closest targetable player or goal (could be None)
+#             # First we create a list of all players/goals which can be targeted
+#             targetable_players = [p for p in game.players + game.goals if p.team == self.owner.team and targetable(p, self.owner)]
+#
+#             if len(targetable_players) > 0:
+#                 # Choose the nearest one
+#                 # dist_key returns a function which gets the distance of the ball owner from whichever player or goal (p)
+#                 # the sorted function is currently assessing
+#                 target = min(targetable_players, key=dist_key(self.owner.vpos))
+#                 game.debug_shoot_target = target.vpos
+#             else:
+#                 target = None
+#
+#             if team.human():
+#                 # If the owner is player-controlled, we kick if the player hits their kick key
+#                 do_shoot = team.controls.shoot()
+#             else:
+#                 # If the owner is computer-controlled, we kick if the ball's hold-off timer has expired
+#                 # and there is a targetable player or goal, and the targetable player or goal is in a more
+#                 # favourable location (according to cost()) than the owner's location
+#                 do_shoot = self.timer <= 0 and target and cost(target.vpos, self.owner.team) < cost(self.owner.vpos, self.owner.team)
+#
+#             if do_shoot:
+#                 # play a random kick effect
+#                 game.play_sound("kick", 4)
+#
+#                 if target:
+#                     # If there is a targetable player or goal, kick towards it
+#
+#                     # If the owner is player-controlled, we assume the player will continue to hold the same direction
+#                     # keys down after the pass, so the target  will start moving in the same direction as the
+#                     # current owner; on this assumption, we will kick the ball slightly ahead of the target player's
+#                     # current position,  through a process of iterative refinement
+#
+#                     # If the owner is computer-controlled, or the target is a goal, we only execute the loop once and
+#                     # so do not apply lead, as there are no keys being held down and goals don't move.
+#
+#                     r = 0
+#
+#                     # Decide how many times we're going to go through the loop - the more times, the more accurate
+#                     iterations = 8 if team.human() and isinstance(target, Player) else 1
+#
+#                     for i in range(iterations):
+#                         # In the first loop, t will simply be the position of the targeted player or goal.
+#                         # In subsequent loops (if there are any), it will represent a position which is at the
+#                         # target's feet plus a bit further in whichever direction the player is currently pressing.
+#                         t = target.vpos + angle_to_vec(self.owner.dir) * r
+#
+#                         # Get direction vector and distance between target pos and us
+#                         vec, length = safe_normalise(t - self.vpos)
+#
+#                         # The steps function works out the number of physics steps the ball will take to travel
+#                         # the given distance
+#                         # todo r
+#                         r = HUMAN_PLAYER_WITHOUT_BALL_SPEED * steps(length)
+#                 else:
+#                     # We're not targeting a player or goal, so just kick the ball straight ahead
+#
+#                     # Get direction vector
+#                     vec = angle_to_vec(self.owner.dir)
+#
+#                     # Make a rough guess at which player the ball might end up closest to so, we can set them as the new
+#                     # active player. Pick a point 250 pixels ahead and find the nearest player to that.
+#                     target = min([p for p in game.players if p.team == self.owner.team],
+#                                  key=dist_key(self.vpos + (vec * 250)))
+#
+#                 if isinstance(target, Player):
+#                     # If we just kicked the ball towards a player, make that player the new active player for this team
+#                     game.teams[self.owner.team].active_control_player = target
+#
+#                 self.owner.timer = 10  # Owner can't regain the ball for at least 10 frames
+#
+#                 # Set velocity
+#                 self.vel = vec * KICK_STRENGTH
+#
+#                 # We no longer have an owner
+#                 self.owner = None
+#
 # # Return True if the given position is inside the level area, otherwise False
 # # Takes the goals into account so you can't run through them
 # def allow_movement(x, y):

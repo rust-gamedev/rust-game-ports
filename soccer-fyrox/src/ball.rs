@@ -1,3 +1,5 @@
+use fyrox::core::num_traits::Zero;
+
 use crate::prelude::*;
 
 const PITCH_BOUNDS_X: (f32, f32) = (HALF_LEVEL_W - HALF_PITCH_W, HALF_LEVEL_W + HALF_PITCH_W);
@@ -225,7 +227,7 @@ impl Ball {
             if !ball_owner_r.is_some_and(|(_, ball_owner)| ball_owner.team == target.team)
                 && ball.collide(target)
             {
-                if let Some((ball_owner_t, ball_owner)) = &mut ball_owner_r {
+                if let Some((_, ball_owner)) = &mut ball_owner_r {
                     //# New player is taking the ball from previous owner
                     //# Set hold-off timer so previous owner can't immediately reacquire the ball
                     ball_owner.timer = 60;
@@ -245,6 +247,146 @@ impl Ball {
             game.pools.players.put_back(ball_owner_t, ball_owner);
         }
 
-        // WRITEME
+        //# If the ball has an owner, it's time to decide whether to kick it
+        if let Some(owner_h) = ball.owner {
+            let ball_owner = game.pools.players.borrow(owner_h);
+            let team = &game.teams[ball_owner.team as usize];
+
+            //# Find the closest targetable player or goal (could be None)
+            //# First we create a list of all players/goals which can be targeted
+
+            let targetable_players = game
+                .pools
+                .players
+                .iter()
+                .filter(|p| {
+                    p.team == ball_owner.team
+                        && targetable(p, ball_owner, &game.teams, &game.pools.players)
+                })
+                .map(|p| Target::Player(game.pools.players.handle_of(p)))
+                .collect::<Vec<_>>();
+            // WRITEME: targetable must be updated to accept Goals
+            // targetable_players = [p for p in game.players + game.goals if p.team == ball_owner.team and targetable(p, ball_owner)];
+            // targetable_players.extend(
+            //     game.goals_pool
+            //         .iter()
+            //         .map(|p| Target::Goal(game.goals_pool.handle_of(p))),
+            // );
+
+            let target = if targetable_players.len() > 0 {
+                //# Choose the nearest one
+                //# dist_key returns a function which gets the distance of the ball owner from whichever player or goal (p)
+                //# the sorted function is currently assessing
+                targetable_players.iter().min_by(|p1, p2| {
+                    dist_key(
+                        &p1.vpos(&game.pools),
+                        &p2.vpos(&game.pools),
+                        ball_owner.vpos,
+                    )
+                })
+                //game.debug_shoot_target = target.vpos
+            } else {
+                None
+            };
+            let do_shoot = if team.human() {
+                //# If the owner is player-controlled, we kick if the player hits their kick key
+                team.controls.as_ref().unwrap().shoot(input)
+            } else {
+                //# If the owner is computer-controlled, we kick if the ball's hold-off timer has expired
+                //# and there is a targetable player or goal, and the targetable player or goal is in a more
+                //# favourable location (according to cost()) than the owner's location
+                ball.timer <= 0
+                    && target.is_some_and(|target| {
+                        cost(
+                            target.vpos(&game.pools),
+                            ball_owner.team,
+                            0,
+                            &game.pools.players,
+                        ) < cost(ball_owner.vpos, ball_owner.team, 0, &game.pools.players)
+                    })
+            };
+
+            if do_shoot {
+                //# play a random kick effect
+
+                media.play_sound(scene, "goal", &[thread_rng().gen_range(0..2)]);
+                // game.play_sound("kick", 4);
+
+                // Initialize to a phony; the compiler (appropriately) thinks that can be left uninitialized.
+                let mut vek = Vector2::zero();
+
+                let target = if let Some(target) = target {
+                    //# If there is a targetable player or goal, kick towards it
+
+                    //# If the owner is player-controlled, we assume the player will continue to hold the same direction
+                    //# keys down after the pass, so the target  will start moving in the same direction as the
+                    //# current owner; on this assumption, we will kick the ball slightly ahead of the target player's
+                    //# current position,  through a process of iterative refinement
+
+                    //# If the owner is computer-controlled, or the target is a goal, we only execute the loop once and
+                    //# so do not apply lead, as there are no keys being held down and goals don't move.
+
+                    let mut r = 0.;
+
+                    //# Decide how many times we're going to go through the loop - the more times, the more accurate
+                    let iterations = if team.human() && target.is_player() {
+                        8
+                    } else {
+                        1
+                    };
+
+                    for _ in 0..iterations {
+                        //# In the first loop, t will simply be the position of the targeted player or goal.
+                        //# In subsequent loops (if there are any), it will represent a position which is at the
+                        //# target's feet plus a bit further in whichever direction the player is currently pressing.
+                        let t = target.vpos(&game.pools) + angle_to_vec(ball_owner.dir) * r;
+
+                        //# Get direction vector and distance between target pos and us
+                        let (vek_copy, length) = safe_normalise(&(t - ball.vpos));
+                        vek = vek_copy;
+
+                        //# The steps function works out the number of physics steps the ball will take to travel
+                        //# the given distance
+                        //# todo r
+                        r = HUMAN_PLAYER_WITHOUT_BALL_SPEED * steps(length) as f32
+                    }
+
+                    target.clone()
+                } else {
+                    //# We're not targeting a player or goal, so just kick the ball straight ahead
+
+                    //# Get direction vector
+                    vek = angle_to_vec(ball_owner.dir);
+
+                    //# Make a rough guess at which player the ball might end up closest to so, we can set them as the new
+                    //# active player. Pick a point 250 pixels ahead and find the nearest player to that.
+
+                    let closest_player = game
+                        .pools
+                        .players
+                        .iter()
+                        .filter(|p| p.team == ball_owner.team)
+                        .min_by(|p1, p2| dist_key(&p1.vpos, &p2.vpos, ball.vpos + (vek * 250.)))
+                        .unwrap();
+
+                    Target::Player(game.pools.players.handle_of(closest_player))
+                };
+                if let Target::Player(target) = target {
+                    //# If we just kicked the ball towards a player, make that player the new active player for this team
+                    game.teams[ball_owner.team as usize].active_control_player = Some(target);
+                }
+
+                // Reborrow mutably, otherwise there would be a mutable and immutable references to
+                // a Player.
+                let ball_owner = game.pools.players.borrow_mut(owner_h);
+                ball_owner.timer = 10; //# Owner can't regain the ball for at least 10 frames
+
+                //# Set velocity
+                ball.vel = vek * KICK_STRENGTH;
+
+                //# We no longer have an owner
+                ball.owner = None
+            }
+        }
     }
 }
