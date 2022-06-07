@@ -35,7 +35,7 @@ fn allow_movement(x: f32, y: f32) -> bool {
 #[my_actor_based]
 pub struct Player {
     pub peer: Handle<Player>,
-    pub mark: Target,
+    pub mark: TargetHandle,
     pub lead: Option<f32>,
     home: Vector2<f32>,
     pub team: u8,
@@ -63,7 +63,7 @@ impl Player {
         let img_indexes = vec![];
 
         let peer = Handle::NONE;
-        let mark = Target::None;
+        let mark = TargetHandle::None;
         let lead = None;
 
         //# Remember home position, where we'll stand by default if we're not active (i.e. far from the ball)

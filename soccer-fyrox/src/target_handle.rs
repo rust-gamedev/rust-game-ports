@@ -3,13 +3,13 @@ use crate::prelude::*;
 // Stupid simple workaround for the source project duck typing.
 
 #[derive(Clone, Copy)]
-pub enum Target {
+pub enum TargetHandle {
     None,
     Player(Handle<Player>),
     Goal(Handle<Goal>),
 }
 
-impl Target {
+impl TargetHandle {
     // The is_*() methods could be replaced by making Any a supertrait of Targetable, but there are
     // tradeoff; in some cases, the object is not loaded, so the chain `load(&pool).as_any().is::<T>`,
     // while (in a way) more elegant, it's actually clunkier.

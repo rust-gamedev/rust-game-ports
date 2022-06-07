@@ -264,7 +264,7 @@ impl Ball {
                     p.team == ball_owner.team
                         && targetable(*p, ball_owner, &game.teams, &game.pools.players)
                 })
-                .map(|p| Target::Player(game.pools.players.handle_of(p)))
+                .map(|p| TargetHandle::Player(game.pools.players.handle_of(p)))
                 .collect::<Vec<_>>();
 
             targetable_players.extend(
@@ -275,7 +275,7 @@ impl Ball {
                         p.team() == ball_owner.team
                             && targetable(*p, ball_owner, &game.teams, &game.pools.players)
                     })
-                    .map(|p| Target::Goal(game.pools.goals.handle_of(p))),
+                    .map(|p| TargetHandle::Goal(game.pools.goals.handle_of(p))),
             );
 
             let target = if targetable_players.len() > 0 {
@@ -374,9 +374,9 @@ impl Ball {
                         .min_by(|p1, p2| dist_key(&p1.vpos, &p2.vpos, ball.vpos + (vek * 250.)))
                         .unwrap();
 
-                    Target::Player(game.pools.players.handle_of(closest_player))
+                    TargetHandle::Player(game.pools.players.handle_of(closest_player))
                 };
-                if let Target::Player(target) = target {
+                if let TargetHandle::Player(target) = target {
                     //# If we just kicked the ball towards a player, make that player the new active player for this team
                     game.teams[ball_owner.team as usize].active_control_player = Some(target);
                 }

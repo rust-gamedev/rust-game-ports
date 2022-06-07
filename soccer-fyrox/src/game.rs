@@ -178,7 +178,7 @@ impl Game {
 
         //# Each frame, reset mark and lead of each player
         for b in self.pools.players.iter_mut() {
-            b.mark = Target::Player(b.peer);
+            b.mark = TargetHandle::Player(b.peer);
             b.lead = None;
             //b.debug_target = None
         }
@@ -216,7 +216,10 @@ impl Game {
 
                     // See comment below this block; this part is described as "then..." (in the source
                     // project, this statement was after).
-                    std::mem::replace(&mut nearest.mark, Target::Goal(self.goals[team as usize]))
+                    std::mem::replace(
+                        &mut nearest.mark,
+                        TargetHandle::Goal(self.goals[team as usize]),
+                    )
                 };
 
                 //# Set the ball owner's peer to mark whoever the goalie was marking, then set the goalie to mark the goal
