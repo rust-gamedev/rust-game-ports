@@ -10,6 +10,9 @@ pub enum Target {
 }
 
 impl Target {
+    // The is_*() methods could be replaced by making Any a supertrait of Targetable, but there are
+    // tradeoff; in some cases, the object is not loaded, so the chain `load(&pool).as_any().is::<T>`,
+    // while (in a way) more elegant, it's actually clunkier.
     pub fn is_goal(&self) -> bool {
         match self {
             Self::Player(_) => false,
