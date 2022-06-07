@@ -160,7 +160,7 @@ impl Ball {
         //# If the ball has an owner, it's being dribbled, so its position is
         //# based on its owner's position
         if let Some(owner_h) = ball.owner {
-            let owner = game.players_pool.borrow_mut(owner_h);
+            let owner = game.pools.players.borrow_mut(owner_h);
             //# Calculate new ball position for dribbling
             //# Our target position will be a point just ahead of our owner. However, we don't want to just snap to that
             //# position straight away. We want to transition to it over several frames, so we take the average of our
@@ -215,10 +215,10 @@ impl Ball {
 
         let mut ball_owner_r = ball
             .owner
-            .map(|owner_h| game.players_pool.take_reserve(owner_h));
+            .map(|owner_h| game.pools.players.take_reserve(owner_h));
 
         //# Search for a player that can acquire the ball
-        for target in game.players_pool.iter() {
+        for target in game.pools.players.iter() {
             //# A player can acquire the ball if the ball has no owner, or the player is on the other team
             //# from the owner, and collides with the ball
             // Restructured the condition, in order to accommodate the Rust approach.
@@ -236,13 +236,13 @@ impl Ball {
                 ball.timer = game.difficulty.holdoff_timer as i32;
 
                 //# Update owner, and controllable player for player's team, to player
-                ball.owner = Some(game.players_pool.handle_of(target));
+                ball.owner = Some(game.pools.players.handle_of(target));
                 game.teams[target.team as usize].active_control_player = ball.owner;
             }
         }
 
         if let Some((ball_owner_t, ball_owner)) = ball_owner_r {
-            game.players_pool.put_back(ball_owner_t, ball_owner);
+            game.pools.players.put_back(ball_owner_t, ball_owner);
         }
 
         // WRITEME

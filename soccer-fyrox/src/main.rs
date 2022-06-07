@@ -14,6 +14,7 @@ mod media;
 mod menu_state;
 mod my_actor;
 mod player;
+mod pools;
 mod position_utils;
 mod rect;
 mod state;
@@ -44,6 +45,7 @@ pub mod prelude {
     pub use crate::menu_state::MenuState;
     pub use crate::my_actor::MyActor;
     pub use crate::player::Player;
+    pub use crate::pools::Pools;
     pub use crate::position_utils::*;
     pub use crate::rect::Rect;
     pub use crate::state::State;

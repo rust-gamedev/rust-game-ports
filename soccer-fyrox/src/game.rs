@@ -31,8 +31,7 @@ pub struct Game {
     pub ball: Ball,
     camera_focus: Vector2<f32>,
 
-    pub players_pool: Pool<Player>,
-    pub goals_pool: Pool<Goal>,
+    pub pools: Pools,
 }
 
 impl Game {
@@ -72,8 +71,7 @@ impl Game {
         //# Focus camera on ball - copy ball pos
         let camera_focus = ball.vpos.clone();
 
-        let players_pool = Pool::new();
-        let goals_pool = Pool::new();
+        let pools = Pools::new();
 
         let mut instance = Self {
             teams,
@@ -85,8 +83,7 @@ impl Game {
             kickoff_player,
             ball,
             camera_focus,
-            players_pool,
-            goals_pool,
+            pools,
         };
 
         instance.reset();
@@ -101,7 +98,7 @@ impl Game {
         //# The lambda function is used to give the player start positions a slight random offset so they're not
         //# perfectly aligned to their starting spots
         //
-        self.players_pool.clear();
+        self.pools.players.clear();
         self.players.clear();
 
         // Watch out! Python's randint() spec is different, as it's inclusive on both ends, so we use
@@ -112,27 +109,27 @@ impl Game {
             //# For each entry in pos, create one player for each team - positions are flipped (both horizontally and
             //# vertically) versions of each other
             let player = Player::new(random_offset(pos.0), random_offset(pos.1), 0);
-            self.players.push(self.players_pool.spawn(player));
+            self.players.push(self.pools.players.spawn(player));
 
             let player = Player::new(
                 random_offset(LEVEL_W - pos.0),
                 random_offset(LEVEL_H - pos.1),
                 1,
             );
-            self.players.push(self.players_pool.spawn(player));
+            self.players.push(self.pools.players.spawn(player));
         }
 
         //# Players in the list are stored in an alternating fashion - a team 0 player, then a team 1 player, and so on.
         //# The peer for each player is the opposing team player at the opposite end of the list. As there are 14 players
         //# in total, the peers are 0 and 13, 1 and 12, 2 and 11, and so on.
         for (a, b) in self.players.iter().zip(self.players.iter().rev()) {
-            self.players_pool.borrow_mut(*a).peer = *b;
+            self.pools.players.borrow_mut(*a).peer = *b;
         }
 
         //# Create two goals
         self.goals = (0..2)
             .into_iter()
-            .map(|i| self.goals_pool.spawn(Goal::new(i)))
+            .map(|i| self.pools.goals.spawn(Goal::new(i)))
             .collect();
 
         //# The current active player under control by each team, indicated by arrows over their heads
@@ -149,7 +146,8 @@ impl Game {
         self.kickoff_player = Some(self.players[other_team as usize]);
 
         //# Set pos of kickoff player. A team 0 player will stand to the left of the ball, team 1 on the right
-        self.players_pool
+        self.pools
+            .players
             .borrow_mut(self.kickoff_player.unwrap())
             .vpos = Vector2::new(HALF_LEVEL_W - 30. + other_team as f32 * 60., HALF_LEVEL_H);
     }
@@ -174,7 +172,7 @@ impl Game {
 
         //# Each frame, reset mark and lead of each player
         for b in &self.players {
-            let b = self.players_pool.borrow_mut(*b);
+            let b = self.pools.players.borrow_mut(*b);
             b.mark = Target::Player(b.peer);
             b.lead = None;
             //b.debug_target = None
@@ -190,7 +188,7 @@ impl Game {
             //# Ball has an owner (above is equivalent to s.ball.owner != None, or s.ball.owner is not None)
             //# Assign some shorthand variables
             let (pos, team, peer) = {
-                let o = self.players_pool.borrow(*o);
+                let o = self.pools.players.borrow(*o);
                 (o.vpos, o.team, o.peer)
             };
             // Bug here, fixed (was: `other_team = 1 if team == 0 else 1`)
@@ -199,11 +197,13 @@ impl Game {
             if self.difficulty.goalie_enabled {
                 let previous_nearest_mark = {
                     let owners_target_goal_h = self.goals[team as usize];
-                    let owners_target_goal_vpos = self.goals_pool.borrow(owners_target_goal_h).vpos;
+                    let owners_target_goal_vpos =
+                        self.pools.goals.borrow(owners_target_goal_h).vpos;
 
                     //# Find the nearest opposing team player to the goal, and make them mark the goal
                     let nearest = self
-                        .players_pool
+                        .pools
+                        .players
                         .iter_mut()
                         .filter(|p| p.team != team)
                         .min_by(|p1, p2| dist_key(&p1.vpos, &p2.vpos, owners_target_goal_vpos))
@@ -215,7 +215,7 @@ impl Game {
                 };
 
                 //# Set the ball owner's peer to mark whoever the goalie was marking, then set the goalie to mark the goal
-                self.players_pool.borrow_mut(peer).mark = previous_nearest_mark;
+                self.pools.players.borrow_mut(peer).mark = previous_nearest_mark;
 
                 //# Choose one or two lead players to spearhead the attack on the ball owner
                 //# Create a list of players who are on the opposite team from the ball owner, are allowed to acquire
@@ -225,7 +225,7 @@ impl Game {
                     .players
                     .iter()
                     .filter_map(|p_h| {
-                        let p = self.players_pool.borrow(*p_h);
+                        let p = self.pools.players.borrow(*p_h);
 
                         let other_active_p = self.teams[other_team]
                             .active_control_player
@@ -281,9 +281,9 @@ impl Game {
 
                 //# Either one or two players (depending on difficulty settings) follow the ball owner, one from up-field and
                 //# one from down-field of the owner
-                self.players_pool.borrow_mut(*zipped[0].0).lead = Some(LEAD_DISTANCE_1);
+                self.pools.players.borrow_mut(*zipped[0].0).lead = Some(LEAD_DISTANCE_1);
                 if self.difficulty.second_lead_enabled {
-                    self.players_pool.borrow_mut(*zipped[1].0).lead = Some(LEAD_DISTANCE_2);
+                    self.pools.players.borrow_mut(*zipped[1].0).lead = Some(LEAD_DISTANCE_2);
                 }
 
                 //# If the ball has an owner, kick-off must have taken place, so unset the kickoff player
@@ -296,9 +296,9 @@ impl Game {
         //# Update all players and ball
         for obj_h in &self.players.clone() {
             // If we borrow, player_pool is in turn locked.
-            let (obj_ticket, mut obj) = self.players_pool.take_reserve(*obj_h);
+            let (obj_ticket, mut obj) = self.pools.players.take_reserve(*obj_h);
             obj.update(*obj_h, self, input);
-            self.players_pool.put_back(obj_ticket, obj);
+            self.pools.players.put_back(obj_ticket, obj);
         }
         Ball::update(self, input, scene, media);
 
@@ -330,7 +330,8 @@ impl Game {
                 };
 
                 self.teams[team_num].active_control_player = self
-                    .players_pool
+                    .pools
+                    .players
                     .iter()
                     .filter(|p| p.team == team_num as u8)
                     .min_by(|p1, p2| {
@@ -338,7 +339,7 @@ impl Game {
                             .partial_cmp(&dist_key_weighted(p2.vpos))
                             .unwrap()
                     })
-                    .map(|p| self.players_pool.handle_of(p));
+                    .map(|p| self.pools.players.handle_of(p));
             }
         }
 
@@ -369,20 +370,26 @@ impl Game {
         // We deviate from the source project here, by taking advantage of the z-depth, which considerably
         // simplifies the port.
 
-        self.goals_pool
-            .borrow(self.goals[0])
-            .draw(scene, media, offset_x, offset_y, DRAW_GOAL_0_Z);
+        self.pools.goals.borrow(self.goals[0]).draw(
+            scene,
+            media,
+            offset_x,
+            offset_y,
+            DRAW_GOAL_0_Z,
+        );
 
         // Min/max also include the ball.
         let min_player_y = self
-            .players_pool
+            .pools
+            .players
             .iter()
             .map(|p| p.vpos.y)
             .min_by(|y1, y2| y1.partial_cmp(y2).unwrap())
             .unwrap()
             .min(self.ball.vpos.y);
         let max_player_y = self
-            .players_pool
+            .pools
+            .players
             .iter()
             .map(|p| p.vpos.y)
             .max_by(|y1, y2| y1.partial_cmp(y2).unwrap())
@@ -392,7 +399,7 @@ impl Game {
         // This crashes if all the players, and the ball, are on the exact same y coordinate :)
         let players_z_unit = (DRAW_PLAYERS_Z.1 - DRAW_PLAYERS_Z.0) / (max_player_y - min_player_y);
 
-        for player in self.players_pool.iter() {
+        for player in self.pools.players.iter() {
             let player_z = DRAW_PLAYERS_Z.0 + (player.vpos.y - min_player_y) * players_z_unit;
             player.draw(scene, media, offset_x, offset_y, player_z);
 
@@ -412,19 +419,28 @@ impl Game {
             .shadow
             .draw(scene, media, offset_x, offset_y, ball_shadow_z);
 
-        self.goals_pool
-            .borrow(self.goals[0])
-            .draw(scene, media, offset_x, offset_y, DRAW_GOAL_0_Z);
-        self.goals_pool
-            .borrow(self.goals[1])
-            .draw(scene, media, offset_x, offset_y, DRAW_GOAL_1_Z);
+        self.pools.goals.borrow(self.goals[0]).draw(
+            scene,
+            media,
+            offset_x,
+            offset_y,
+            DRAW_GOAL_0_Z,
+        );
+        self.pools.goals.borrow(self.goals[1]).draw(
+            scene,
+            media,
+            offset_x,
+            offset_y,
+            DRAW_GOAL_1_Z,
+        );
 
         //# Show active players
         for t in 0..2 {
             //# Only show arrow for human teams
             if self.teams[t].human() {
                 let arrow_pos = self
-                    .players_pool
+                    .pools
+                    .players
                     .borrow(self.teams[t].active_control_player.unwrap())
                     .vpos()
                     - offset
