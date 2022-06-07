@@ -33,7 +33,6 @@ fn allow_movement(x: f32, y: f32) -> bool {
 }
 
 #[my_actor_based]
-#[derive(Clone)]
 pub struct Player {
     pub peer: Handle<Player>,
     pub mark: Target,
