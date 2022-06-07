@@ -186,9 +186,8 @@ impl Player {
                 //# for the comparisons.
                 //# When min finds the tuple with the minimum cost value, we extract the target pos (which is what we
                 //# actually care about) and discard the actual cost value - hence the '_' dummy variable
-                target = costs
-                    .map(|(_, pos)| pos)
-                    .min_by(|pos1, pos2| pos1[0].partial_cmp(&pos2[0]).unwrap())
+                (_, target) = costs
+                    .min_by(|cost1, cost2| cost1.0.partial_cmp(&cost2.0).unwrap())
                     .unwrap();
 
                 //# speed depends on difficulty
