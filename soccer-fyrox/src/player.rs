@@ -33,10 +33,9 @@ fn allow_movement(x: f32, y: f32) -> bool {
 }
 
 #[my_actor_based]
-#[derive(Clone)]
 pub struct Player {
     pub peer: Handle<Player>,
-    pub mark: Target,
+    pub mark: TargetHandle,
     pub lead: Option<f32>,
     home: Vector2<f32>,
     pub team: u8,
@@ -64,7 +63,7 @@ impl Player {
         let img_indexes = vec![];
 
         let peer = Handle::NONE;
-        let mark = Target::None;
+        let mark = TargetHandle::None;
         let lead = None;
 
         //# Remember home position, where we'll stand by default if we're not active (i.e. far from the ball)
@@ -98,13 +97,6 @@ impl Player {
             timer,
             shadow,
         }
-    }
-
-    pub fn active(&self, ball: &Ball) -> bool {
-        //# Is ball within 400 pixels on the Y axis? If so I'll be considered active, meaning I'm currently doing
-        //# something useful in the game like trying to get the ball. If I'm not active, I'll either mark another player,
-        //# or just stay at my home position
-        (ball.vpos.y - self.home.y).abs() < 400.
     }
 
     // An option is to pass all the Game fields individually, but this is simpler.
@@ -163,9 +155,7 @@ impl Player {
 
                 //# First, create a list of costs for each of the 5 tested positions - a lower number is better. Each
                 //# element is a tuple containing the cost and the position that cost relates to.
-                let costs = (0..5).map(|d| {
-                    let d = d as i8 - 2;
-                    // TODO (port): verify that self.dir is always > 2, since angle_to_vec expects the range 0..=7.
+                let costs = (-2..3).map(|d| {
                     cost(
                         player.vpos + angle_to_vec((player.dir as i8 + d) as u8) * 3.,
                         player.team,
@@ -205,8 +195,8 @@ impl Player {
                 }
                 //# If we're not active, we'll do the default action of moving towards our home position
             } else {
-                let mark_active = player.mark.active(&game.pools, &game.ball);
-                let mark_vpos = player.mark.vpos(&game.pools);
+                let mark_active = player.mark.load(&game.pools).active(&game.ball);
+                let mark_vpos = player.mark.load(&game.pools).vpos();
 
                 //# Ball is owned by a player on the opposite team
                 if player.lead.is_some() {
@@ -350,5 +340,17 @@ impl Player {
 
         //# Update shadow position to track player
         player.shadow.vpos = player.vpos.clone();
+    }
+}
+
+impl Target for Player {
+    fn active(&self, ball: &Ball) -> bool {
+        //# Is ball within 400 pixels on the Y axis? If so I'll be considered active, meaning I'm currently doing
+        //# something useful in the game like trying to get the ball. If I'm not active, I'll either mark another player,
+        //# or just stay at my home position
+        (ball.vpos.y - self.home.y).abs() < 400.
+    }
+    fn team(&self) -> u8 {
+        self.team
     }
 }

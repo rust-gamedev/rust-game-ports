@@ -19,6 +19,7 @@ mod position_utils;
 mod rect;
 mod state;
 mod target;
+mod target_handle;
 mod team;
 
 pub mod prelude {
@@ -50,6 +51,7 @@ pub mod prelude {
     pub use crate::rect::Rect;
     pub use crate::state::State;
     pub use crate::target::Target;
+    pub use crate::target_handle::TargetHandle;
     pub use crate::team::Team;
     pub use soccer_macros_fyrox::my_actor_based;
 
