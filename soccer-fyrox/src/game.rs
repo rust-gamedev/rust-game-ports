@@ -221,81 +221,81 @@ impl Game {
 
                 //# Set the ball owner's peer to mark whoever the goalie was marking, then set the goalie to mark the goal
                 self.pools.players.borrow_mut(peer).mark = previous_nearest_mark;
-
-                //# Choose one or two lead players to spearhead the attack on the ball owner
-                //# Create a list of players who are on the opposite team from the ball owner, are allowed to acquire
-                //# the ball (their hold-off timer must not be positive), are not currently being controlled by a human,
-                //# and are not currently assigned to be the goalie. The list is sorted based on distance from the ball owner.
-                let mut l = self
-                    .players
-                    .iter()
-                    .filter_map(|p_h| {
-                        let p = self.pools.players.borrow(*p_h);
-
-                        let other_active_p = self.teams[other_team]
-                            .active_control_player
-                            .unwrap_or(Handle::NONE);
-
-                        let is_p_match = p.team != team
-                            && p.timer <= 0
-                            && (!self.teams[other_team].human() || *p_h != other_active_p)
-                            && !p.mark.is_goal();
-
-                        is_p_match.then_some((p_h, p.vpos))
-                    })
-                    .collect::<Vec<_>>();
-
-                l.sort_by(|(_, vpos1), (_, vpos2)| dist_key(vpos1, vpos2, pos));
-
-                //# a is a list of players from l who are upfield of the ball owner (i.e. towards our own goal, away from the
-                //# direction of the goal the ball owner is trying to score in). b is all the other players. It's possible for
-                //# one of these to be empty, as there might not be any players in the relevant direction.
-                //
-                // The direct translation of the source logic is not trivial in Rust, due to Player
-                // not supporting equality, but luckily, the partition() API will do even better :)
-                let (a, b): (Vec<_>, Vec<_>) = l.into_iter().partition(|(_, p_vpos)| {
-                    if team == 0 {
-                        p_vpos.y > pos.y
-                    } else {
-                        p_vpos.y < pos.y
-                    }
-                });
-
-                //# Zip a and b together in an alternating fashion. Why do we add NONE2 (i.e. [None,None]) to each list?
-                //# Because the zip function stops when there are no more items in one of the lists. We want our final list
-                //# to contain at least 2 elements. Adding NONE2 (i.e. [None,None] as defined near the top) ensures that each
-                //# list has at least 2 items. But we don't want any values in the final list to be None, hence the final part
-                //# of the list comprehension 'for s in t if s', which discards any None values from the final result
-                //
-                // The Rust translation is pretty direct, but it's more verbose due to static typing
-                // (primarily, conversion to Option<T> and back).
-                let a = a
-                    .into_iter()
-                    .map(|s| Some(s))
-                    .chain([None, None].into_iter());
-                let b = b
-                    .into_iter()
-                    .map(|s| Some(s))
-                    .chain([None, None].into_iter());
-                let zipped = a
-                    .zip(b)
-                    .map(|(s, t)| [s, t])
-                    .flatten()
-                    .filter_map(|s| s)
-                    .collect::<Vec<_>>();
-
-                //# Either one or two players (depending on difficulty settings) follow the ball owner, one from up-field and
-                //# one from down-field of the owner
-                self.pools.players.borrow_mut(*zipped[0].0).lead = Some(LEAD_DISTANCE_1);
-                if self.difficulty.second_lead_enabled {
-                    self.pools.players.borrow_mut(*zipped[1].0).lead = Some(LEAD_DISTANCE_2);
-                }
-
-                //# If the ball has an owner, kick-off must have taken place, so unset the kickoff player
-                //# Of course, kick-off might have already taken place a while ago, in which case kick-off_player will already
-                //# be None, and will remain None
-                self.kickoff_player = None;
             }
+
+            //# Choose one or two lead players to spearhead the attack on the ball owner
+            //# Create a list of players who are on the opposite team from the ball owner, are allowed to acquire
+            //# the ball (their hold-off timer must not be positive), are not currently being controlled by a human,
+            //# and are not currently assigned to be the goalie. The list is sorted based on distance from the ball owner.
+            let mut l = self
+                .players
+                .iter()
+                .filter_map(|p_h| {
+                    let p = self.pools.players.borrow(*p_h);
+
+                    let other_active_p = self.teams[other_team]
+                        .active_control_player
+                        .unwrap_or(Handle::NONE);
+
+                    let is_p_match = p.team != team
+                        && p.timer <= 0
+                        && (!self.teams[other_team].human() || *p_h != other_active_p)
+                        && !p.mark.is_goal();
+
+                    is_p_match.then_some((p_h, p.vpos))
+                })
+                .collect::<Vec<_>>();
+
+            l.sort_by(|(_, vpos1), (_, vpos2)| dist_key(vpos1, vpos2, pos));
+
+            //# a is a list of players from l who are upfield of the ball owner (i.e. towards our own goal, away from the
+            //# direction of the goal the ball owner is trying to score in). b is all the other players. It's possible for
+            //# one of these to be empty, as there might not be any players in the relevant direction.
+            //
+            // The direct translation of the source logic is not trivial in Rust, due to Player
+            // not supporting equality, but luckily, the partition() API will do even better :)
+            let (a, b): (Vec<_>, Vec<_>) = l.into_iter().partition(|(_, p_vpos)| {
+                if team == 0 {
+                    p_vpos.y > pos.y
+                } else {
+                    p_vpos.y < pos.y
+                }
+            });
+
+            //# Zip a and b together in an alternating fashion. Why do we add NONE2 (i.e. [None,None]) to each list?
+            //# Because the zip function stops when there are no more items in one of the lists. We want our final list
+            //# to contain at least 2 elements. Adding NONE2 (i.e. [None,None] as defined near the top) ensures that each
+            //# list has at least 2 items. But we don't want any values in the final list to be None, hence the final part
+            //# of the list comprehension 'for s in t if s', which discards any None values from the final result
+            //
+            // The Rust translation is pretty direct, but it's more verbose due to static typing
+            // (primarily, conversion to Option<T> and back).
+            let a = a
+                .into_iter()
+                .map(|s| Some(s))
+                .chain([None, None].into_iter());
+            let b = b
+                .into_iter()
+                .map(|s| Some(s))
+                .chain([None, None].into_iter());
+            let zipped = a
+                .zip(b)
+                .map(|(s, t)| [s, t])
+                .flatten()
+                .filter_map(|s| s)
+                .collect::<Vec<_>>();
+
+            //# Either one or two players (depending on difficulty settings) follow the ball owner, one from up-field and
+            //# one from down-field of the owner
+            self.pools.players.borrow_mut(*zipped[0].0).lead = Some(LEAD_DISTANCE_1);
+            if self.difficulty.second_lead_enabled {
+                self.pools.players.borrow_mut(*zipped[1].0).lead = Some(LEAD_DISTANCE_2);
+            }
+
+            //# If the ball has an owner, kick-off must have taken place, so unset the kickoff player
+            //# Of course, kick-off might have already taken place a while ago, in which case kick-off_player will already
+            //# be None, and will remain None
+            self.kickoff_player = None;
         }
 
         //# Update all players and ball
