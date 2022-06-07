@@ -29,4 +29,8 @@ impl Targetable for Goal {
         //# Is ball within 500 pixels on the Y axis?
         (ball.vpos.y - self.vpos.y).abs() < 500.
     }
+
+    fn team(&self) -> u8 {
+        self.team
+    }
 }

@@ -352,4 +352,7 @@ impl Targetable for Player {
         //# or just stay at my home position
         (ball.vpos.y - self.home.y).abs() < 400.
     }
+    fn team(&self) -> u8 {
+        self.team
+    }
 }
