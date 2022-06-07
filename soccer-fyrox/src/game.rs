@@ -171,8 +171,7 @@ impl Game {
         }
 
         //# Each frame, reset mark and lead of each player
-        for b in &self.players {
-            let b = self.pools.players.borrow_mut(*b);
+        for b in self.pools.players.iter_mut() {
             b.mark = Target::Player(b.peer);
             b.lead = None;
             //b.debug_target = None
