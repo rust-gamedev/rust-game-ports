@@ -22,8 +22,10 @@ impl Goal {
             anchor: Anchor::Center,
         }
     }
+}
 
-    pub fn active(&self, ball: &Ball) -> bool {
+impl Targetable for Goal {
+    fn active(&self, ball: &Ball) -> bool {
         //# Is ball within 500 pixels on the Y axis?
         (ball.vpos.y - self.vpos.y).abs() < 500.
     }

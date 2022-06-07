@@ -99,13 +99,6 @@ impl Player {
         }
     }
 
-    pub fn active(&self, ball: &Ball) -> bool {
-        //# Is ball within 400 pixels on the Y axis? If so I'll be considered active, meaning I'm currently doing
-        //# something useful in the game like trying to get the ball. If I'm not active, I'll either mark another player,
-        //# or just stay at my home position
-        (ball.vpos.y - self.home.y).abs() < 400.
-    }
-
     // An option is to pass all the Game fields individually, but this is simpler.
     //
     // this implementation is the simplest (no tickets passed around), but 1. is also a simple alternative.
@@ -349,5 +342,14 @@ impl Player {
 
         //# Update shadow position to track player
         player.shadow.vpos = player.vpos.clone();
+    }
+}
+
+impl Targetable for Player {
+    fn active(&self, ball: &Ball) -> bool {
+        //# Is ball within 400 pixels on the Y axis? If so I'll be considered active, meaning I'm currently doing
+        //# something useful in the game like trying to get the ball. If I'm not active, I'll either mark another player,
+        //# or just stay at my home position
+        (ball.vpos.y - self.home.y).abs() < 400.
     }
 }
