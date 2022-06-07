@@ -197,8 +197,8 @@ impl Player {
                 }
                 //# If we're not active, we'll do the default action of moving towards our home position
             } else {
-                let mark_active = player.mark.active(&game.pools, &game.ball);
-                let mark_vpos = player.mark.vpos(&game.pools);
+                let mark_active = player.mark.load(&game.pools).active(&game.ball);
+                let mark_vpos = player.mark.load(&game.pools).vpos();
 
                 //# Ball is owned by a player on the opposite team
                 if player.lead.is_some() {

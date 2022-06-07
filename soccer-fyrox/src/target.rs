@@ -33,19 +33,4 @@ impl Target {
             Self::None => panic!(),
         }
     }
-
-    // There's no trivial solution to this - instantiating each variant with the respective pool is
-    // a nice idea, but requires either Rc's, that pollute the program with borrow()'s, or references,
-    // which pollute the program with lifetimes.
-    // Alternatively, players and goals could be stored in a single pool under a single trait, although
-    // a mixed Pool type should be implemented (it's farly easy), otherwise, all the borrows require
-    // downcasting (from Any), which is, again, very polluting.
-    //
-    pub fn vpos(&self, pools: &Pools) -> Vector2<f32> {
-        self.load(pools).vpos()
-    }
-
-    pub fn active(&self, pools: &Pools, ball: &Ball) -> bool {
-        self.load(pools).active(ball)
-    }
 }

@@ -279,8 +279,8 @@ impl Ball {
                 //# the sorted function is currently assessing
                 targetable_players.iter().min_by(|p1, p2| {
                     dist_key(
-                        &p1.vpos(&game.pools),
-                        &p2.vpos(&game.pools),
+                        &p1.load(&game.pools).vpos(),
+                        &p2.load(&game.pools).vpos(),
                         ball_owner.vpos,
                     )
                 })
@@ -298,7 +298,7 @@ impl Ball {
                 ball.timer <= 0
                     && target.is_some_and(|target| {
                         cost(
-                            target.vpos(&game.pools),
+                            target.load(&game.pools).vpos(),
                             ball_owner.team,
                             0,
                             &game.pools.players,
@@ -339,7 +339,7 @@ impl Ball {
                         //# In the first loop, t will simply be the position of the targeted player or goal.
                         //# In subsequent loops (if there are any), it will represent a position which is at the
                         //# target's feet plus a bit further in whichever direction the player is currently pressing.
-                        let t = target.vpos(&game.pools) + angle_to_vec(ball_owner.dir) * r;
+                        let t = target.load(&game.pools).vpos() + angle_to_vec(ball_owner.dir) * r;
 
                         //# Get direction vector and distance between target pos and us
                         let (vek_copy, length) = safe_normalise(&(t - ball.vpos));
