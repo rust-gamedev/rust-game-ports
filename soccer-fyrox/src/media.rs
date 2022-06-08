@@ -231,7 +231,9 @@ impl Media {
             .build(&mut scene.graph);
     }
 
-    // In PyGame, music is a streamed (and repeated) sound; in Fyrox, there isn't the streaming concept.
+    // In PyGame, music is a streamed (and repeated) sound; in Fyrox, this can also be enabled programmatically,
+    // but the simplest thing is to use an options file - see `theme.ogg.options`.
+    //
     // In the source project, looping sounds don't have an index.
     //
     // We could merge this and the play_sound(), but it's simpler (API-wise) to separate them, taking
