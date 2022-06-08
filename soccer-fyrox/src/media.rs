@@ -25,6 +25,11 @@ const RESOURCES_PATH: &str = "resources";
 const IMAGES_PATH: &str = "images";
 const SOUNDS_PATH: &str = "sounds";
 
+// Avoid loading other files, ie. .options
+//
+const SUPPORTED_IMAGE_EXTENSIONS: &'static [&'static str] = &[".gif", ".png"];
+const SUPPORTED_SOUND_EXTENSIONS: &'static [&'static str] = &[".ogg"];
+
 // It's not easy to make the overall design of the program simple, since Fyrox requires several elements
 // to be carried around (scene, handles, resources...).
 // For a simple game like this, a simple type like this will do, and it will take care of everything.
@@ -41,7 +46,14 @@ impl Media {
 
         let image_paths = read_dir(images_path)
             .unwrap()
-            .map(|entry| entry.unwrap().path().to_string_lossy().into_owned())
+            .filter_map(|entry| {
+                let filename = entry.unwrap().path().to_string_lossy().into_owned();
+
+                SUPPORTED_IMAGE_EXTENSIONS
+                    .iter()
+                    .any(|ext| filename.ends_with(ext))
+                    .then_some(filename)
+            })
             .collect::<Vec<String>>();
 
         // As of Fyrox v0.25, loading textures in debug mode is extremely slow (1.4" for each PNG file,
@@ -57,7 +69,14 @@ impl Media {
 
         let sound_paths = read_dir(sounds_path)
             .unwrap()
-            .map(|entry| entry.unwrap().path().to_string_lossy().into_owned())
+            .filter_map(|entry| {
+                let filename = entry.unwrap().path().to_string_lossy().into_owned();
+
+                SUPPORTED_SOUND_EXTENSIONS
+                    .iter()
+                    .any(|ext| filename.ends_with(ext))
+                    .then_some(filename)
+            })
             .collect::<Vec<String>>();
 
         let sound_requests = join_all(
