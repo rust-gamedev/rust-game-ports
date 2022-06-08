@@ -25,6 +25,11 @@ const RESOURCES_PATH: &str = "resources";
 const IMAGES_PATH: &str = "images";
 const SOUNDS_PATH: &str = "sounds";
 
+// Avoid loading other files, ie. .options
+//
+const SUPPORTED_IMAGE_EXTENSIONS: &'static [&'static str] = &[".gif", ".png"];
+const SUPPORTED_SOUND_EXTENSIONS: &'static [&'static str] = &[".ogg"];
+
 // It's not easy to make the overall design of the program simple, since Fyrox requires several elements
 // to be carried around (scene, handles, resources...).
 // For a simple game like this, a simple type like this will do, and it will take care of everything.
@@ -41,7 +46,14 @@ impl Media {
 
         let image_paths = read_dir(images_path)
             .unwrap()
-            .map(|entry| entry.unwrap().path().to_string_lossy().into_owned())
+            .filter_map(|entry| {
+                let filename = entry.unwrap().path().to_string_lossy().into_owned();
+
+                SUPPORTED_IMAGE_EXTENSIONS
+                    .iter()
+                    .any(|ext| filename.ends_with(ext))
+                    .then_some(filename)
+            })
             .collect::<Vec<String>>();
 
         // As of Fyrox v0.25, loading textures in debug mode is extremely slow (1.4" for each PNG file,
@@ -57,7 +69,14 @@ impl Media {
 
         let sound_paths = read_dir(sounds_path)
             .unwrap()
-            .map(|entry| entry.unwrap().path().to_string_lossy().into_owned())
+            .filter_map(|entry| {
+                let filename = entry.unwrap().path().to_string_lossy().into_owned();
+
+                SUPPORTED_SOUND_EXTENSIONS
+                    .iter()
+                    .any(|ext| filename.ends_with(ext))
+                    .then_some(filename)
+            })
             .collect::<Vec<String>>();
 
         let sound_requests = join_all(
@@ -74,13 +93,23 @@ impl Media {
         let image_textures = image_paths
             .iter()
             .zip(block_on(texture_requests))
-            .map(|(path, texture)| (path[..(path.len() - 4)].to_string(), texture.expect(path)))
+            .map(|(path, texture)| {
+                (
+                    path[..(path.len() - 4)].to_string(),
+                    texture.expect(&format!("Error while loading image file '{}'", path)),
+                )
+            })
             .collect::<HashMap<_, _>>();
 
         let sound_resources = sound_paths
             .iter()
             .zip(block_on(sound_requests))
-            .map(|(path, sound)| (path.to_string(), sound.expect(path)))
+            .map(|(path, sound)| {
+                (
+                    path.to_string(),
+                    sound.expect(&format!("Error while loading sound file: '{}'", path)),
+                )
+            })
             .collect::<HashMap<_, _>>();
 
         let images_root = PivotBuilder::new(BaseBuilder::new()).build(&mut scene.graph);
@@ -202,7 +231,9 @@ impl Media {
             .build(&mut scene.graph);
     }
 
-    // In PyGame, music is a streamed (and repeated) sound; in Fyrox, there isn't the streaming concept.
+    // In PyGame, music is a streamed (and repeated) sound; in Fyrox, this can also be enabled programmatically,
+    // but the simplest thing is to use an options file - see `theme.ogg.options`.
+    //
     // In the source project, looping sounds don't have an index.
     //
     // We could merge this and the play_sound(), but it's simpler (API-wise) to separate them, taking
