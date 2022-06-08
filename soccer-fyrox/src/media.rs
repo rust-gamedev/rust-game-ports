@@ -1,4 +1,4 @@
-use std::{collections::HashMap, fmt::Display, fs::read_dir};
+use std::{collections::HashMap, fmt::Display, fs::read_dir, path::PathBuf};
 
 use fyrox::{
     core::futures::{executor::block_on, future::join_all},
@@ -19,8 +19,11 @@ const ZERO_ORD: u8 = '0' as u8;
 //
 pub const BLANK_IMAGE: &str = "blank";
 
-const IMAGES_PATH: &str = "resources/images";
-const SOUNDS_PATH: &str = "resources/sounds";
+// Use Media::build_path to access resources.
+//
+const RESOURCES_PATH: &str = "resources";
+const IMAGES_PATH: &str = "images";
+const SOUNDS_PATH: &str = "sounds";
 
 // It's not easy to make the overall design of the program simple, since Fyrox requires several elements
 // to be carried around (scene, handles, resources...).
@@ -34,7 +37,9 @@ pub struct Media {
 
 impl Media {
     pub fn new(resource_manager: &ResourceManager, scene: &mut Scene) -> Self {
-        let image_paths = read_dir(IMAGES_PATH)
+        let images_path = Self::resource_path(&[IMAGES_PATH]);
+
+        let image_paths = read_dir(images_path)
             .unwrap()
             .map(|entry| entry.unwrap().path().to_string_lossy().into_owned())
             .collect::<Vec<String>>();
@@ -48,7 +53,9 @@ impl Media {
                 .map(|path| resource_manager.request_texture(path)),
         );
 
-        let sound_paths = read_dir(SOUNDS_PATH)
+        let sounds_path = Self::resource_path(&[SOUNDS_PATH]);
+
+        let sound_paths = read_dir(sounds_path)
             .unwrap()
             .map(|entry| entry.unwrap().path().to_string_lossy().into_owned())
             .collect::<Vec<String>>();
@@ -234,11 +241,13 @@ impl Media {
             panic!();
         }
 
-        let mut full_path = format!("resources/images/{}", base);
+        let mut filename = base.to_string();
 
         for index in indexes {
-            full_path.push((ZERO_ORD + index) as char);
+            filename.push((ZERO_ORD + index) as char);
         }
+
+        let full_path = Self::resource_path(&[IMAGES_PATH, &filename]);
 
         self.image_textures
             .get(&full_path)
@@ -253,17 +262,29 @@ impl Media {
             panic!();
         }
 
-        let mut full_path = format!("resources/sounds/{}", base);
+        let mut filename = base.to_string();
 
         for index in indexes {
-            full_path.push((ZERO_ORD + index) as char);
+            filename.push((ZERO_ORD + index) as char);
         }
 
-        full_path.push_str(".ogg");
+        filename.push_str(".ogg");
+
+        let full_path = Self::resource_path(&[SOUNDS_PATH, &filename]);
 
         self.sound_resources
             .get(&full_path)
             .expect(&format!("Sound '{}' not found!", &full_path))
             .clone()
+    }
+
+    fn resource_path(paths: &[&str]) -> String {
+        paths
+            .iter()
+            .fold(PathBuf::from(RESOURCES_PATH), |result, current| {
+                result.join(current)
+            })
+            .to_string_lossy()
+            .into_owned()
     }
 }
