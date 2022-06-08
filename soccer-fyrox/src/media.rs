@@ -74,13 +74,23 @@ impl Media {
         let image_textures = image_paths
             .iter()
             .zip(block_on(texture_requests))
-            .map(|(path, texture)| (path[..(path.len() - 4)].to_string(), texture.expect(path)))
+            .map(|(path, texture)| {
+                (
+                    path[..(path.len() - 4)].to_string(),
+                    texture.expect(&format!("Error while loading image file '{}'", path)),
+                )
+            })
             .collect::<HashMap<_, _>>();
 
         let sound_resources = sound_paths
             .iter()
             .zip(block_on(sound_requests))
-            .map(|(path, sound)| (path.to_string(), sound.expect(path)))
+            .map(|(path, sound)| {
+                (
+                    path.to_string(),
+                    sound.expect(&format!("Error while loading sound file: '{}'", path)),
+                )
+            })
             .collect::<HashMap<_, _>>();
 
         let images_root = PivotBuilder::new(BaseBuilder::new()).build(&mut scene.graph);
