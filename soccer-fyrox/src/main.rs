@@ -106,7 +106,8 @@ pub mod prelude {
     pub const DRAW_GOAL_1_Z: f32 = 10.0;
     pub const DRAW_ARROWS_Z: f32 = 9.0;
 
-    pub const DRAW_GAME_OVER_Z: f32 = -1.0;
+    pub const DRAW_GAME_OVER_BACKGROUND_Z: f32 = 0.0;
+    pub const DRAW_GAME_OVER_SCORES_Z: f32 = -1.0;
 }
 
 use fyrox::engine::framework::Framework;
