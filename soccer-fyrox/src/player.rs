@@ -156,8 +156,14 @@ impl Player {
                 //# First, create a list of costs for each of the 5 tested positions - a lower number is better. Each
                 //# element is a tuple containing the cost and the position that cost relates to.
                 let costs = (-2..3).map(|d| {
+                    // angle_to_vec's documentation in the source says that the range of values is from
+                    // 0 to 7, but this formula sometimes generate negative values (-2/-1). Such values
+                    // yield correct results (as the formula is essentialy mod(8)), however, it's not
+                    // clear if it was the intention of the author not to perform mod(8). From the port
+                    // perspective though, this is a bug, since unintented wraparound causes debug panic.
+                    let angle = (player.dir as i8 + d).rem_euclid(8) as u8;
                     cost(
-                        player.vpos + angle_to_vec((player.dir as i8 + d) as u8) * 3.,
+                        player.vpos + angle_to_vec(angle) * 3.,
                         player.team,
                         d.abs() as u8,
                         &game.pools.players,
