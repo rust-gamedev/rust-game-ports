@@ -224,7 +224,7 @@ impl GameGlobal {
                 //# Display "Game Over" image
                 let index = (self.game.teams[1].score > self.game.teams[0].score) as u8;
                 self.media
-                    .blit_image(scene, "over", &[index], 0., 0., DRAW_GAME_OVER_Z);
+                    .blit_image(scene, "over", &[index], 0., 0., DRAW_GAME_OVER_BACKGROUND_Z);
 
                 //# Show score for each team
                 for i in 0..2 {
@@ -234,7 +234,7 @@ impl GameGlobal {
                         &[i as u8, self.game.teams[i as usize].score],
                         HALF_WINDOW_W + 25. - 125. * i as f32,
                         144.,
-                        DRAW_GAME_OVER_Z,
+                        DRAW_GAME_OVER_SCORES_Z,
                     );
                 }
             }
