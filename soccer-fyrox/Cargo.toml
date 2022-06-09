@@ -9,6 +9,9 @@ fyrox = "0.26.0"
 rand = "*" # Use the same as Fyrox
 soccer-macros-fyrox = {path = "../soccer-macros-fyrox"} 
 
+[profile.dev.package."*"]
+opt-level = 3
+
 # Fixes window resizing (see https://github.com/rust-windowing/winit/issues/2306).
 #
 [patch.crates-io]
