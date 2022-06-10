@@ -237,15 +237,15 @@ impl Media {
     // advantage of the two points above.
     //
     pub fn play_looping_sound(&mut self, scene: &mut Scene, name: &str) {
-        let sound = self.sound(name, &[]);
-
-        let node = SoundBuilder::new(BaseBuilder::new())
-            .with_buffer(Some(sound))
-            .with_looping(true)
-            .with_status(Status::Playing)
-            .build(&mut scene.graph);
-
-        self.looping_sounds.insert(name.to_string(), node);
+        //         let sound = self.sound(name, &[]);
+        //
+        //         let node = SoundBuilder::new(BaseBuilder::new())
+        //             .with_buffer(Some(sound))
+        //             .with_looping(true)
+        //             .with_status(Status::Playing)
+        //             .build(&mut scene.graph);
+        //
+        //         self.looping_sounds.insert(name.to_string(), node);
     }
 
     // The source project allows attempting to stop a sound that hasn't been started.
@@ -253,15 +253,15 @@ impl Media {
     // Looping sounds don't have an index (see play_sound()).
     //
     pub fn stop_looping_sound(&mut self, scene: &mut Scene, base: &str) {
-        if let Some(sound_h) = self.looping_sounds.remove(base) {
-            let sound = &mut scene.graph[sound_h];
-
-            // Removing the node also stops the sound, so this is technically redundant.
-            //
-            sound.as_sound_mut().stop();
-
-            scene.remove_node(sound_h);
-        }
+        //         if let Some(sound_h) = self.looping_sounds.remove(base) {
+        //             let sound = &mut scene.graph[sound_h];
+        //
+        //             // Removing the node also stops the sound, so this is technically redundant.
+        //             //
+        //             sound.as_sound_mut().stop();
+        //
+        //             scene.remove_node(sound_h);
+        //         }
     }
 
     fn image<S: AsRef<str> + Display>(&self, base: S, indexes: &[u8]) -> Texture {
