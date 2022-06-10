@@ -28,7 +28,7 @@ impl GameState for GameGlobal {
 
         Self::add_camera(&mut scene);
 
-        let mut media = Media::new(&engine.resource_manager, &mut scene);
+        let mut media = Media::new(&engine.resource_manager);
 
         let input = InputController::new();
 
@@ -41,7 +41,6 @@ impl GameState for GameGlobal {
         Self {
             media,
             scene: scene_h,
-            // camera,
             input,
             game,
             state,
