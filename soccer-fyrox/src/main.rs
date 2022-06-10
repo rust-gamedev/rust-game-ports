@@ -17,6 +17,7 @@ mod player;
 mod pools;
 mod position_utils;
 mod rect;
+mod scenes;
 mod state;
 mod target;
 mod target_handle;
@@ -28,8 +29,11 @@ pub mod prelude {
             algebra::{Vector2, Vector3},
             pool::{Handle, Pool},
         },
+        engine::Engine,
         event::VirtualKeyCode,
-        scene::{base::BaseBuilder, node::Node, transform::TransformBuilder, Scene},
+        scene::{
+            base::BaseBuilder, node::Node, transform::TransformBuilder, Scene, SceneContainer,
+        },
     };
     pub use rand::{thread_rng, Rng};
 
@@ -49,6 +53,7 @@ pub mod prelude {
     pub use crate::pools::Pools;
     pub use crate::position_utils::*;
     pub use crate::rect::Rect;
+    pub use crate::scenes::Scenes;
     pub use crate::state::State;
     pub use crate::target::Target;
     pub use crate::target_handle::TargetHandle;

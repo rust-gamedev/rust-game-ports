@@ -156,7 +156,13 @@ impl Ball {
 
     // We can't pass `&mut game.ball` and `&mut game` at the same time, so we just just make this a
     // function, and call it a day :)
-    pub fn update(game: &mut Game, input: &InputController, scene: &mut Scene, media: &Media) {
+    pub fn update(
+        game: &mut Game,
+        input: &InputController,
+        scenes: &mut Scenes,
+        scene_container: &mut SceneContainer,
+        media: &Media,
+    ) {
         let ball = &mut game.ball;
         ball.timer -= 1;
 
@@ -314,7 +320,9 @@ impl Ball {
             if do_shoot {
                 //# play a random kick effect
 
-                media.play_sound(scene, "goal", &[thread_rng().gen_range(0..2)]);
+                scenes.iter_all_scenes(scene_container, |scene| {
+                    media.play_sound(scene, "goal", &[thread_rng().gen_range(0..2)]);
+                });
                 // game.play_sound("kick", 4);
 
                 // Initialize to a phony; the compiler (appropriately) thinks that can be left uninitialized.

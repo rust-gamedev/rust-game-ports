@@ -39,29 +39,37 @@ impl Game {
         p1_controls: Option<Controls>,
         p2_controls: Option<Controls>,
         difficulty: u8,
-        scene: &mut Scene,
+        scenes: &mut Scenes,
+        scene_container: &mut SceneContainer,
         media: &mut Media,
     ) -> Self {
         let teams = vec![Team::new(p1_controls), Team::new(p2_controls)];
         let difficulty = DIFFICULTY[difficulty as usize];
 
-        if teams[0].human() {
-            //# Beginning a game with at least 1 human player
-            //# music.fadeout(1); // WRITEME: Fyrox doesn't currently support fading out
-            media.stop_looping_sound(scene, "theme"); // ^^ remove once fadeout is implemented
-            media.play_looping_sound(scene, "crowd");
-            media.play_sound(scene, "start", &[]);
-        } else {
-            //# No players - we must be on the menu. Play title music.
-            media.play_looping_sound(scene, "theme");
-            media.stop_looping_sound(scene, "crowd");
-        }
+        scenes.iter_all_scenes(scene_container, |scene| {
+            if teams[0].human() {
+                //# Beginning a game with at least 1 human player
+                //# music.fadeout(1); // WRITEME: Fyrox doesn't currently support fading out
+                media.stop_looping_sound(scene, "theme"); // ^^ remove once fadeout is implemented
+                media.play_looping_sound(scene, "crowd");
+                media.play_sound(scene, "start", &[]);
+            } else {
+                //# No players - we must be on the menu. Play title music.
+                media.play_looping_sound(scene, "theme");
+                media.stop_looping_sound(scene, "crowd");
+            }
+        });
 
         let score_timer = 0;
         let scoring_team = 1;
 
-        // Owner of the players.
-        let players = vec![];
+        // The objects that are reset(), are instantiated here, but with phony values.
+
+        let mut pools = Pools::new();
+
+        let players = (0..(2 * PLAYER_START_POS.len()))
+            .map(|_| pools.players.spawn(Player::new()))
+            .collect();
         let goals = vec![];
         let kickoff_player = None;
 
@@ -70,8 +78,6 @@ impl Game {
 
         //# Focus camera on ball - copy ball pos
         let camera_focus = ball.vpos.clone();
-
-        let pools = Pools::new();
 
         let mut instance = Self {
             teams,
@@ -98,25 +104,26 @@ impl Game {
         //# The lambda function is used to give the player start positions a slight random offset so they're not
         //# perfectly aligned to their starting spots
         //
-        self.pools.players.clear();
-        self.players.clear();
-
         // Watch out! Python's randint() spec is different, as it's inclusive on both ends, so we use
         // 33 on the right end.
         let random_offset = |x| x + rand::thread_rng().gen_range(-32..33) as f32;
-        for pos in PLAYER_START_POS {
-            //# pos is a pair of coordinates in a tuple
-            //# For each entry in pos, create one player for each team - positions are flipped (both horizontally and
-            //# vertically) versions of each other
-            let player = Player::new(random_offset(pos.0), random_offset(pos.1), 0);
-            self.players.push(self.pools.players.spawn(player));
 
-            let player = Player::new(
+        //# pos is a pair of coordinates in a tuple
+        //# For each entry in pos, create one player for each team - positions are flipped (both horizontally and
+        //# vertically) versions of each other
+        for (players_h, pos) in self.players.chunks(2).zip(PLAYER_START_POS.iter()) {
+            let (player0, player1) = self
+                .pools
+                .players
+                .borrow_two_mut((players_h[0], players_h[1]));
+
+            player0.reset(random_offset(pos.0), random_offset(pos.1), 0);
+
+            player1.reset(
                 random_offset(LEVEL_W - pos.0),
                 random_offset(LEVEL_H - pos.1),
                 1,
             );
-            self.players.push(self.pools.players.spawn(player));
         }
 
         //# Players in the list are stored in an alternating fashion - a team 0 player, then a team 1 player, and so on.
@@ -158,14 +165,22 @@ impl Game {
         self.camera_focus = self.ball.vpos.clone();
     }
 
-    pub fn update(&mut self, media: &Media, scene: &mut Scene, input: &InputController) {
+    pub fn update(
+        &mut self,
+        media: &Media,
+        scenes: &mut Scenes,
+        scene_container: &mut SceneContainer,
+        input: &InputController,
+    ) {
         self.score_timer -= 1;
 
         if self.score_timer == 0 {
             //# Reset for new kick-off after goal scored
             self.reset();
         } else if self.score_timer < 0 && (self.ball.vpos.y - HALF_LEVEL_H).abs() > HALF_PITCH_H {
-            media.play_sound(scene, "goal", &[thread_rng().gen_range(0..2)]);
+            scenes.iter_all_scenes(scene_container, |scene| {
+                media.play_sound(scene, "goal", &[thread_rng().gen_range(0..2)]);
+            });
 
             self.scoring_team = if self.ball.vpos.y < HALF_LEVEL_H {
                 0
@@ -305,7 +320,7 @@ impl Game {
         for obj_h in &self.players.clone() {
             Player::update(*obj_h, self, input);
         }
-        Ball::update(self, input, scene, media);
+        Ball::update(self, input, scenes, scene_container, media);
 
         let owner = self.ball.owner;
 
@@ -357,13 +372,20 @@ impl Game {
         }
     }
 
-    pub fn draw(&self, scene: &mut Scene, media: &mut Media) {
+    pub fn draw(
+        &self,
+        scenes: &mut Scenes,
+        scene_container: &mut SceneContainer,
+        media: &mut Media,
+    ) {
         //# For the purpose of scrolling, all objects will be drawn with these offsets
         let offset_x = (self.camera_focus.x - WIDTH / 2.).clamp(0., LEVEL_W - WIDTH);
         let offset_y = (self.camera_focus.y - HEIGHT / 2.).clamp(0., LEVEL_H - HEIGHT);
         let offset = Vector2::new(offset_x, offset_y);
 
-        media.blit_image(scene, "pitch", &[], -offset_x, -offset_y, DRAW_PITCH_Z);
+        scenes.iter_all_scenes(scene_container, |scene| {
+            media.blit_image(scene, "pitch", &[], -offset_x, -offset_y, DRAW_PITCH_Z)
+        });
 
         //# Prepare to draw all objects
         //# 1. Create a list of all players and the ball, sorted based on their Y positions
@@ -376,7 +398,8 @@ impl Game {
         // simplifies the port.
 
         self.pools.goals.borrow(self.goals[0]).draw(
-            scene,
+            scenes,
+            scene_container,
             media,
             offset_x,
             offset_y,
@@ -406,33 +429,46 @@ impl Game {
 
         for player in self.pools.players.iter() {
             let player_z = DRAW_PLAYERS_Z.0 + (player.vpos.y - min_player_y) * players_z_unit;
-            player.draw(scene, media, offset_x, offset_y, player_z);
+            player.draw(scenes, scene_container, media, offset_x, offset_y, player_z);
 
             let player_shadow_z =
                 DRAW_SHADOWS_Z.0 + (player.shadow.vpos.y - min_player_y) * players_z_unit;
-            player
-                .shadow
-                .draw(scene, media, offset_x, offset_y, player_shadow_z);
+            player.shadow.draw(
+                scenes,
+                scene_container,
+                media,
+                offset_x,
+                offset_y,
+                player_shadow_z,
+            );
         }
 
         let ball_z = DRAW_PLAYERS_Z.0 + (self.ball.vpos.y - min_player_y) * players_z_unit;
-        self.ball.draw(scene, media, offset_x, offset_y, ball_z);
+        self.ball
+            .draw(scenes, scene_container, media, offset_x, offset_y, ball_z);
 
         let ball_shadow_z =
             DRAW_PLAYERS_Z.0 + (self.ball.shadow.vpos.y - min_player_y) * players_z_unit;
-        self.ball
-            .shadow
-            .draw(scene, media, offset_x, offset_y, ball_shadow_z);
+        self.ball.shadow.draw(
+            scenes,
+            scene_container,
+            media,
+            offset_x,
+            offset_y,
+            ball_shadow_z,
+        );
 
         self.pools.goals.borrow(self.goals[0]).draw(
-            scene,
+            scenes,
+            scene_container,
             media,
             offset_x,
             offset_y,
             DRAW_GOAL_0_Z,
         );
         self.pools.goals.borrow(self.goals[1]).draw(
-            scene,
+            scenes,
+            scene_container,
             media,
             offset_x,
             offset_y,
@@ -450,14 +486,16 @@ impl Game {
                     .vpos()
                     - offset
                     - Vector2::new(11., 45.);
-                media.blit_image(
-                    scene,
-                    "arrow",
-                    &[t as u8],
-                    arrow_pos.x,
-                    arrow_pos.y,
-                    DRAW_ARROWS_Z,
-                );
+                scenes.iter_all_scenes(scene_container, |scene| {
+                    media.blit_image(
+                        scene,
+                        "arrow",
+                        &[t as u8],
+                        arrow_pos.x,
+                        arrow_pos.y,
+                        DRAW_ARROWS_Z,
+                    );
+                });
             }
         }
 
