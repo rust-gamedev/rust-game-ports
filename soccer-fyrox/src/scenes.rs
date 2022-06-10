@@ -52,6 +52,17 @@ impl Scenes {
         }
     }
 
+    pub fn iter_all_scenes<'a>(
+        &self,
+        scene_container: &'a mut SceneContainer,
+        mut func: impl FnMut(&mut Scene),
+    ) {
+        for scene_h in [self.menu, self.play, self.game_over] {
+            let scene = &mut scene_container[scene_h];
+            func(scene);
+        }
+    }
+
     // Disables the other states.
     pub fn enable(&self, enable_state: State, scene_container: &mut SceneContainer) {
         for state in State::iter() {
