@@ -63,8 +63,13 @@ impl Game {
         let score_timer = 0;
         let scoring_team = 1;
 
-        // Owner of the players.
-        let players = vec![];
+        // The objects that are reset(), are instantiated here, but with phony values.
+
+        let mut pools = Pools::new();
+
+        let players = (0..(2 * PLAYER_START_POS.len()))
+            .map(|_| pools.players.spawn(Player::new()))
+            .collect();
         let goals = vec![];
         let kickoff_player = None;
 
@@ -73,8 +78,6 @@ impl Game {
 
         //# Focus camera on ball - copy ball pos
         let camera_focus = ball.vpos.clone();
-
-        let pools = Pools::new();
 
         let mut instance = Self {
             teams,
@@ -101,25 +104,26 @@ impl Game {
         //# The lambda function is used to give the player start positions a slight random offset so they're not
         //# perfectly aligned to their starting spots
         //
-        self.pools.players.clear();
-        self.players.clear();
-
         // Watch out! Python's randint() spec is different, as it's inclusive on both ends, so we use
         // 33 on the right end.
         let random_offset = |x| x + rand::thread_rng().gen_range(-32..33) as f32;
-        for pos in PLAYER_START_POS {
-            //# pos is a pair of coordinates in a tuple
-            //# For each entry in pos, create one player for each team - positions are flipped (both horizontally and
-            //# vertically) versions of each other
-            let player = Player::new(random_offset(pos.0), random_offset(pos.1), 0);
-            self.players.push(self.pools.players.spawn(player));
 
-            let player = Player::new(
+        //# pos is a pair of coordinates in a tuple
+        //# For each entry in pos, create one player for each team - positions are flipped (both horizontally and
+        //# vertically) versions of each other
+        for (players_h, pos) in self.players.chunks(2).zip(PLAYER_START_POS.iter()) {
+            let (player0, player1) = self
+                .pools
+                .players
+                .borrow_two_mut((players_h[0], players_h[1]));
+
+            player0.reset(random_offset(pos.0), random_offset(pos.1), 0);
+
+            player1.reset(
                 random_offset(LEVEL_W - pos.0),
                 random_offset(LEVEL_H - pos.1),
                 1,
             );
-            self.players.push(self.pools.players.spawn(player));
         }
 
         //# Players in the list are stored in an alternating fashion - a team 0 player, then a team 1 player, and so on.
