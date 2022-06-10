@@ -1,6 +1,4 @@
-use fyrox::{core::algebra::Vector2, scene::Scene};
-
-use crate::{anchor::Anchor, media::Media};
+use crate::prelude::*;
 
 //# The MyActor class extends Pygame Zero's Actor class by providing the attribute 'vpos', which stores the object's
 //# current position using Pygame's Vector2 class. All code should change or read the position via vpos, as opposed to
@@ -13,18 +11,28 @@ pub trait MyActor {
     fn anchor(&self) -> Anchor;
 
     //# We draw with the supplied offset to enable scrolling
-    fn draw(&self, scene: &mut Scene, media: &mut Media, offset_x: f32, offset_y: f32, z: f32) {
+    fn draw(
+        &self,
+        scenes: &mut Scenes,
+        scene_container: &mut SceneContainer,
+        media: &mut Media,
+        offset_x: f32,
+        offset_y: f32,
+        z: f32,
+    ) {
         let pos_x = self.vpos().x - offset_x;
         let pos_y = self.vpos().y - offset_y;
 
-        media.draw_image(
-            scene,
-            self.img_base(),
-            &self.img_indexes(),
-            pos_x,
-            pos_y,
-            z,
-            self.anchor(),
-        );
+        scenes.iter_all_scenes(scene_container, |scene| {
+            media.draw_image(
+                scene,
+                self.img_base(),
+                &self.img_indexes(),
+                pos_x,
+                pos_y,
+                z,
+                self.anchor(),
+            );
+        });
     }
 }
