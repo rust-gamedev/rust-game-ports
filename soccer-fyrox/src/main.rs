@@ -28,6 +28,7 @@ pub mod prelude {
             algebra::{Vector2, Vector3},
             pool::{Handle, Pool},
         },
+        engine::Engine,
         event::VirtualKeyCode,
         scene::{base::BaseBuilder, node::Node, transform::TransformBuilder, Scene},
     };

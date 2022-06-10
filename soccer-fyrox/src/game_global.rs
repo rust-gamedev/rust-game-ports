@@ -1,7 +1,6 @@
 use fyrox::{
     dpi::PhysicalSize,
     engine::framework::prelude::GameState,
-    engine::Engine,
     event::{ElementState, WindowEvent},
     event_loop::ControlFlow,
     scene::camera::{CameraBuilder, OrthographicProjection, Projection},
