@@ -3,14 +3,13 @@ use fyrox::{
     engine::framework::prelude::GameState,
     event::{ElementState, WindowEvent},
     event_loop::ControlFlow,
-    scene::camera::{CameraBuilder, OrthographicProjection, Projection},
 };
 
 use crate::prelude::*;
 
 pub struct GameGlobal {
     media: Media,
-    scene: Handle<Scene>,
+    scenes: Scenes,
     input: InputController,
     game: Game,
     state: State,
@@ -23,23 +22,27 @@ impl GameState for GameGlobal {
     fn init(engine: &mut Engine) -> Self {
         Self::preset_window(engine);
 
-        let mut scene = Scene::new();
-
-        Self::add_camera(&mut scene);
+        let scenes = Scenes::new(&mut engine.scenes);
+        scenes.add_cameras(&mut engine.scenes);
+        scenes.enable(State::Menu, &mut engine.scenes);
 
         let mut media = Media::new(&engine.resource_manager);
 
         let input = InputController::new();
 
-        let game = Game::new(None, None, DEFAULT_DIFFICULTY, &mut scene, &mut media);
+        let game = Game::new(
+            None,
+            None,
+            DEFAULT_DIFFICULTY,
+            scenes.scene(State::Menu, &mut engine.scenes),
+            &mut media,
+        );
         let state = State::Menu;
         let menu_state = Some(MenuState::NumPlayers);
 
-        let scene_h = engine.scenes.add(scene);
-
         Self {
             media,
-            scene: scene_h,
+            scenes,
             input,
             game,
             state,
@@ -50,7 +53,7 @@ impl GameState for GameGlobal {
     }
 
     fn on_tick(&mut self, engine: &mut Engine, _dt: f32, _control_flow: &mut ControlFlow) {
-        let mut scene = &mut engine.scenes[self.scene];
+        let mut scene = self.scenes.scene(State::Menu, &mut engine.scenes);
 
         self.media.clear_images(&mut scene);
 
@@ -97,7 +100,7 @@ impl GameGlobal {
         use VirtualKeyCode::*;
         use {MenuState::*, State::*};
 
-        let mut scene = &mut engine.scenes[self.scene];
+        let mut scene = self.scenes.scene(State::Menu, &mut engine.scenes);
 
         match &self.state {
             Menu => {
@@ -174,7 +177,7 @@ impl GameGlobal {
     }
 
     fn draw(&mut self, engine: &mut Engine) {
-        let scene = &mut engine.scenes[self.scene];
+        let scene = self.scenes.scene(State::Menu, &mut engine.scenes);
 
         self.game.draw(scene, &mut self.media);
 
@@ -237,15 +240,5 @@ impl GameGlobal {
                 }
             }
         }
-    }
-
-    fn add_camera(scene: &mut Scene) -> Handle<Node> {
-        CameraBuilder::new(BaseBuilder::new())
-            .with_projection(Projection::Orthographic(OrthographicProjection {
-                z_near: CAMERA_NEAR_Z,
-                z_far: CAMERA_FAR_Z,
-                vertical_size: (HEIGHT / 2.),
-            }))
-            .build(&mut scene.graph)
     }
 }

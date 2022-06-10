@@ -1,3 +1,4 @@
+use fyrox::scene::camera::{CameraBuilder, OrthographicProjection, Projection};
 use strum::IntoEnumIterator;
 
 use crate::prelude::*;
@@ -19,6 +20,21 @@ impl Scenes {
             menu,
             play,
             game_over,
+        }
+    }
+
+    // This could be included in new(), however, it would hide the cameras addition, which could be confusing.
+    pub fn add_cameras(&self, scene_container: &mut SceneContainer) {
+        for state in State::iter() {
+            let scene = self.scene(state, scene_container);
+
+            CameraBuilder::new(BaseBuilder::new())
+                .with_projection(Projection::Orthographic(OrthographicProjection {
+                    z_near: CAMERA_NEAR_Z,
+                    z_far: CAMERA_FAR_Z,
+                    vertical_size: (HEIGHT / 2.),
+                }))
+                .build(&mut scene.graph);
         }
     }
 
