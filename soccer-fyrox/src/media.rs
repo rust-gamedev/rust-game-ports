@@ -6,7 +6,6 @@ use fyrox::{
     resource::texture::{Texture, TextureKind},
     scene::{
         dim2::rectangle::RectangleBuilder,
-        pivot::PivotBuilder,
         sound::{SoundBufferResource, SoundBuilder, Status},
     },
 };
@@ -36,12 +35,11 @@ const SUPPORTED_SOUND_EXTENSIONS: &'static [&'static str] = &[".ogg"];
 pub struct Media {
     image_textures: HashMap<String, Texture>,
     sound_resources: HashMap<String, SoundBufferResource>,
-    images_root: Handle<Node>,
     looping_sounds: HashMap<String, Handle<Node>>,
 }
 
 impl Media {
-    pub fn new(resource_manager: &ResourceManager, scene: &mut Scene) -> Self {
+    pub fn new(resource_manager: &ResourceManager) -> Self {
         let images_path = Self::resource_path(&[IMAGES_PATH]);
 
         let image_paths = read_dir(images_path)
@@ -112,14 +110,11 @@ impl Media {
             })
             .collect::<HashMap<_, _>>();
 
-        let images_root = PivotBuilder::new(BaseBuilder::new()).build(&mut scene.graph);
-
         let looping_sounds = HashMap::new();
 
         Self {
             image_textures,
             sound_resources,
-            images_root,
             looping_sounds,
         }
     }
@@ -129,8 +124,12 @@ impl Media {
     // By scaling the pivot node to the screen size, we don't need to scale the sprites.
     //
     pub fn clear_images(&mut self, scene: &mut Scene) {
-        for child in scene.graph[self.images_root].children().to_vec() {
-            scene.graph.remove_node(child);
+        let root = scene.graph.get_root();
+
+        for child in scene.graph[root].children().to_vec() {
+            if scene.graph[child].is_rectangle() {
+                scene.graph.remove_node(child);
+            }
         }
     }
 
@@ -204,7 +203,7 @@ impl Media {
                 }
             };
 
-            let node = RectangleBuilder::new(
+            RectangleBuilder::new(
                 BaseBuilder::new().with_local_transform(
                     TransformBuilder::new()
                         .with_local_position(Vector3::new(fyrox_x, fyrox_y, z))
@@ -214,8 +213,6 @@ impl Media {
             )
             .with_texture(texture)
             .build(&mut scene.graph);
-
-            scene.graph.link_nodes(node, self.images_root);
         } else {
             panic!("Texture is not a rectangle!")
         }
