@@ -8,6 +8,8 @@ version = "0.1.0"
 fyrox = "0.26.0" 
 rand = "*" # Use the same as Fyrox
 soccer-macros-fyrox = {path = "../soccer-macros-fyrox"} 
+strum = "0.24.0" 
+strum_macros = "0.24.0" 
 
 [profile.dev.package."*"]
 opt-level = 3
