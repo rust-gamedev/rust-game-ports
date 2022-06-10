@@ -30,7 +30,9 @@ impl GameState for GameGlobal {
 
         let input = InputController::new();
 
+        let state = State::Menu;
         let game = Game::new(
+            state,
             None,
             None,
             DEFAULT_DIFFICULTY,
@@ -38,7 +40,6 @@ impl GameState for GameGlobal {
             &mut engine.scenes,
             &mut media,
         );
-        let state = State::Menu;
         let menu_state = Some(MenuState::NumPlayers);
 
         Self {
@@ -58,9 +59,9 @@ impl GameState for GameGlobal {
 
         self.media.clear_images(&mut scene);
 
-        self.update(engine);
+        self.update(self.state, engine);
 
-        self.draw(engine);
+        self.draw(self.state, engine);
 
         self.input.flush_event_received_state();
     }
@@ -97,9 +98,12 @@ impl GameGlobal {
         });
     }
 
-    fn update(&mut self, engine: &mut Engine) {
+    fn update(&mut self, mut state: State, engine: &mut Engine) {
         use VirtualKeyCode::*;
         use {MenuState::*, State::*};
+
+        // WATCH OUT!! Must be extremely careful to use the new state when instantiating a new Game.
+        // An effective way is to search for `self.state =`.
 
         match &self.state {
             Menu => {
@@ -110,9 +114,11 @@ impl GameGlobal {
                             self.menu_state = Some(MenuState::Difficulty);
                         } else {
                             //# Start 2P game
-                            self.state = State::Play;
+                            state = State::Play;
+                            self.state = state;
                             self.menu_state = None;
                             self.game = Game::new(
+                                state,
                                 Some(Controls::new(0)),
                                 Some(Controls::new(1)),
                                 DEFAULT_DIFFICULTY,
@@ -123,9 +129,11 @@ impl GameGlobal {
                         }
                     } else {
                         //# Start 1P game
-                        self.state = State::Play;
+                        state = State::Play;
+                        self.state = state;
                         self.menu_state = None;
                         self.game = Game::new(
+                            state,
                             Some(Controls::new(0)),
                             None,
                             self.menu_difficulty,
@@ -156,6 +164,7 @@ impl GameGlobal {
                 }
 
                 self.game.update(
+                    state,
                     &self.media,
                     &mut self.scenes,
                     &mut engine.scenes,
@@ -167,9 +176,11 @@ impl GameGlobal {
                 let max_score = self.game.teams.iter().map(|t| t.score).max().unwrap();
 
                 if max_score == 9 && self.game.score_timer == 1 {
-                    self.state = State::GameOver;
+                    state = State::GameOver;
+                    self.state = state;
                 } else {
                     self.game.update(
+                        state,
                         &self.media,
                         &mut self.scenes,
                         &mut engine.scenes,
@@ -180,9 +191,11 @@ impl GameGlobal {
             GameOver => {
                 if self.input.is_key_just_pressed(Space) {
                     //# Switch to menu state, and create a new game object without a player
-                    self.state = State::Menu;
+                    state = State::Menu;
+                    self.state = state;
                     self.menu_state = Some(MenuState::NumPlayers);
                     self.game = Game::new(
+                        state,
                         None,
                         None,
                         DEFAULT_DIFFICULTY,
@@ -195,11 +208,17 @@ impl GameGlobal {
         }
     }
 
-    fn draw(&mut self, engine: &mut Engine) {
+    fn draw(&mut self, state: State, engine: &mut Engine) {
         use {MenuState::*, State::*};
 
-        self.game
-            .draw(&mut self.scenes, &mut engine.scenes, &mut self.media);
+        // The source project somewhat incorrectly always invokes Game#draw, which draws field objects
+        // also during game over. It gets away due to ordering, but here we can't do this, because objects
+        // are per-scene.
+        //
+        if state != State::GameOver {
+            self.game
+                .draw(state, &mut self.scenes, &mut engine.scenes, &mut self.media);
+        }
 
         self.scenes.iter_all_scenes(&mut engine.scenes, |scene| {
             match &self.state {

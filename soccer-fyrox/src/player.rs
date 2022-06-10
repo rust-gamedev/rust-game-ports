@@ -117,8 +117,15 @@ impl Player {
     //
     // this implementation is the simplest (no tickets passed around), but 1. is also a simple alternative.
     //
-    pub fn update(player_h: Handle<Player>, game: &mut Game, input: &InputController) {
+    pub fn update(
+        state: State,
+        player_h: Handle<Player>,
+        game: &mut Game,
+        input: &InputController,
+    ) {
         let player = game.pools.players.borrow_mut(player_h);
+        let ball = &game.ball[&state];
+        let kickoff_player = game.kickoff_player.get(&state);
 
         if player.team == INVALID_TEAM {
             panic!("Player not reset before updating!");
@@ -136,8 +143,8 @@ impl Player {
 
         //# Some shorthand variables to make the code below a bit easier to follow
         let my_team = &game.teams[player.team as usize];
-        let pre_kickoff = game.kickoff_player.is_some();
-        let i_am_kickoff_player = Some(player_h) == game.kickoff_player;
+        let pre_kickoff = kickoff_player.is_some();
+        let i_am_kickoff_player = Some(&player_h) == kickoff_player;
 
         if Some(player_h) == game.teams[player.team as usize].active_control_player
             && my_team.human()
@@ -149,7 +156,7 @@ impl Player {
             //# run around while waiting for player 1 to do the kickoff (and vice versa)
 
             //# A player with the ball runs slightly more slowly than one without
-            speed = if game.ball.owner == Some(player_h) {
+            speed = if ball.owner == Some(player_h) {
                 HUMAN_PLAYER_WITH_BALL_SPEED
             } else {
                 HUMAN_PLAYER_WITHOUT_BALL_SPEED
@@ -157,7 +164,7 @@ impl Player {
 
             //# Find target by calling the controller for the player's team todo comment
             target = player.vpos + my_team.controls.as_ref().unwrap().move_player(speed, input);
-        } else if let Some(ball_owner_h) = game.ball.owner {
+        } else if let Some(ball_owner_h) = ball.owner {
             let ball_owner = game.pools.players.borrow(ball_owner_h);
 
             //# Someone has the ball - is it me?
@@ -210,18 +217,18 @@ impl Player {
                 speed = CPU_PLAYER_WITH_BALL_BASE_SPEED + game.difficulty.speed_boost
             } else if ball_owner.team == player.team {
                 //# Ball is owned by another player on our team
-                if player.active(&game.ball) {
+                if player.active(&ball) {
                     //# If I'm near enough to the ball, try to run somewhere useful, and unique to this player - we
                     //# don't want all players running to the same place. Target is halfway between home and a point
                     //# 400 pixels ahead of the ball. Team 0 are trying to score in the goal at the top of the
                     //# pitch, team 1 the goal at the bottom
                     let direction = if player.team == 0 { -1. } else { 1. };
-                    target.x = (game.ball.vpos.x + target.x) / 2.;
-                    target.y = (game.ball.vpos.y + 400. * direction + target.y) / 2.;
+                    target.x = (ball.vpos.x + target.x) / 2.;
+                    target.y = (ball.vpos.y + 400. * direction + target.y) / 2.;
                 }
                 //# If we're not active, we'll do the default action of moving towards our home position
             } else {
-                let mark_active = player.mark.load(&game.pools).active(&game.ball);
+                let mark_active = player.mark.load(&game.pools).active(&ball);
                 let mark_vpos = player.mark.load(&game.pools).vpos();
 
                 //# Ball is owned by a player on the opposite team
@@ -250,10 +257,10 @@ impl Player {
                         //# We don't do the marking behaviour below for human teams for a number of reasons. Try changing
                         //# the code to see how the game feels when marking behaviour applies to both human and computer
                         //# teams.
-                        target = game.ball.vpos.clone();
+                        target = ball.vpos.clone();
                     } else {
                         //# Get vector between the ball and whatever we're marking
-                        let (nvec, mut length) = safe_normalise(&(game.ball.vpos - mark_vpos));
+                        let (nvec, mut length) = safe_normalise(&(ball.vpos - mark_vpos));
 
                         //# Alter length to choose a position in between the ball and whatever we're marking
                         //# We don't apply this behaviour for human teams - in that case we just run straight at the ball
@@ -274,7 +281,7 @@ impl Player {
             //# No-one has the ball
 
             //# If we’re pre-kickoff and I’m the kickoff player, OR if we’re not pre-kickoff and I’m active
-            if (pre_kickoff && i_am_kickoff_player) || (!pre_kickoff && player.active(&game.ball)) {
+            if (pre_kickoff && i_am_kickoff_player) || (!pre_kickoff && player.active(&ball)) {
                 //# Try to intercept the ball
                 //# Deciding where to go to achieve this is harder than you might think. You can't target the ball's
                 //# current location, because (assuming it's moving) by the time you get there it'll have moved on, so
@@ -285,8 +292,8 @@ impl Player {
                 //# The code below simulates the ball's movement over a series of frames, working out where it would be
                 //# after each frame. We also work out how far the player could have moved at each frame, and whether
                 //# that distance would be enough to reach the currently simulated location of the ball.
-                target = game.ball.vpos.clone(); //# current simulated location of ball
-                let mut vel = game.ball.vel.clone(); //# ball velocity - slows down each frame due to friction
+                target = ball.vpos.clone(); //# current simulated location of ball
+                let mut vel = ball.vel.clone(); //# ball velocity - slows down each frame due to friction
                 let mut frame = 0;
 
                 //# DRIBBLE_DIST_X is the distance at which a player can gain control of the ball.
@@ -344,7 +351,7 @@ impl Player {
             player.anim_frame = ((player.anim_frame as f32 + distance.max(1.5)) % 72.) as i8;
         } else {
             //# Already at target position - just turn to face the ball
-            target_dir = vec_to_angle(game.ball.vpos - player.vpos);
+            target_dir = vec_to_angle(ball.vpos - player.vpos);
             player.anim_frame = -1;
         }
 

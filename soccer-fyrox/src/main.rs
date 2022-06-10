@@ -32,7 +32,11 @@ pub mod prelude {
         engine::Engine,
         event::VirtualKeyCode,
         scene::{
-            base::BaseBuilder, node::Node, transform::TransformBuilder, Scene, SceneContainer,
+            base::BaseBuilder,
+            dim2::rectangle::{Rectangle, RectangleBuilder},
+            node::Node,
+            transform::TransformBuilder,
+            Scene, SceneContainer,
         },
     };
     pub use rand::{thread_rng, Rng};

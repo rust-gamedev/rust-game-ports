@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use crate::prelude::*;
 
 pub const DEFAULT_DIFFICULTY: u8 = 2;
@@ -25,10 +27,10 @@ pub struct Game {
     pub difficulty: Difficulty,
     pub score_timer: i32,
     scoring_team: u8,
-    players: Vec<Handle<Player>>,
-    goals: Vec<Handle<Goal>>,
-    pub kickoff_player: Option<Handle<Player>>,
-    pub ball: Ball,
+    players: HashMap<State, Vec<Handle<Player>>>,
+    goals: HashMap<State, Vec<Handle<Goal>>>,
+    pub kickoff_player: HashMap<State, Handle<Player>>, // the handle is optional
+    pub ball: HashMap<State, Ball>,
     camera_focus: Vector2<f32>,
 
     pub pools: Pools,
@@ -36,6 +38,7 @@ pub struct Game {
 
 impl Game {
     pub fn new(
+        state: State,
         p1_controls: Option<Controls>,
         p2_controls: Option<Controls>,
         difficulty: u8,
@@ -67,17 +70,19 @@ impl Game {
 
         let mut pools = Pools::new();
 
-        let players = (0..(2 * PLAYER_START_POS.len()))
-            .map(|_| pools.players.spawn(Player::new()))
-            .collect();
-        let goals = vec![];
-        let kickoff_player = None;
+        let players = Self::instantiate_players(scenes, scene_container, &mut pools);
+
+        let goals = Self::instantiate_goals(scenes, scene_container, &mut pools);
+
+        let kickoff_player = HashMap::new();
 
         //# Create ball
-        let ball = Ball::new();
+        let mut ball = HashMap::new();
+        ball.insert(State::Menu, Ball::new());
+        ball.insert(State::Play, Ball::new());
 
         //# Focus camera on ball - copy ball pos
-        let camera_focus = ball.vpos.clone();
+        let camera_focus = ball[&state].vpos.clone();
 
         let mut instance = Self {
             teams,
@@ -92,13 +97,54 @@ impl Game {
             pools,
         };
 
-        instance.reset();
+        instance.reset(state);
 
         instance
     }
 
-    fn reset(&mut self) {
+    fn instantiate_players(
+        _scenes: &mut Scenes,
+        _scene_container: &mut SceneContainer,
+        pools: &mut Pools,
+    ) -> HashMap<State, Vec<Handle<Player>>> {
+        // let players = HashMap::new();
+
+        let tot_players = 2 * PLAYER_START_POS.len();
+        let states = [State::Menu, State::Play];
+
+        let all_players = states.map(|_state| {
+            (0..tot_players)
+                .map(|_| pools.players.spawn(Player::new()))
+                .collect::<Vec<_>>()
+        });
+
+        states
+            .into_iter()
+            .zip(all_players)
+            .collect::<HashMap<_, _>>()
+    }
+
+    fn instantiate_goals(
+        _scenes: &mut Scenes,
+        _scene_container: &mut SceneContainer,
+        pools: &mut Pools,
+    ) -> HashMap<State, Vec<Handle<Goal>>> {
+        let states = [State::Menu, State::Play];
+
+        let all_goals = states.map(|_state| {
+            (0..2)
+                .map(|i| pools.goals.spawn(Goal::new(i)))
+                .collect::<Vec<_>>()
+        });
+
+        states.into_iter().zip(all_goals).collect::<HashMap<_, _>>()
+    }
+
+    fn reset(&mut self, state: State) {
+        println!("reset ({:?})", state);
         //# Called at game start, and after a goal has been scored
+
+        let players = &self.players[&state];
 
         //# Set up players list/positions
         //# The lambda function is used to give the player start positions a slight random offset so they're not
@@ -111,7 +157,7 @@ impl Game {
         //# pos is a pair of coordinates in a tuple
         //# For each entry in pos, create one player for each team - positions are flipped (both horizontally and
         //# vertically) versions of each other
-        for (players_h, pos) in self.players.chunks(2).zip(PLAYER_START_POS.iter()) {
+        for (players_h, pos) in players.chunks(2).zip(PLAYER_START_POS.iter()) {
             let (player0, player1) = self
                 .pools
                 .players
@@ -129,20 +175,14 @@ impl Game {
         //# Players in the list are stored in an alternating fashion - a team 0 player, then a team 1 player, and so on.
         //# The peer for each player is the opposing team player at the opposite end of the list. As there are 14 players
         //# in total, the peers are 0 and 13, 1 and 12, 2 and 11, and so on.
-        for (a, b) in self.players.iter().zip(self.players.iter().rev()) {
+        for (a, b) in players.iter().zip(players.iter().rev()) {
             self.pools.players.borrow_mut(*a).peer = *b;
         }
 
-        //# Create two goals
-        self.goals = (0..2)
-            .into_iter()
-            .map(|i| self.pools.goals.spawn(Goal::new(i)))
-            .collect();
-
         //# The current active player under control by each team, indicated by arrows over their heads
         //# Choose first two players to begin with
-        self.teams[0].active_control_player = Some(self.players[0]);
-        self.teams[1].active_control_player = Some(self.players[1]);
+        self.teams[0].active_control_player = Some(players[0]);
+        self.teams[1].active_control_player = Some(players[1]);
 
         //# If team 1 just scored (or if it's the start of the game), team 0 will kick off
         let other_team = if self.scoring_team == 0 { 1 } else { 0 };
@@ -150,39 +190,44 @@ impl Game {
         //# Players are stored in the players list in an alternating fashion – the first player being on team 0, the
         //# second on team 1, the third on team 0 etc. The player that kicks off will always be the first player of
         //# the relevant team.
-        self.kickoff_player = Some(self.players[other_team as usize]);
+        self.kickoff_player
+            .insert(state, players[other_team as usize]);
 
         //# Set pos of kickoff player. A team 0 player will stand to the left of the ball, team 1 on the right
         self.pools
             .players
-            .borrow_mut(self.kickoff_player.unwrap())
+            .borrow_mut(self.kickoff_player[&state])
             .vpos = Vector2::new(HALF_LEVEL_W - 30. + other_team as f32 * 60., HALF_LEVEL_H);
 
         //# Create ball
-        self.ball = Ball::new();
+        self.ball.get_mut(&state).unwrap().reset();
 
         //# Focus camera on ball - copy ball pos
-        self.camera_focus = self.ball.vpos.clone();
+        self.camera_focus = self.ball[&state].vpos.clone();
     }
 
     pub fn update(
         &mut self,
+        state: State,
         media: &Media,
         scenes: &mut Scenes,
         scene_container: &mut SceneContainer,
         input: &InputController,
     ) {
+        println!("update ({:?})", state);
         self.score_timer -= 1;
 
         if self.score_timer == 0 {
             //# Reset for new kick-off after goal scored
-            self.reset();
-        } else if self.score_timer < 0 && (self.ball.vpos.y - HALF_LEVEL_H).abs() > HALF_PITCH_H {
+            self.reset(state);
+        } else if self.score_timer < 0
+            && (self.ball[&state].vpos.y - HALF_LEVEL_H).abs() > HALF_PITCH_H
+        {
             scenes.iter_all_scenes(scene_container, |scene| {
                 media.play_sound(scene, "goal", &[thread_rng().gen_range(0..2)]);
             });
 
-            self.scoring_team = if self.ball.vpos.y < HALF_LEVEL_H {
+            self.scoring_team = if self.ball[&state].vpos.y < HALF_LEVEL_H {
                 0
             } else {
                 1
@@ -192,7 +237,8 @@ impl Game {
         }
 
         //# Each frame, reset mark and lead of each player
-        for b in self.pools.players.iter_mut() {
+        for bh in &self.players[&state] {
+            let b = self.pools.players.borrow_mut(*bh);
             b.mark = TargetHandle::Player(b.peer);
             b.lead = None;
             //b.debug_target = None
@@ -201,7 +247,7 @@ impl Game {
         //# Reset debug shoot target
         //self.debug_shoot_target = None
 
-        if let Some(o) = &self.ball.owner {
+        if let Some(o) = &self.ball[&state].owner {
             // This part requires considerable BCK gymnastics, because of the multiple borrows; several
             // statements had to be moved around.
 
@@ -216,7 +262,7 @@ impl Game {
 
             if self.difficulty.goalie_enabled {
                 let previous_nearest_mark = {
-                    let owners_target_goal_h = self.goals[team as usize];
+                    let owners_target_goal_h = self.goals[&state][team as usize];
                     let owners_target_goal_vpos =
                         self.pools.goals.borrow(owners_target_goal_h).vpos;
 
@@ -233,7 +279,7 @@ impl Game {
                     // project, this statement was after).
                     std::mem::replace(
                         &mut nearest.mark,
-                        TargetHandle::Goal(self.goals[team as usize]),
+                        TargetHandle::Goal(self.goals[&state][team as usize]),
                     )
                 };
 
@@ -245,8 +291,7 @@ impl Game {
             //# Create a list of players who are on the opposite team from the ball owner, are allowed to acquire
             //# the ball (their hold-off timer must not be positive), are not currently being controlled by a human,
             //# and are not currently assigned to be the goalie. The list is sorted based on distance from the ball owner.
-            let mut l = self
-                .players
+            let mut l = self.players[&state]
                 .iter()
                 .filter_map(|p_h| {
                     let p = self.pools.players.borrow(*p_h);
@@ -313,16 +358,16 @@ impl Game {
             //# If the ball has an owner, kick-off must have taken place, so unset the kickoff player
             //# Of course, kick-off might have already taken place a while ago, in which case kick-off_player will already
             //# be None, and will remain None
-            self.kickoff_player = None;
+            self.kickoff_player.remove(&state);
         }
 
         //# Update all players and ball
-        for obj_h in &self.players.clone() {
-            Player::update(*obj_h, self, input);
+        for obj_h in &self.players[&state].clone() {
+            Player::update(state, *obj_h, self, input);
         }
-        Ball::update(self, input, scenes, scene_container, media);
+        Ball::update(self, state, input, scenes, scene_container, media);
 
-        let owner = self.ball.owner;
+        let owner = self.ball[&state].owner;
 
         for team_num in 0..2 {
             let team_obj = &mut self.teams[team_num];
@@ -338,21 +383,20 @@ impl Game {
                 //# this weighting added. We use this function as the key for the min function, which will choose
                 //# the player who results in the lowest value when passed as an argument to dist_key_weighted.
                 let dist_key_weighted = |p_vpos: Vector2<f32>| {
-                    let dist_to_ball = (p_vpos - self.ball.vpos).norm();
+                    let dist_to_ball = (p_vpos - self.ball[&state].vpos).norm();
                     //# Thonny gives a warning about the following line, relating to closures (an advanced topic), but
                     //# in this case there is not actually a problem as the closure is only called within the loop
                     let goal_dir = 2. * team_num as f32 - 1.;
-                    if owner.is_some() && (p_vpos.y - self.ball.vpos.y) * goal_dir < 0. {
+                    if owner.is_some() && (p_vpos.y - self.ball[&state].vpos.y) * goal_dir < 0. {
                         dist_to_ball / 2.0
                     } else {
                         dist_to_ball
                     }
                 };
 
-                self.teams[team_num].active_control_player = self
-                    .pools
-                    .players
+                self.teams[team_num].active_control_player = self.players[&state]
                     .iter()
+                    .map(|player_h| self.pools.players.borrow(*player_h))
                     .filter(|p| p.team == team_num as u8)
                     .min_by(|p1, p2| {
                         dist_key_weighted(p1.vpos)
@@ -364,7 +408,8 @@ impl Game {
         }
 
         //# Get vector between current camera pos and ball pos
-        let (camera_ball_vec, distance) = safe_normalise(&(self.camera_focus - self.ball.vpos));
+        let (camera_ball_vec, distance) =
+            safe_normalise(&(self.camera_focus - self.ball[&state].vpos));
         if distance > 0.0 {
             //# Move camera towards ball, at no more than 8 pixels per frame
             let camera_shift = camera_ball_vec * distance.min(8.0);
@@ -374,6 +419,7 @@ impl Game {
 
     pub fn draw(
         &self,
+        state: State,
         scenes: &mut Scenes,
         scene_container: &mut SceneContainer,
         media: &mut Media,
@@ -397,7 +443,7 @@ impl Game {
         // We deviate from the source project here, by taking advantage of the z-depth, which considerably
         // simplifies the port.
 
-        self.pools.goals.borrow(self.goals[0]).draw(
+        self.pools.goals.borrow(self.goals[&state][0]).draw(
             scenes,
             scene_container,
             media,
@@ -414,7 +460,7 @@ impl Game {
             .map(|p| p.vpos.y)
             .min_by(|y1, y2| y1.partial_cmp(y2).unwrap())
             .unwrap()
-            .min(self.ball.vpos.y);
+            .min(self.ball[&state].vpos.y);
         let max_player_y = self
             .pools
             .players
@@ -422,12 +468,14 @@ impl Game {
             .map(|p| p.vpos.y)
             .max_by(|y1, y2| y1.partial_cmp(y2).unwrap())
             .unwrap()
-            .max(self.ball.vpos.y);
+            .max(self.ball[&state].vpos.y);
 
         // This crashes if all the players, and the ball, are on the exact same y coordinate :)
         let players_z_unit = (DRAW_PLAYERS_Z.1 - DRAW_PLAYERS_Z.0) / (max_player_y - min_player_y);
 
-        for player in self.pools.players.iter() {
+        for player_h in &self.players[&state] {
+            let player = self.pools.players.borrow(*player_h);
+
             let player_z = DRAW_PLAYERS_Z.0 + (player.vpos.y - min_player_y) * players_z_unit;
             player.draw(scenes, scene_container, media, offset_x, offset_y, player_z);
 
@@ -443,13 +491,12 @@ impl Game {
             );
         }
 
-        let ball_z = DRAW_PLAYERS_Z.0 + (self.ball.vpos.y - min_player_y) * players_z_unit;
-        self.ball
-            .draw(scenes, scene_container, media, offset_x, offset_y, ball_z);
+        let ball_z = DRAW_PLAYERS_Z.0 + (self.ball[&state].vpos.y - min_player_y) * players_z_unit;
+        self.ball[&state].draw(scenes, scene_container, media, offset_x, offset_y, ball_z);
 
         let ball_shadow_z =
-            DRAW_PLAYERS_Z.0 + (self.ball.shadow.vpos.y - min_player_y) * players_z_unit;
-        self.ball.shadow.draw(
+            DRAW_PLAYERS_Z.0 + (self.ball[&state].shadow.vpos.y - min_player_y) * players_z_unit;
+        self.ball[&state].shadow.draw(
             scenes,
             scene_container,
             media,
@@ -458,7 +505,7 @@ impl Game {
             ball_shadow_z,
         );
 
-        self.pools.goals.borrow(self.goals[0]).draw(
+        self.pools.goals.borrow(self.goals[&state][0]).draw(
             scenes,
             scene_container,
             media,
@@ -466,7 +513,7 @@ impl Game {
             offset_y,
             DRAW_GOAL_0_Z,
         );
-        self.pools.goals.borrow(self.goals[1]).draw(
+        self.pools.goals.borrow(self.goals[&state][1]).draw(
             scenes,
             scene_container,
             media,

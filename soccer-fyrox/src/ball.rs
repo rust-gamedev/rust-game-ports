@@ -147,6 +147,13 @@ impl Ball {
         }
     }
 
+    pub fn reset(&mut self) {
+        self.vpos = Vector2::new(HALF_LEVEL_W, HALF_LEVEL_H);
+        self.vel = Vector2::new(0.0, 0.0);
+        self.owner = None;
+        self.timer = 0;
+    }
+
     //# Check for collision with player p
     fn collide(&self, p: &Player) -> bool {
         //# The ball collides with p if p's hold-off timer has expired
@@ -158,12 +165,13 @@ impl Ball {
     // function, and call it a day :)
     pub fn update(
         game: &mut Game,
+        state: State,
         input: &InputController,
         scenes: &mut Scenes,
         scene_container: &mut SceneContainer,
         media: &Media,
     ) {
-        let ball = &mut game.ball;
+        let ball = game.ball.get_mut(&state).unwrap();
         ball.timer -= 1;
 
         //# If the ball has an owner, it's being dribbled, so its position is
