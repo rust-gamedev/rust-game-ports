@@ -41,7 +41,6 @@ impl GameState for GameGlobal {
         Self {
             media,
             scene: scene_h,
-            // camera,
             input,
             game,
             state,
