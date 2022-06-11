@@ -6,6 +6,7 @@ temp/
 Cargo.lock
 target/
 target-ra/
+target-win/
 
 # Fyrox
 #
