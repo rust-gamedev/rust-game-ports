@@ -152,20 +152,6 @@ impl Media {
         }
     }
 
-    // This is a convenience, to make comparison with the source project simpler.
-    // Blitting is equal to drawing with a TopLeft Anchor.
-    pub fn blit_image(
-        &mut self,
-        scene: &mut Scene,
-        base: &str,
-        indexes: &[u8],
-        std_x: f32,
-        std_y: f32,
-        z: f32,
-    ) {
-        self.draw_image(scene, base, indexes, std_x, std_y, z, Anchor::TopLeft);
-    }
-
     pub fn draw_gui_image(
         &mut self,
         user_interface: &mut UserInterface,

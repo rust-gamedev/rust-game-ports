@@ -377,7 +377,7 @@ impl Game {
                 .build(),
         );
 
-        media.blit_image(scene, "pitch", &[], 0., 0., DRAW_PITCH_Z);
+        media.draw_image(scene, "pitch", &[], 0., 0., DRAW_PITCH_Z, Anchor::TopLeft);
 
         //# Prepare to draw all objects
         //# 1. Create a list of all players and the ball, sorted based on their Y positions
@@ -450,13 +450,14 @@ impl Game {
                     .borrow(self.teams[t].active_control_player.unwrap())
                     .vpos()
                     - Vector2::new(11., 45.);
-                media.blit_image(
+                media.draw_image(
                     scene,
                     "arrow",
                     &[t as u8],
                     arrow_pos.x,
                     arrow_pos.y,
                     DRAW_ARROWS_Z,
+                    Anchor::TopLeft,
                 );
             }
         }
