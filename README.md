@@ -2,34 +2,84 @@
 
 My ports of open source games to Rust, using different pure-Rust game engines.
 
-## Ports plan
+- [Rust Game Ports](#rust-game-ports)
+  - [Summary](#summary)
+  - [Games](#games)
+    - [Boing/ggez](#boingggez)
+    - [Cavern/Macroquad](#cavernmacroquad)
+    - [Rusty Roguelike/Bevy ECS](#rusty-roguelikebevy-ecs)
+    - [Soccer/Fyrox](#soccerfyrox)
+  - [Source Projects/Libraries](#source-projectslibraries)
+  - [Projects structure/configuration](#projects-structureconfiguration)
+
+## Summary
 
 The completed ports are:
 
-- Code the Classics Vol. 1/Boing: ported to [ggez](https://github.com/ggez/ggez)
-- Code the Classics Vol. 1/Cavern: ported to [Macroquad](https://github.com/not-fl3/macroquad) (without using experimental features)
-- Hands-on Rust: Effective Learning.../Rusty Roguelike: ported to [Bevy](https://github.com/bevyengine/bevy)
-- Code the Classics Vol. 1/Soccer: ported to [Fyrox](https://github.com/FyroxEngine/Fyrox) (see dedicated section)
+| Source                               |      Game       |  Engine   |
+| ------------------------------------ | :-------------: | :-------: |
+| Code the Classics Vol. 1             |      Boing      |   ggez    |
+| Code the Classics Vol. 1             |     Cavern      | Macroquad |
+| Hands-on Rust: Effective Learning... | Rusty Roguelike |   Bevy    |
+| Code the Classics Vol. 1             |     Soccer      |   Fyrox   |
 
-## Book!
+I currently don't plan any further ports.
 
-The Rusty Roguelike port is now the subject of my work-in-progress mini book ["Learn Bevy's ECS by ripping off someone else's project"](https://saveriomiroddi.github.io/learn_bevy_ecs_by_ripping_off)!
+## Games
 
-## Soccer/Fyrox
+### Boing/ggez
 
-The published revision of the game hasn't been designed to fully use the engine APIs:
+![Boing](/readme_images/boing.png?raw=true)
 
-- there should be multiple scenes, instead of one;
-- the camera should be used for panning, instead of manually computing the visible area.
+A very straightforward port 🙂
 
-The port has been nonetheless carefully designed and implemented.
+### Cavern/Macroquad
 
-While porting the game, I've found experenced two Fyrox bugs, reported [here](https://github.com/FyroxEngine/Fyrox/issues/320) and [here](https://github.com/FyroxEngine/Fyrox/issues/324).
+![Cavern](/readme_images/cavern.png?raw=true)
 
-## Source Projects
+Another very straightforward port 🙂
+
+This port suffers from two Macroquad bugs:
+
+- the music starts with a delay;
+- on Nvidia cards, on Linux, CPU runs at 100% load (reported [here](https://github.com/not-fl3/macroquad/issues/275#issuecomment-939525290)).
+
+Only the stable part of the library is used (the experimental [`scene`](https://github.com/not-fl3/macroquad/blob/master/src/experimental/scene.rs) API is not used).
+
+### Rusty Roguelike/Bevy ECS
+
+![Rusty Roguelike](/readme_images/rusty_roguelike.png?raw=true)
+
+The ECS part of this game, originally Legion, has been ported to Bevy (the graphic/input library used is still [bracket-lib](https://github.com/amethyst/bracket-lib)).
+
+I'm writing a mini book, ["Learn Bevy's ECS by ripping off someone else's project"](https://saveriomiroddi.github.io/learn_bevy_ecs_by_ripping_off), based on this project.
+
+### Soccer/Fyrox
+
+![Soccer](/readme_images/soccer.png?raw=true)
+
+This port has designed with pseudo-immediate mode (to reflect the original logic); idiomatic Fyrox projects should instead use scene graphs.
+
+Widget APIs should also be used for the HUD/menus, but it seems that they don't support transparency, which is a requirement (feedback is pending on this topic).
+
+The port suffers from two Fyrox bugs:
+
+- at least one sound plays with a delay (reported [here](https://github.com/FyroxEngine/Fyrox/issues/324));
+- some images render incorrectly (reported [here](https://github.com/FyroxEngine/Fyrox/issues/320)).
+
+## Source Projects/Libraries
+
+Projects:
 
 - Code the Classics Vol. 1 ([repository](https://github.com/Wireframe-Magazine/Code-the-Classics) and [book](https://wireframe.raspberrypi.org/books/code-the-classics1)): A very beautiful book on beginning game programming, written in Python; the project comprises of several games of different genres, each with a surprising complexity under the hood
 - Rust Roguelike/Hands-on Rust: Effective Learning... ([repository](https://github.com/thebracket/HandsOnRust) and [book](https://pragprog.com/titles/hwrust/hands-on-rust)): Another great book, on writing games in Rust; the project is divided in clear and progressive steps, and it's, in my opinion, the most effective way to learn working with ECSs (in this case, [Legion](https://github.com/amethyst/legion))
+
+Libraries:
+
+- [ggez](https://github.com/ggez/ggez)
+- [Macroquad](https://github.com/not-fl3/macroquad)
+- [Bevy](https://github.com/bevyengine/bevy)
+- [Fyrox](https://github.com/FyroxEngine/Fyrox)
 
 ## Projects structure/configuration
 
