@@ -357,7 +357,14 @@ impl Game {
         }
     }
 
-    pub fn draw(&self, scene: &mut Scene, camera_h: Handle<Node>, media: &mut Media) {
+    // Returns the camera offset; hopefully, it can be removed if Image widgets support transparency.
+    //
+    pub fn draw(
+        &self,
+        scene: &mut Scene,
+        camera_h: Handle<Node>,
+        media: &mut Media,
+    ) -> Vector2<f32> {
         let cam_offset = Vector2::new(
             -(self.camera_focus.x - WIDTH / 2.).clamp(0., LEVEL_W - WIDTH),
             -(self.camera_focus.y - HEIGHT / 2.).clamp(0., LEVEL_H - HEIGHT),
@@ -486,5 +493,8 @@ impl Game {
         //            screen_pos = Vector2(x,y)-offset
         //            screen_pos = (screen_pos.x,screen_pos.y)    # draw.text can't reliably take a Vector2
         //            screen.draw.text("{0:.0f}".format(c), center=screen_pos)
+
+        // By inverting it, we make it easier to use (it is added the objects coordinates).
+        cam_offset * -1.
     }
 }
