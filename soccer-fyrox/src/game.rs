@@ -358,13 +358,15 @@ impl Game {
     }
 
     pub fn draw(&self, scene: &mut Scene, camera_h: Handle<Node>, media: &mut Media) {
-        let cam_offset_x = -(self.camera_focus.x - WIDTH / 2.).clamp(0., LEVEL_W - WIDTH);
-        let cam_offset_y = -(self.camera_focus.y - HEIGHT / 2.).clamp(0., LEVEL_H - HEIGHT);
+        let cam_offset = Vector2::new(
+            -(self.camera_focus.x - WIDTH / 2.).clamp(0., LEVEL_W - WIDTH),
+            -(self.camera_focus.y - HEIGHT / 2.).clamp(0., LEVEL_H - HEIGHT),
+        );
 
         let camera = scene.graph[camera_h].as_camera_mut();
         camera.set_local_transform(
             TransformBuilder::new()
-                .with_local_position(Vector3::new(cam_offset_x, cam_offset_y, 0.))
+                .with_local_position(Vector3::new(cam_offset.x, cam_offset.y, 0.))
                 .build(),
         );
 
