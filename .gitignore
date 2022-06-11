@@ -1,3 +1,6 @@
+# Generic
+temp/
+
 # Rust
 #
 Cargo.lock
