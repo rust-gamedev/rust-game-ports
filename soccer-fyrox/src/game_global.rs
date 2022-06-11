@@ -54,8 +54,9 @@ impl GameState for GameGlobal {
 
     fn on_tick(&mut self, engine: &mut Engine, _dt: f32, _control_flow: &mut ControlFlow) {
         let mut scene = &mut engine.scenes[self.scene];
+        let mut user_interface = &mut engine.user_interface;
 
-        self.media.clear_images(&mut scene);
+        self.media.clear_images(&mut scene, &mut user_interface);
 
         self.update(engine);
 
@@ -179,7 +180,7 @@ impl GameGlobal {
     fn draw(&mut self, engine: &mut Engine, camera: Handle<Node>) {
         let scene = &mut engine.scenes[self.scene];
 
-        let cam_offset = self.game.draw(scene, camera, &mut self.media);
+        self.game.draw(scene, camera, &mut self.media);
 
         use {MenuState::*, State::*};
 
@@ -190,70 +191,59 @@ impl GameGlobal {
                     Difficulty => (1, self.menu_difficulty),
                 };
 
-                self.media.blit_image(
-                    scene,
+                self.media.draw_gui_image(
+                    &mut engine.user_interface,
                     "menu",
                     &[image_i1, image_i2],
-                    cam_offset.x,
-                    cam_offset.y,
-                    DRAW_MENU_Z,
+                    0.,
+                    0.,
                 );
             }
             Play => {
                 //# Display score bar at top
-                self.media.blit_image(
-                    scene,
+                self.media.draw_gui_image(
+                    &mut engine.user_interface,
                     "bar",
                     &[],
-                    cam_offset.x + HALF_WINDOW_W - 176.,
-                    cam_offset.y,
-                    DRAW_GAME_HUD_Z,
+                    HALF_WINDOW_W - 176.,
+                    0.,
                 );
                 //# Show score for each team
                 for i in 0..2 {
-                    self.media.blit_image(
-                        scene,
+                    self.media.draw_gui_image(
+                        &mut engine.user_interface,
                         "s",
                         &[self.game.teams[i].score],
-                        cam_offset.x + HALF_WINDOW_W + 7. - 39. * (i as f32),
-                        cam_offset.y + 6.,
-                        DRAW_GAME_SCORES_Z,
+                        HALF_WINDOW_W + 7. - 39. * (i as f32),
+                        6.,
                     );
                 }
 
                 //# Show GOAL image if a goal has recently been scored
                 if self.game.score_timer > 0 {
-                    self.media.blit_image(
-                        scene,
+                    self.media.draw_gui_image(
+                        &mut engine.user_interface,
                         "goal",
                         &[],
-                        cam_offset.x + HALF_WINDOW_W - 300.,
-                        cam_offset.y + HEIGHT / 2. - 88.,
-                        DRAW_GAME_HUD_Z,
+                        HALF_WINDOW_W - 300.,
+                        HEIGHT / 2. - 88.,
                     );
                 }
             }
             GameOver => {
                 //# Display "Game Over" image
                 let index = (self.game.teams[1].score > self.game.teams[0].score) as u8;
-                self.media.blit_image(
-                    scene,
-                    "over",
-                    &[index],
-                    cam_offset.x,
-                    cam_offset.y,
-                    DRAW_GAME_OVER_BACKGROUND_Z,
-                );
+                self.media
+                    .draw_gui_image(&mut engine.user_interface, "over", &[index], 0., 0.);
 
                 //# Show score for each team
                 for i in 0..2 {
-                    self.media.blit_image(
-                        scene,
+                    self.media.draw_gui_image(
+                        &mut engine.user_interface,
                         "l",
                         &[i as u8, self.game.teams[i as usize].score],
-                        cam_offset.x + HALF_WINDOW_W + 25. - 125. * i as f32,
-                        cam_offset.y + 144.,
-                        DRAW_GAME_OVER_SCORES_Z,
+                        HALF_WINDOW_W + 25. - 125. * i as f32,
+                        144.,
                     );
                 }
             }
