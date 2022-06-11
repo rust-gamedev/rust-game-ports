@@ -29,13 +29,13 @@ I currently don't plan any further ports.
 
 ### Boing/ggez
 
-![Boing](/readme_images/boing.png?raw=true)
+![Boing](/images/readme/boing.png?raw=true)
 
 A very straightforward port 🙂
 
 ### Cavern/Macroquad
 
-![Cavern](/readme_images/cavern.png?raw=true)
+![Cavern](/images/readme/cavern.png?raw=true)
 
 Another very straightforward port 🙂
 
@@ -48,7 +48,7 @@ Only the stable part of the library is used (the experimental [`scene`](https://
 
 ### Rusty Roguelike/Bevy ECS
 
-![Rusty Roguelike](/readme_images/rusty_roguelike.png?raw=true)
+![Rusty Roguelike](/images/readme/rusty_roguelike.png?raw=true)
 
 The ECS part of this game, originally Legion, has been ported to Bevy (the graphic/input library used is still [bracket-lib](https://github.com/amethyst/bracket-lib)).
 
@@ -56,7 +56,7 @@ I'm writing a mini book, ["Learn Bevy's ECS by ripping off someone else's projec
 
 ### Soccer/Fyrox
 
-![Soccer](/readme_images/soccer.png?raw=true)
+![Soccer](/images/readme/soccer.png?raw=true)
 
 This port has designed with pseudo-immediate mode (to reflect the original logic); idiomatic Fyrox projects should instead use scene graphs.
 
