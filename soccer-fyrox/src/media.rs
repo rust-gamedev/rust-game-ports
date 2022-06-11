@@ -119,10 +119,6 @@ impl Media {
         }
     }
 
-    // The simplest way to model a design that is as close a possible to a conventional 2d game
-    // library, is to a pivot node as root node, and to dynamically add each sprite to draw as node.
-    // By scaling the pivot node to the screen size, we don't need to scale the sprites.
-    //
     pub fn clear_images(&mut self, scene: &mut Scene) {
         let root = scene.graph.get_root();
 
