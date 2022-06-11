@@ -23,8 +23,8 @@ impl Controls {
         } else {
             Self {
                 key_up: W,
-                key_down: A,
-                key_left: S,
+                key_down: S,
+                key_left: A,
                 key_right: D,
                 key_shoot: LShift,
             }
