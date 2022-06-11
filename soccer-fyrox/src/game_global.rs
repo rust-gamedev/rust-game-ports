@@ -12,6 +12,7 @@ use crate::prelude::*;
 pub struct GameGlobal {
     media: Media,
     scene: Handle<Scene>,
+    camera: Handle<Node>,
     input: InputController,
     game: Game,
     state: State,
@@ -26,7 +27,7 @@ impl GameState for GameGlobal {
 
         let mut scene = Scene::new();
 
-        Self::add_camera(&mut scene);
+        let camera = Self::add_camera(&mut scene);
 
         let mut media = Media::new(&engine.resource_manager);
 
@@ -41,6 +42,7 @@ impl GameState for GameGlobal {
         Self {
             media,
             scene: scene_h,
+            camera,
             input,
             game,
             state,
@@ -57,7 +59,7 @@ impl GameState for GameGlobal {
 
         self.update(engine);
 
-        self.draw(engine);
+        self.draw(engine, self.camera);
 
         self.input.flush_event_received_state();
     }
@@ -174,10 +176,10 @@ impl GameGlobal {
         }
     }
 
-    fn draw(&mut self, engine: &mut Engine) {
+    fn draw(&mut self, engine: &mut Engine, camera: Handle<Node>) {
         let scene = &mut engine.scenes[self.scene];
 
-        self.game.draw(scene, &mut self.media);
+        self.game.draw(scene, camera, &mut self.media);
 
         use {MenuState::*, State::*};
 

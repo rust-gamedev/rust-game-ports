@@ -357,13 +357,18 @@ impl Game {
         }
     }
 
-    pub fn draw(&self, scene: &mut Scene, media: &mut Media) {
-        //# For the purpose of scrolling, all objects will be drawn with these offsets
-        let offset_x = (self.camera_focus.x - WIDTH / 2.).clamp(0., LEVEL_W - WIDTH);
-        let offset_y = (self.camera_focus.y - HEIGHT / 2.).clamp(0., LEVEL_H - HEIGHT);
-        let offset = Vector2::new(offset_x, offset_y);
+    pub fn draw(&self, scene: &mut Scene, camera_h: Handle<Node>, media: &mut Media) {
+        let cam_offset_x = -(self.camera_focus.x - WIDTH / 2.).clamp(0., LEVEL_W - WIDTH);
+        let cam_offset_y = -(self.camera_focus.y - HEIGHT / 2.).clamp(0., LEVEL_H - HEIGHT);
 
-        media.blit_image(scene, "pitch", &[], -offset_x, -offset_y, DRAW_PITCH_Z);
+        let camera = scene.graph[camera_h].as_camera_mut();
+        camera.set_local_transform(
+            TransformBuilder::new()
+                .with_local_position(Vector3::new(cam_offset_x, cam_offset_y, 0.))
+                .build(),
+        );
+
+        media.blit_image(scene, "pitch", &[], 0., 0., DRAW_PITCH_Z);
 
         //# Prepare to draw all objects
         //# 1. Create a list of all players and the ball, sorted based on their Y positions
@@ -375,13 +380,10 @@ impl Game {
         // We deviate from the source project here, by taking advantage of the z-depth, which considerably
         // simplifies the port.
 
-        self.pools.goals.borrow(self.goals[0]).draw(
-            scene,
-            media,
-            offset_x,
-            offset_y,
-            DRAW_GOAL_0_Z,
-        );
+        self.pools
+            .goals
+            .borrow(self.goals[0])
+            .draw(scene, media, DRAW_GOAL_0_Z);
 
         // Min/max also include the ball.
         let min_player_y = self
@@ -406,38 +408,28 @@ impl Game {
 
         for player in self.pools.players.iter() {
             let player_z = DRAW_PLAYERS_Z.0 + (player.vpos.y - min_player_y) * players_z_unit;
-            player.draw(scene, media, offset_x, offset_y, player_z);
+            player.draw(scene, media, player_z);
 
             let player_shadow_z =
                 DRAW_SHADOWS_Z.0 + (player.shadow.vpos.y - min_player_y) * players_z_unit;
-            player
-                .shadow
-                .draw(scene, media, offset_x, offset_y, player_shadow_z);
+            player.shadow.draw(scene, media, player_shadow_z);
         }
 
         let ball_z = DRAW_PLAYERS_Z.0 + (self.ball.vpos.y - min_player_y) * players_z_unit;
-        self.ball.draw(scene, media, offset_x, offset_y, ball_z);
+        self.ball.draw(scene, media, ball_z);
 
         let ball_shadow_z =
             DRAW_PLAYERS_Z.0 + (self.ball.shadow.vpos.y - min_player_y) * players_z_unit;
-        self.ball
-            .shadow
-            .draw(scene, media, offset_x, offset_y, ball_shadow_z);
+        self.ball.shadow.draw(scene, media, ball_shadow_z);
 
-        self.pools.goals.borrow(self.goals[0]).draw(
-            scene,
-            media,
-            offset_x,
-            offset_y,
-            DRAW_GOAL_0_Z,
-        );
-        self.pools.goals.borrow(self.goals[1]).draw(
-            scene,
-            media,
-            offset_x,
-            offset_y,
-            DRAW_GOAL_1_Z,
-        );
+        self.pools
+            .goals
+            .borrow(self.goals[0])
+            .draw(scene, media, DRAW_GOAL_0_Z);
+        self.pools
+            .goals
+            .borrow(self.goals[1])
+            .draw(scene, media, DRAW_GOAL_1_Z);
 
         //# Show active players
         for t in 0..2 {
@@ -448,7 +440,6 @@ impl Game {
                     .players
                     .borrow(self.teams[t].active_control_player.unwrap())
                     .vpos()
-                    - offset
                     - Vector2::new(11., 45.);
                 media.blit_image(
                     scene,
