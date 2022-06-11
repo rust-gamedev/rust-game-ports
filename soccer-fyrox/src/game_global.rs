@@ -12,6 +12,7 @@ use crate::prelude::*;
 pub struct GameGlobal {
     media: Media,
     scene: Handle<Scene>,
+    camera: Handle<Node>,
     input: InputController,
     game: Game,
     state: State,
@@ -26,7 +27,7 @@ impl GameState for GameGlobal {
 
         let mut scene = Scene::new();
 
-        Self::add_camera(&mut scene);
+        let camera = Self::add_camera(&mut scene);
 
         let mut media = Media::new(&engine.resource_manager);
 
@@ -41,6 +42,7 @@ impl GameState for GameGlobal {
         Self {
             media,
             scene: scene_h,
+            camera,
             input,
             game,
             state,
@@ -57,7 +59,7 @@ impl GameState for GameGlobal {
 
         self.update(engine);
 
-        self.draw(engine);
+        self.draw(engine, self.camera);
 
         self.input.flush_event_received_state();
     }
@@ -174,10 +176,10 @@ impl GameGlobal {
         }
     }
 
-    fn draw(&mut self, engine: &mut Engine) {
+    fn draw(&mut self, engine: &mut Engine, camera: Handle<Node>) {
         let scene = &mut engine.scenes[self.scene];
 
-        self.game.draw(scene, &mut self.media);
+        let cam_offset = self.game.draw(scene, camera, &mut self.media);
 
         use {MenuState::*, State::*};
 
@@ -188,21 +190,33 @@ impl GameGlobal {
                     Difficulty => (1, self.menu_difficulty),
                 };
 
-                self.media
-                    .blit_image(scene, "menu", &[image_i1, image_i2], 0., 0., DRAW_MENU_Z);
+                self.media.blit_image(
+                    scene,
+                    "menu",
+                    &[image_i1, image_i2],
+                    cam_offset.x,
+                    cam_offset.y,
+                    DRAW_MENU_Z,
+                );
             }
             Play => {
                 //# Display score bar at top
-                self.media
-                    .blit_image(scene, "bar", &[], HALF_WINDOW_W - 176., 0., DRAW_GAME_HUD_Z);
+                self.media.blit_image(
+                    scene,
+                    "bar",
+                    &[],
+                    cam_offset.x + HALF_WINDOW_W - 176.,
+                    cam_offset.y,
+                    DRAW_GAME_HUD_Z,
+                );
                 //# Show score for each team
                 for i in 0..2 {
                     self.media.blit_image(
                         scene,
                         "s",
                         &[self.game.teams[i].score],
-                        HALF_WINDOW_W + 7. - 39. * (i as f32),
-                        6.,
+                        cam_offset.x + HALF_WINDOW_W + 7. - 39. * (i as f32),
+                        cam_offset.y + 6.,
                         DRAW_GAME_SCORES_Z,
                     );
                 }
@@ -213,8 +227,8 @@ impl GameGlobal {
                         scene,
                         "goal",
                         &[],
-                        HALF_WINDOW_W - 300.,
-                        HEIGHT / 2. - 88.,
+                        cam_offset.x + HALF_WINDOW_W - 300.,
+                        cam_offset.y + HEIGHT / 2. - 88.,
                         DRAW_GAME_HUD_Z,
                     );
                 }
@@ -222,8 +236,14 @@ impl GameGlobal {
             GameOver => {
                 //# Display "Game Over" image
                 let index = (self.game.teams[1].score > self.game.teams[0].score) as u8;
-                self.media
-                    .blit_image(scene, "over", &[index], 0., 0., DRAW_GAME_OVER_BACKGROUND_Z);
+                self.media.blit_image(
+                    scene,
+                    "over",
+                    &[index],
+                    cam_offset.x,
+                    cam_offset.y,
+                    DRAW_GAME_OVER_BACKGROUND_Z,
+                );
 
                 //# Show score for each team
                 for i in 0..2 {
@@ -231,8 +251,8 @@ impl GameGlobal {
                         scene,
                         "l",
                         &[i as u8, self.game.teams[i as usize].score],
-                        HALF_WINDOW_W + 25. - 125. * i as f32,
-                        144.,
+                        cam_offset.x + HALF_WINDOW_W + 25. - 125. * i as f32,
+                        cam_offset.y + 144.,
                         DRAW_GAME_OVER_SCORES_Z,
                     );
                 }
