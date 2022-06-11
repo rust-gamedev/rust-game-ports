@@ -58,9 +58,7 @@ I'm writing a mini book, ["Learn Bevy's ECS by ripping off someone else's projec
 
 ![Soccer](/images/readme/soccer.png?raw=true)
 
-This port has designed with pseudo-immediate mode (to reflect the original logic); idiomatic Fyrox projects should instead use scene graphs.
-
-Widget APIs should also be used for the HUD/menus, but it seems that they don't support transparency, which is a requirement (feedback is pending on this topic).
+This port has designed in a pseudo-immediate mode (to reflect the original logic) - all nodes are added/removed from the scene graph on each cycle; idiomatic Fyrox projects should instead use scene graphs.
 
 The port suffers from two Fyrox bugs:
 
