@@ -81,7 +81,5 @@ Libraries:
 
 ## Projects structure/configuration
 
-- all the projects share a Cargo configuration (in the repository root), with tweaks to speedup the compilation
-- each project uses a `nightly` Rust toolchain, in order to take advantage of the Cargo configuration
 - each project has a dedicated Visual Studio Code configuration (`.vscode` directory)
 - the Rusty Roguelike project has one directory (workspace) for each step, but a shared `target` directory (in the parent directory of the projects)

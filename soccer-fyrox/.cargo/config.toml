@@ -1,3 +1,0 @@
-[target.x86_64-unknown-linux-gnu]
-linker = "/usr/bin/clang"
-rustflags = ["-Clink-arg=-fuse-ld=/home/saverio/local/mold/bin/mold", "-Zshare-generics=y"]
