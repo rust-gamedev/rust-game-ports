@@ -12,7 +12,6 @@ pub trait MyActor {
     fn img_indexes(&self) -> &[u8];
     fn anchor(&self) -> Anchor;
 
-    //# We draw with the supplied offset to enable scrolling
     fn draw(&self, scene: &mut Scene, media: &mut Media, z: f32) {
         media.draw_image(
             scene,
