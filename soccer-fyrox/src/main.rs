@@ -5,6 +5,7 @@ mod ball;
 mod bare_actor;
 mod controls;
 mod difficulty;
+mod draw_utils;
 mod game;
 mod game_global;
 mod goal;
@@ -38,6 +39,7 @@ pub mod prelude {
     pub use crate::bare_actor::BareActor;
     pub use crate::controls::Controls;
     pub use crate::difficulty::{Difficulty, DIFFICULTY};
+    pub use crate::draw_utils::*;
     pub use crate::game::{Game, DEFAULT_DIFFICULTY};
     pub use crate::goal::Goal;
     pub use crate::input_controller::InputController;
