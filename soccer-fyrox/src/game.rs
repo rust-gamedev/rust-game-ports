@@ -68,8 +68,12 @@ impl Game {
             .iter()
             .flat_map(|(_, _)| {
                 [
-                    pools.players.spawn(Player::new(0., 0., 0)),
-                    pools.players.spawn(Player::new(0., 0., 1)),
+                    pools
+                        .players
+                        .spawn(Player::new(0., 0., 0, &mut scene.graph)),
+                    pools
+                        .players
+                        .spawn(Player::new(0., 0., 1, &mut scene.graph)),
                 ]
             })
             .collect::<Vec<_>>();
@@ -83,13 +87,13 @@ impl Game {
         //# Create two goals
         let goals = (0..2)
             .into_iter()
-            .map(|i| pools.goals.spawn(Goal::new(i)))
+            .map(|i| pools.goals.spawn(Goal::new(i, &mut scene.graph)))
             .collect();
 
         let kickoff_player = None;
 
         //# Create ball
-        let ball = Ball::new();
+        let ball = Ball::new(&mut scene.graph);
 
         //# Focus camera on ball - copy ball pos
         let camera_focus = ball.vpos.clone();
@@ -107,12 +111,12 @@ impl Game {
             pools,
         };
 
-        instance.reset();
+        instance.reset(&mut scene.graph);
 
         instance
     }
 
-    fn reset(&mut self) {
+    fn reset(&mut self, graph: &mut Graph) {
         //# Called at game start, and after a goal has been scored
 
         //# Set up players list/positions
@@ -137,12 +141,13 @@ impl Game {
 
             let (player0, player1) = self.pools.players.borrow_two_mut((*player0_h, *player1_h));
 
-            player0.reset(random_offset(pos.0), random_offset(pos.1), 0);
+            player0.reset(random_offset(pos.0), random_offset(pos.1), 0, graph);
 
             player1.reset(
                 random_offset(LEVEL_W - pos.0),
                 random_offset(LEVEL_H - pos.1),
                 1,
+                graph,
             );
         }
 
@@ -177,7 +182,7 @@ impl Game {
 
         if self.score_timer == 0 {
             //# Reset for new kick-off after goal scored
-            self.reset();
+            self.reset(&mut scene.graph);
         } else if self.score_timer < 0 && (self.ball.vpos.y - HALF_LEVEL_H).abs() > HALF_PITCH_H {
             media.play_sound(scene, "goal", &[thread_rng().gen_range(0..2)]);
 

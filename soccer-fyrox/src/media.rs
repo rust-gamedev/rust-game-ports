@@ -1,25 +1,13 @@
-use std::{
-    collections::{HashMap, HashSet},
-    fmt::Display,
-    fs::read_dir,
-    path::PathBuf,
-};
+use std::{collections::HashMap, fmt::Display, fs::read_dir, path::PathBuf};
 
 use fyrox::{
     core::futures::{executor::block_on, future::join_all},
     engine::resource_manager::ResourceManager,
-    gui::{
-        image::ImageBuilder,
-        message::MessageDirection,
-        widget::{WidgetBuilder, WidgetMessage},
-        UiNode, UserInterface,
-    },
-    resource::texture::{Texture, TextureKind},
+    resource::texture::Texture,
     scene::{
         dim2::rectangle::RectangleBuilder,
         sound::{SoundBufferResource, SoundBuilder, Status},
     },
-    utils::into_gui_texture,
 };
 
 use crate::prelude::*;
@@ -48,7 +36,6 @@ pub struct Media {
     image_textures: HashMap<String, Texture>,
     sound_resources: HashMap<String, SoundBufferResource>,
     looping_sounds: HashMap<String, Handle<Node>>,
-    widget_handles: HashSet<Handle<UiNode>>,
 }
 
 impl Media {
@@ -125,61 +112,10 @@ impl Media {
 
         let looping_sounds = HashMap::new();
 
-        let widget_handles = HashSet::new();
-
         Self {
             image_textures,
             sound_resources,
             looping_sounds,
-            widget_handles,
-        }
-    }
-
-    pub fn clear_images(&mut self, scene: &mut Scene, user_interface: &mut UserInterface) {
-        for widget_h in &self.widget_handles {
-            user_interface
-                .send_message(WidgetMessage::remove(*widget_h, MessageDirection::ToWidget));
-        }
-
-        self.widget_handles.clear();
-
-        let root = scene.graph.get_root();
-
-        for child in scene.graph[root].children().to_vec() {
-            if scene.graph[child].is_rectangle() {
-                scene.graph.remove_node(child);
-            }
-        }
-    }
-
-    pub fn draw_gui_image(
-        &mut self,
-        user_interface: &mut UserInterface,
-        base: &str,
-        indexes: &[u8],
-        std_x: f32,
-        std_y: f32,
-    ) {
-        let texture = self.image(base, indexes);
-        let texture_kind = texture.data_ref().kind();
-
-        if let TextureKind::Rectangle {
-            width: texture_width,
-            height: texture_height,
-        } = texture_kind
-        {
-            let widget_h = ImageBuilder::new(
-                WidgetBuilder::new()
-                    .with_width(texture_width as f32)
-                    .with_height(texture_height as f32)
-                    .with_desired_position(Vector2::new(std_x, std_y)),
-            )
-            .with_texture(into_gui_texture(texture))
-            .build(&mut user_interface.build_ctx());
-
-            self.widget_handles.insert(widget_h);
-        } else {
-            panic!("Texture is not a rectangle!")
         }
     }
 
@@ -265,7 +201,7 @@ impl Media {
         }
     }
 
-    fn image<S: AsRef<str> + Display>(&self, base: S, indexes: &[u8]) -> Texture {
+    pub fn image<S: AsRef<str> + Display>(&self, base: S, indexes: &[u8]) -> Texture {
         if indexes.len() > 3 {
             panic!();
         }
