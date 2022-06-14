@@ -151,8 +151,8 @@ impl Game {
             .borrow_mut(self.kickoff_player.unwrap())
             .vpos = Vector2::new(HALF_LEVEL_W - 30. + other_team as f32 * 60., HALF_LEVEL_H);
 
-        //# Create ball
-        self.ball = Ball::new();
+        //# Reset ball
+        self.ball.reset();
 
         //# Focus camera on ball - copy ball pos
         self.camera_focus = self.ball.vpos.clone();

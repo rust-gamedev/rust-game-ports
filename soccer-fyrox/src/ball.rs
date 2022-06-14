@@ -122,20 +122,18 @@ pub struct Ball {
 
 impl Ball {
     pub fn new() -> Self {
-        let vpos = Vector2::new(HALF_LEVEL_W, HALF_LEVEL_H);
-
         let img_base = "ball";
         let img_indexes = vec![];
+        let shadow = BareActor::new("balls", Anchor::Center);
 
-        //# Velocity
-        let vel = Vector2::new(0.0, 0.0);
-
+        // Placeholders - reset below.
+        //
+        let vpos = Vector2::zero();
+        let vel = Vector2::zero();
         let owner = None;
         let timer = 0;
 
-        let shadow = BareActor::new("balls", Anchor::Center);
-
-        Self {
+        let mut instance = Self {
             img_base,
             img_indexes,
             vpos,
@@ -144,7 +142,18 @@ impl Ball {
             owner,
             timer,
             shadow,
-        }
+        };
+
+        instance.reset();
+
+        instance
+    }
+
+    pub fn reset(&mut self) {
+        self.vpos = Vector2::new(HALF_LEVEL_W, HALF_LEVEL_H);
+        self.vel = Vector2::new(0.0, 0.0);
+        self.owner = None;
+        self.timer = 0;
     }
 
     //# Check for collision with player p
