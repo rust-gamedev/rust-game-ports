@@ -1,3 +1,5 @@
+use std::env;
+
 use fyrox::{
     dpi::PhysicalSize,
     engine::framework::prelude::GameState,
@@ -9,6 +11,8 @@ use fyrox::{
 
 use crate::prelude::*;
 
+const DEFAULT_WIN_SCORE: &str = "9";
+
 pub struct GameGlobal {
     media: Media,
     scene: Handle<Scene>,
@@ -19,6 +23,9 @@ pub struct GameGlobal {
     menu_state: Option<MenuState>,
     menu_num_players: u8,
     menu_difficulty: u8,
+
+    // For debugging; can be set via env var `SOCCER_WIN_SCORE`.
+    win_score: u8,
 }
 
 impl GameState for GameGlobal {
@@ -39,6 +46,11 @@ impl GameState for GameGlobal {
 
         let scene_h = engine.scenes.add(scene);
 
+        let win_score = env::var("SOCCER_WIN_SCORE")
+            .unwrap_or(String::from(DEFAULT_WIN_SCORE))
+            .parse()
+            .unwrap();
+
         Self {
             media,
             scene: scene_h,
@@ -49,6 +61,7 @@ impl GameState for GameGlobal {
             menu_state,
             menu_num_players: 1,
             menu_difficulty: 0,
+            win_score,
         }
     }
 
@@ -159,7 +172,9 @@ impl GameGlobal {
                 //# First player to 9 wins
                 let max_score = self.game.teams.iter().map(|t| t.score).max().unwrap();
 
-                if max_score == 9 && self.game.score_timer == 1 {
+                if self.win_score == 0
+                    || (max_score == self.win_score && self.game.score_timer == 1)
+                {
                     self.state = State::GameOver;
                 } else {
                     self.game.update(&self.media, scene, &self.input);
