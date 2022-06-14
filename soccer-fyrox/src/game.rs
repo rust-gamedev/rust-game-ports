@@ -60,8 +60,26 @@ impl Game {
         let score_timer = 0;
         let scoring_team = 1;
 
-        // Owner of the players.
-        let players = vec![];
+        let mut pools = Pools::new();
+
+        // The players are reset below.
+        // Watch out! The team *must* be set, preferrably here.
+        let players = PLAYER_START_POS
+            .iter()
+            .flat_map(|(_, _)| {
+                [
+                    pools.players.spawn(Player::new(0., 0., 0)),
+                    pools.players.spawn(Player::new(0., 0., 1)),
+                ]
+            })
+            .collect::<Vec<_>>();
+        //# Players in the list are stored in an alternating fashion - a team 0 player, then a team 1 player, and so on.
+        //# The peer for each player is the opposing team player at the opposite end of the list. As there are 14 players
+        //# in total, the peers are 0 and 13, 1 and 12, 2 and 11, and so on.
+        for (a, b) in players.iter().zip(players.iter().rev()) {
+            pools.players.borrow_mut(*a).peer = *b;
+        }
+
         let goals = vec![];
         let kickoff_player = None;
 
@@ -70,8 +88,6 @@ impl Game {
 
         //# Focus camera on ball - copy ball pos
         let camera_focus = ball.vpos.clone();
-
-        let pools = Pools::new();
 
         let mut instance = Self {
             teams,
@@ -98,32 +114,31 @@ impl Game {
         //# The lambda function is used to give the player start positions a slight random offset so they're not
         //# perfectly aligned to their starting spots
         //
-        self.pools.players.clear();
-        self.players.clear();
+        // The Pool iterator doesn't have the chunks() API, so for simplicity, we implement it.
+        //
+        let player_couple_hs = self
+            .players
+            .iter()
+            .step_by(2)
+            .zip(self.players.iter().skip(1).step_by(2));
 
         // Watch out! Python's randint() spec is different, as it's inclusive on both ends, so we use
         // 33 on the right end.
         let random_offset = |x| x + rand::thread_rng().gen_range(-32..33) as f32;
-        for pos in PLAYER_START_POS {
+        for (pos, (player0_h, player1_h)) in PLAYER_START_POS.iter().zip(player_couple_hs) {
             //# pos is a pair of coordinates in a tuple
             //# For each entry in pos, create one player for each team - positions are flipped (both horizontally and
             //# vertically) versions of each other
-            let player = Player::new(random_offset(pos.0), random_offset(pos.1), 0);
-            self.players.push(self.pools.players.spawn(player));
 
-            let player = Player::new(
+            let (player0, player1) = self.pools.players.borrow_two_mut((*player0_h, *player1_h));
+
+            player0.reset(random_offset(pos.0), random_offset(pos.1), 0);
+
+            player1.reset(
                 random_offset(LEVEL_W - pos.0),
                 random_offset(LEVEL_H - pos.1),
                 1,
             );
-            self.players.push(self.pools.players.spawn(player));
-        }
-
-        //# Players in the list are stored in an alternating fashion - a team 0 player, then a team 1 player, and so on.
-        //# The peer for each player is the opposing team player at the opposite end of the list. As there are 14 players
-        //# in total, the peers are 0 and 13, 1 and 12, 2 and 11, and so on.
-        for (a, b) in self.players.iter().zip(self.players.iter().rev()) {
-            self.pools.players.borrow_mut(*a).peer = *b;
         }
 
         //# Create two goals
