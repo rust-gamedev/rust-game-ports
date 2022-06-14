@@ -1,3 +1,5 @@
+use fyrox::core::num_traits::Zero;
+
 use crate::prelude::*;
 
 const ANCHOR: Vector2<f32> = Vector2::new(25., 37.);
@@ -37,9 +39,12 @@ pub struct Player {
     pub peer: Handle<Player>,
     pub mark: TargetHandle,
     pub lead: Option<f32>,
+    //# Remember home position, where we'll stand by default if we're not active (i.e. far from the ball)
     home: Vector2<f32>,
     pub team: u8,
+    //# Facing direction: 0 = up, 1 = top right, up to 7 = top left
     pub dir: u8,
+    //# Animation frame
     anim_frame: i8,
     pub timer: i32,
     pub shadow: BareActor,
@@ -47,42 +52,30 @@ pub struct Player {
 
 impl Player {
     pub fn new(x: f32, y: f32, team: u8) -> Self {
-        //# Player objects are recreated each time there is a kickoff
-        //# Team will be 0 or 1
-        //# The x and y values supplied represent our 'home' position - the place we'll return to by default when not near
-        //# the ball. However, on creation, we want players to be in their kickoff positions, which means all players from
-        //# team 0 will be below the halfway line, and players from team 1 above. The player chosen to actually do the
-        //# kickoff is moved to be alongside the centre spot after the player objects have been created.
+        //# Player objects are reset each time there is a kickoff
 
-        //# Calculate our initial position for kickoff by halving y, adding 550 and then subtracting either 400 for
-        //# team 1, or nothing for team 0
-        let kickoff_y = (y / 2.) + 550. - (team as f32 * 400.);
-
-        let vpos = Vector2::new(x, kickoff_y);
         let img_base = BLANK_IMAGE;
         let img_indexes = vec![];
-
-        let peer = Handle::NONE;
-        let mark = TargetHandle::None;
-        let lead = None;
-
-        //# Remember home position, where we'll stand by default if we're not active (i.e. far from the ball)
-        let home = Vector2::new(x, y);
-
-        //# Facing direction: 0 = up, 1 = top right, up to 7 = top left
-        let dir = 0;
-
-        //# Animation frame
-        let anim_frame = -1;
-
-        let timer = 0;
-
-        let shadow = BareActor::new(BLANK_IMAGE, Anchor::Custom(ANCHOR));
 
         //# Used when DEBUG_SHOW_TARGETS is on
         //self.debug_target = Vector2(0, 0)
 
-        Self {
+        // This is set by Game() at the beginning, and never reset.
+        //
+        let peer = Handle::NONE;
+
+        // Placeholders - reset below.
+        //
+        let vpos = Vector2::zero();
+        let mark = TargetHandle::None;
+        let lead = None;
+        let home = Vector2::zero();
+        let dir = 0;
+        let anim_frame = 0;
+        let timer = 0;
+        let shadow = BareActor::new("", Anchor::Center);
+
+        let mut instance = Self {
             vpos,
             img_base,
             img_indexes,
@@ -96,7 +89,32 @@ impl Player {
             anim_frame,
             timer,
             shadow,
-        }
+        };
+
+        instance.reset(x, y, team);
+
+        instance
+    }
+
+    pub fn reset(&mut self, x: f32, y: f32, team: u8) {
+        //# Team will be 0 or 1
+        //# The x and y values supplied represent our 'home' position - the place we'll return to by default when not near
+        //# the ball. However, on creation, we want players to be in their kickoff positions, which means all players from
+        //# team 0 will be below the halfway line, and players from team 1 above. The player chosen to actually do the
+        //# kickoff is moved to be alongside the centre spot after the player objects have been created.
+
+        //# Calculate our initial position for kickoff by halving y, adding 550 and then subtracting either 400 for
+        //# team 1, or nothing for team 0
+        let kickoff_y = (y / 2.) + 550. - (team as f32 * 400.);
+
+        self.vpos = Vector2::new(x, kickoff_y);
+        self.mark = TargetHandle::None;
+        self.lead = None;
+        self.home = Vector2::new(x, y);
+        self.dir = 0;
+        self.anim_frame = -1;
+        self.timer = 0;
+        self.shadow = BareActor::new(BLANK_IMAGE, Anchor::Custom(ANCHOR));
     }
 
     // An option is to pass all the Game fields individually, but this is simpler.
