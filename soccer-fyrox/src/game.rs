@@ -80,7 +80,12 @@ impl Game {
             pools.players.borrow_mut(*a).peer = *b;
         }
 
-        let goals = vec![];
+        //# Create two goals
+        let goals = (0..2)
+            .into_iter()
+            .map(|i| pools.goals.spawn(Goal::new(i)))
+            .collect();
+
         let kickoff_player = None;
 
         //# Create ball
@@ -140,12 +145,6 @@ impl Game {
                 1,
             );
         }
-
-        //# Create two goals
-        self.goals = (0..2)
-            .into_iter()
-            .map(|i| self.pools.goals.spawn(Goal::new(i)))
-            .collect();
 
         //# The current active player under control by each team, indicated by arrows over their heads
         //# Choose first two players to begin with
