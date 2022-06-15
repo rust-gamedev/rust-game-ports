@@ -13,11 +13,11 @@ pub struct GameOverScreen {
 impl GameOverScreen {
     pub fn new(user_interface: &mut UserInterface, media: &Media) -> Self {
         let background_h =
-            build_blank_widget(media, BACKGROUND_IMG_BASE, &[0], 0., 0., user_interface);
+            add_widget_node(media, BACKGROUND_IMG_BASE, &[0], 0., 0., user_interface);
 
         let score_hs = (0..2)
             .map(|i| {
-                build_blank_widget(
+                add_widget_node(
                     media,
                     SCORE_IMG_BASE,
                     &[0, 0],
@@ -43,7 +43,7 @@ impl GameOverScreen {
         media: &Media,
         user_interface: &mut UserInterface,
     ) {
-        draw_widget(
+        enable_widget(
             self.background_h,
             media,
             BACKGROUND_IMG_BASE,
@@ -54,7 +54,7 @@ impl GameOverScreen {
         );
 
         for (i, (score_h, team_score)) in self.score_hs.iter().zip(team_scores.iter()).enumerate() {
-            draw_widget(
+            enable_widget(
                 *score_h,
                 media,
                 SCORE_IMG_BASE,

@@ -14,7 +14,7 @@ pub struct GameHud {
 
 impl GameHud {
     pub fn new(user_interface: &mut UserInterface, media: &Media) -> Self {
-        let bar_h = build_blank_widget(
+        let bar_h = add_widget_node(
             media,
             BAR_IMG_BASE,
             &[],
@@ -25,7 +25,7 @@ impl GameHud {
 
         let score_hs = (0..2)
             .map(|i| {
-                build_blank_widget(
+                add_widget_node(
                     media,
                     SCORE_IMG_BASE,
                     &[0],
@@ -38,7 +38,7 @@ impl GameHud {
             .try_into()
             .unwrap();
 
-        let goal_h = build_blank_widget(
+        let goal_h = add_widget_node(
             media,
             GOAL_IMG_BASE,
             &[],
@@ -61,7 +61,7 @@ impl GameHud {
         media: &Media,
         user_interface: &mut UserInterface,
     ) {
-        draw_widget(
+        enable_widget(
             self.bar_h,
             media,
             BAR_IMG_BASE,
@@ -72,7 +72,7 @@ impl GameHud {
         );
 
         for (i, score_h) in self.score_hs.iter().enumerate() {
-            draw_widget(
+            enable_widget(
                 *score_h,
                 media,
                 SCORE_IMG_BASE,
@@ -84,7 +84,7 @@ impl GameHud {
         }
 
         if display_goal {
-            draw_widget(
+            enable_widget(
                 self.goal_h,
                 media,
                 GOAL_IMG_BASE,

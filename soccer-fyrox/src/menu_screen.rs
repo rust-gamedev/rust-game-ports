@@ -10,13 +10,13 @@ pub struct MenuScreen {
 
 impl MenuScreen {
     pub fn new(user_interface: &mut UserInterface, media: &Media) -> Self {
-        let widget_h = build_blank_widget(media, IMG_BASE, &[0, 1], 0., 0., user_interface);
+        let widget_h = add_widget_node(media, IMG_BASE, &[0, 1], 0., 0., user_interface);
 
         Self { widget_h }
     }
 
     pub fn prepare_draw(&self, indexes: &[u8], media: &Media, user_interface: &mut UserInterface) {
-        draw_widget(
+        enable_widget(
             self.widget_h,
             media,
             IMG_BASE,

@@ -44,7 +44,7 @@ pub fn add_image_node(
     .build(&mut scene.graph);
 }
 
-pub fn build_blank_widget(
+pub fn add_widget_node(
     media: &Media,
     base: &str,
     indexes: &[u8],
@@ -74,7 +74,7 @@ pub fn build_blank_widget(
     }
 }
 
-pub fn draw_widget(
+pub fn enable_widget(
     widget_h: Handle<UiNode>,
     media: &Media,
     base: &str,
