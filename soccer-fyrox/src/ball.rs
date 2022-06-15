@@ -132,7 +132,7 @@ impl Ball {
         let owner = None;
         let timer = 0;
 
-        let shadow = BareActor::new("balls", Anchor::Center, graph);
+        let shadow = BareActor::new("balls", None, Anchor::Center, graph);
         let rectangle_h = RectangleBuilder::new(BaseBuilder::new()).build(graph);
 
         let mut instance = Self {

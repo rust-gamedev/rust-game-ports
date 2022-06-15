@@ -73,7 +73,7 @@ impl Player {
         let dir = 0;
         let anim_frame = 0;
         let timer = 0;
-        let shadow = BareActor::new(BLANK_IMAGE, Anchor::Custom(ANCHOR), graph);
+        let shadow = BareActor::new(BLANK_IMAGE, None, Anchor::Custom(ANCHOR), graph);
 
         let rectangle_h = RectangleBuilder::new(BaseBuilder::new()).build(graph);
 
@@ -117,7 +117,7 @@ impl Player {
         self.dir = 0;
         self.anim_frame = -1;
         self.timer = 0;
-        self.shadow = BareActor::new(BLANK_IMAGE, Anchor::Custom(ANCHOR), graph);
+        self.shadow = BareActor::new(BLANK_IMAGE, None, Anchor::Custom(ANCHOR), graph);
     }
 
     // An option is to pass all the Game fields individually, but this is simpler.
