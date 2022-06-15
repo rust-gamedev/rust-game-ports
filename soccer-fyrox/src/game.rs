@@ -43,20 +43,8 @@ impl Game {
         scene: &mut Scene,
         media: &mut Media,
     ) -> Self {
-        let teams = vec![Team::new(p1_controls), Team::new(p2_controls)];
-        let difficulty = DIFFICULTY[difficulty as usize];
-
-        if teams[0].human() {
-            //# Beginning a game with at least 1 human player
-            //# music.fadeout(1); // WRITEME: Fyrox doesn't currently support fading out
-            media.stop_looping_sound(scene, "theme"); // ^^ remove once fadeout is implemented
-            media.play_looping_sound(scene, "crowd");
-            media.play_sound(scene, "start", &[]);
-        } else {
-            //# No players - we must be on the menu. Play title music.
-            media.play_looping_sound(scene, "theme");
-            media.stop_looping_sound(scene, "crowd");
-        }
+        let teams = vec![];
+        let placeholder_difficulty = DIFFICULTY[difficulty as usize];
 
         let score_timer = 0;
         let scoring_team = 1;
@@ -103,7 +91,7 @@ impl Game {
 
         let mut instance = Self {
             teams,
-            difficulty,
+            difficulty: placeholder_difficulty,
             score_timer,
             scoring_team,
             players,
@@ -115,14 +103,39 @@ impl Game {
             pools,
         };
 
-        instance.reset(&mut scene.graph);
+        instance.reset_game(p1_controls, p2_controls, difficulty, scene, media);
 
         instance
     }
 
-    fn reset(&mut self, graph: &mut Graph) {
-        //# Called at game start, and after a goal has been scored
+    pub fn reset_game(
+        &mut self,
+        p1_controls: Option<Controls>,
+        p2_controls: Option<Controls>,
+        difficulty: u8,
+        scene: &mut Scene,
+        media: &mut Media,
+    ) {
+        self.teams = vec![Team::new(p1_controls), Team::new(p2_controls)];
 
+        self.difficulty = DIFFICULTY[difficulty as usize];
+
+        if self.teams[0].human() {
+            //# Beginning a game with at least 1 human player
+            //# music.fadeout(1); // WRITEME: Fyrox doesn't currently support fading out
+            media.stop_looping_sound(scene, "theme"); // ^^ remove once fadeout is implemented
+            media.play_looping_sound(scene, "crowd");
+            media.play_sound(scene, "start", &[]);
+        } else {
+            //# No players - we must be on the menu. Play title music.
+            media.play_looping_sound(scene, "theme");
+            media.stop_looping_sound(scene, "crowd");
+        }
+
+        self.reset_field(&mut scene.graph);
+    }
+
+    fn reset_field(&mut self, graph: &mut Graph) {
         //# Set up players list/positions
         //# The lambda function is used to give the player start positions a slight random offset so they're not
         //# perfectly aligned to their starting spots
@@ -202,7 +215,7 @@ impl Game {
 
         if self.score_timer == 0 {
             //# Reset for new kick-off after goal scored
-            self.reset(&mut scene.graph);
+            self.reset_field(&mut scene.graph);
         } else if self.score_timer < 0 && (self.ball.vpos.y - HALF_LEVEL_H).abs() > HALF_PITCH_H {
             media.play_sound(scene, "goal", &[thread_rng().gen_range(0..2)]);
 

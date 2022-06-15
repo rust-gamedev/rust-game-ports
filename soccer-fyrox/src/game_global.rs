@@ -137,7 +137,7 @@ impl GameGlobal {
 
                             self.state = State::Play;
                             self.menu_state = None;
-                            self.game = Game::new(
+                            self.game.reset_game(
                                 Some(Controls::new(0)),
                                 Some(Controls::new(1)),
                                 DEFAULT_DIFFICULTY,
@@ -152,7 +152,7 @@ impl GameGlobal {
 
                         self.state = State::Play;
                         self.menu_state = None;
-                        self.game = Game::new(
+                        self.game.reset_game(
                             Some(Controls::new(0)),
                             None,
                             self.menu_difficulty,
@@ -204,8 +204,13 @@ impl GameGlobal {
                     //# Switch to menu state, and create a new game object without a player
                     self.state = State::Menu;
                     self.menu_state = Some(MenuState::NumPlayers);
-                    self.game =
-                        Game::new(None, None, DEFAULT_DIFFICULTY, &mut scene, &mut self.media);
+                    self.game.reset_game(
+                        None,
+                        None,
+                        DEFAULT_DIFFICULTY,
+                        &mut scene,
+                        &mut self.media,
+                    );
                 }
             }
         }
