@@ -105,6 +105,9 @@ impl Game {
 
         instance.reset_game(p1_controls, p2_controls, difficulty, scene, media);
 
+        // The pitch is always present, so we draw it only once.
+        media.draw_image(scene, "pitch", &[], 0., 0., DRAW_PITCH_Z, Anchor::TopLeft);
+
         instance
     }
 
@@ -440,8 +443,6 @@ impl Game {
                 .with_local_position(Vector3::new(cam_offset.x, cam_offset.y, 0.))
                 .build(),
         );
-
-        media.draw_image(scene, "pitch", &[], 0., 0., DRAW_PITCH_Z, Anchor::TopLeft);
 
         //# Prepare to draw all objects
         //# 1. Create a list of all players and the ball, sorted based on their Y positions
