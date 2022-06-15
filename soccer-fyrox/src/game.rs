@@ -29,6 +29,7 @@ pub struct Game {
     goals: Vec<Handle<Goal>>,
     pub kickoff_player: Option<Handle<Player>>,
     pub ball: Ball,
+    arrows: Vec<Option<BareActor>>,
     camera_focus: Vector2<f32>,
 
     pub pools: Pools,
@@ -95,6 +96,8 @@ impl Game {
         //# Create ball
         let ball = Ball::new(&mut scene.graph);
 
+        let arrows = vec![None, None];
+
         //# Focus camera on ball - copy ball pos
         let camera_focus = ball.vpos.clone();
 
@@ -107,6 +110,7 @@ impl Game {
             goals,
             kickoff_player,
             ball,
+            arrows,
             camera_focus,
             pools,
         };
@@ -172,6 +176,22 @@ impl Game {
 
         //# Reset ball
         self.ball.reset();
+
+        self.arrows = self
+            .arrows
+            .iter()
+            .enumerate()
+            .map(|(i, arrow)| {
+                if let Some(arrow) = arrow {
+                    graph.remove_node(arrow.rectangle_h());
+                }
+
+                //# Only show arrow for human teams
+                self.teams[i]
+                    .human()
+                    .then(|| BareActor::new("arrow", Some(i as u8), Anchor::TopLeft, graph))
+            })
+            .collect();
 
         //# Focus camera on ball - copy ball pos
         self.camera_focus = self.ball.vpos.clone();
@@ -367,6 +387,18 @@ impl Game {
             }
         }
 
+        for (arrow, team) in self.arrows.iter_mut().zip(self.teams.iter()) {
+            if let Some(arrow) = arrow {
+                let arrow_pos = self
+                    .pools
+                    .players
+                    .borrow(team.active_control_player.unwrap())
+                    .vpos()
+                    - Vector2::new(11., 45.);
+                *arrow.vpos_mut() = arrow_pos;
+            }
+        }
+
         //# Get vector between current camera pos and ball pos
         let (camera_ball_vec, distance) = safe_normalise(&(self.camera_focus - self.ball.vpos));
         if distance > 0.0 {
@@ -460,24 +492,9 @@ impl Game {
             .draw(scene, media, DRAW_GOAL_1_Z);
 
         //# Show active players
-        for t in 0..2 {
-            //# Only show arrow for human teams
-            if self.teams[t].human() {
-                let arrow_pos = self
-                    .pools
-                    .players
-                    .borrow(self.teams[t].active_control_player.unwrap())
-                    .vpos()
-                    - Vector2::new(11., 45.);
-                media.draw_image(
-                    scene,
-                    "arrow",
-                    &[t as u8],
-                    arrow_pos.x,
-                    arrow_pos.y,
-                    DRAW_ARROWS_Z,
-                    Anchor::TopLeft,
-                );
+        for arrow in &self.arrows {
+            if let Some(arrow) = arrow {
+                arrow.draw(scene, media, DRAW_ARROWS_Z);
             }
         }
 
