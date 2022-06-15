@@ -106,7 +106,16 @@ impl Game {
         instance.reset_game(p1_controls, p2_controls, difficulty, scene, media);
 
         // The pitch is always present, so we draw it only once.
-        media.draw_image(scene, "pitch", &[], 0., 0., DRAW_PITCH_Z, Anchor::TopLeft);
+        add_image_node(
+            media,
+            scene,
+            "pitch",
+            &[],
+            0.,
+            0.,
+            DRAW_PITCH_Z,
+            Anchor::TopLeft,
+        );
 
         instance
     }

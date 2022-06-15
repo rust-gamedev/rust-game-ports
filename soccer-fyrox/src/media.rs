@@ -4,10 +4,7 @@ use fyrox::{
     core::futures::{executor::block_on, future::join_all},
     engine::resource_manager::ResourceManager,
     resource::texture::Texture,
-    scene::{
-        dim2::rectangle::RectangleBuilder,
-        sound::{SoundBufferResource, SoundBuilder, Status},
-    },
+    scene::sound::{SoundBufferResource, SoundBuilder, Status},
 };
 
 use crate::prelude::*;
@@ -117,42 +114,6 @@ impl Media {
             sound_resources,
             looping_sounds,
         }
-    }
-
-    // Draws the image (loads the texture, adds the node to the scene, and links it to the root).
-    //
-    // The coordinates ("std" = "standard") are the typical orientation used for 2d libraries (center
-    // at top left, x -> right, y -> down).
-    //
-    // This is difficult to name, since the semantics of Fyrox and (simple) 2d games are different.
-    //
-    pub fn draw_image(
-        &mut self,
-        scene: &mut Scene,
-        base: &str,
-        indexes: &[u8],
-        std_x: f32,
-        std_y: f32,
-        z: f32,
-        anchor: Anchor,
-    ) {
-        if base == BLANK_IMAGE {
-            return;
-        }
-
-        let texture = self.image(base, indexes);
-        let (fyrox_coords, texture_dims) = to_fyrox_coordinates(std_x, std_y, z, anchor, &texture);
-
-        RectangleBuilder::new(
-            BaseBuilder::new().with_local_transform(
-                TransformBuilder::new()
-                    .with_local_position(Vector3::new(fyrox_coords.x, fyrox_coords.y, z))
-                    .with_local_scale(Vector3::new(texture_dims.x, texture_dims.y, f32::EPSILON))
-                    .build(),
-            ),
-        )
-        .with_texture(texture)
-        .build(&mut scene.graph);
     }
 
     pub fn play_sound(&self, scene: &mut Scene, base: &str, indexes: &[u8]) {
