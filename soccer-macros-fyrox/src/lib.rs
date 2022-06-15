@@ -23,6 +23,7 @@ pub fn my_actor_based(args: TokenStream, input: TokenStream) -> TokenStream {
             quote! { pub img_indexes: Vec<u8> },
             quote! { pub vpos: Vector2<f32> },
             quote! { anchor: Anchor },
+            quote! { rectangle_h: Handle<Node> },
         ];
 
         for field_tokens in fields_tokens {
@@ -44,6 +45,10 @@ pub fn my_actor_based(args: TokenStream, input: TokenStream) -> TokenStream {
                 self.vpos
             }
 
+            fn vpos_mut(&mut self) -> &mut Vector2<f32> {
+                &mut self.vpos
+            }
+
             fn img_base(&self) -> &'static str {
                 self.img_base
             }
@@ -54,6 +59,10 @@ pub fn my_actor_based(args: TokenStream, input: TokenStream) -> TokenStream {
 
             fn anchor(&self) -> Anchor {
                 self.anchor
+            }
+
+            fn rectangle_h(&self) -> Handle<Node> {
+                self.rectangle_h
             }
         }
     };

@@ -5,12 +5,16 @@ mod ball;
 mod bare_actor;
 mod controls;
 mod difficulty;
+mod draw_utils;
 mod game;
 mod game_global;
+mod game_hud;
+mod game_over_screen;
 mod goal;
 mod input_controller;
 mod math_utils;
 mod media;
+mod menu_screen;
 mod menu_state;
 mod my_actor;
 mod player;
@@ -29,7 +33,14 @@ pub mod prelude {
             pool::{Handle, Pool},
         },
         event::VirtualKeyCode,
-        scene::{base::BaseBuilder, node::Node, transform::TransformBuilder, Scene},
+        scene::{
+            base::BaseBuilder,
+            dim2::rectangle::{Rectangle, RectangleBuilder},
+            graph::Graph,
+            node::Node,
+            transform::TransformBuilder,
+            Scene,
+        },
     };
     pub use rand::{thread_rng, Rng};
 
@@ -38,11 +49,15 @@ pub mod prelude {
     pub use crate::bare_actor::BareActor;
     pub use crate::controls::Controls;
     pub use crate::difficulty::{Difficulty, DIFFICULTY};
+    pub use crate::draw_utils::*;
     pub use crate::game::{Game, DEFAULT_DIFFICULTY};
+    pub use crate::game_hud::GameHud;
+    pub use crate::game_over_screen::GameOverScreen;
     pub use crate::goal::Goal;
     pub use crate::input_controller::InputController;
     pub use crate::math_utils::*;
     pub use crate::media::{Media, BLANK_IMAGE};
+    pub use crate::menu_screen::MenuScreen;
     pub use crate::menu_state::MenuState;
     pub use crate::my_actor::MyActor;
     pub use crate::player::Player;

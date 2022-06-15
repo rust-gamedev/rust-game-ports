@@ -6,7 +6,7 @@ pub struct Goal {
 }
 
 impl Goal {
-    pub fn new(team: u8) -> Self {
+    pub fn new(team: u8, graph: &mut Graph) -> Self {
         let x = HALF_LEVEL_W;
         let y = if team == 0 { 0. } else { LEVEL_H };
         let vpos = Vector2::new(x, y);
@@ -14,12 +14,15 @@ impl Goal {
         let img_base = "goal";
         let img_indexes = vec![team];
 
+        let rectangle_h = RectangleBuilder::new(BaseBuilder::new()).build(graph);
+
         Self {
             img_base,
             img_indexes,
             vpos,
             team,
             anchor: Anchor::Center,
+            rectangle_h,
         }
     }
 }

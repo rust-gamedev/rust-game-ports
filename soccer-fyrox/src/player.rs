@@ -51,7 +51,7 @@ pub struct Player {
 }
 
 impl Player {
-    pub fn new(x: f32, y: f32, team: u8) -> Self {
+    pub fn new(x: f32, y: f32, team: u8, graph: &mut Graph) -> Self {
         //# Player objects are reset each time there is a kickoff
 
         let img_base = BLANK_IMAGE;
@@ -73,7 +73,9 @@ impl Player {
         let dir = 0;
         let anim_frame = 0;
         let timer = 0;
-        let shadow = BareActor::new("", Anchor::Center);
+        let shadow = BareActor::new(BLANK_IMAGE, None, Anchor::Custom(ANCHOR), graph);
+
+        let rectangle_h = RectangleBuilder::new(BaseBuilder::new()).build(graph);
 
         let mut instance = Self {
             vpos,
@@ -89,14 +91,15 @@ impl Player {
             anim_frame,
             timer,
             shadow,
+            rectangle_h,
         };
 
-        instance.reset(x, y, team);
+        instance.reset(x, y, team, graph);
 
         instance
     }
 
-    pub fn reset(&mut self, x: f32, y: f32, team: u8) {
+    pub fn reset(&mut self, x: f32, y: f32, team: u8, graph: &mut Graph) {
         //# Team will be 0 or 1
         //# The x and y values supplied represent our 'home' position - the place we'll return to by default when not near
         //# the ball. However, on creation, we want players to be in their kickoff positions, which means all players from
@@ -114,7 +117,7 @@ impl Player {
         self.dir = 0;
         self.anim_frame = -1;
         self.timer = 0;
-        self.shadow = BareActor::new(BLANK_IMAGE, Anchor::Custom(ANCHOR));
+        self.shadow = BareActor::new(BLANK_IMAGE, None, Anchor::Custom(ANCHOR), graph);
     }
 
     // An option is to pass all the Game fields individually, but this is simpler.

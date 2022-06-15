@@ -29,6 +29,7 @@ pub struct Game {
     goals: Vec<Handle<Goal>>,
     pub kickoff_player: Option<Handle<Player>>,
     pub ball: Ball,
+    arrows: Vec<Option<BareActor>>,
     camera_focus: Vector2<f32>,
 
     pub pools: Pools,
@@ -42,20 +43,8 @@ impl Game {
         scene: &mut Scene,
         media: &mut Media,
     ) -> Self {
-        let teams = vec![Team::new(p1_controls), Team::new(p2_controls)];
-        let difficulty = DIFFICULTY[difficulty as usize];
-
-        if teams[0].human() {
-            //# Beginning a game with at least 1 human player
-            //# music.fadeout(1); // WRITEME: Fyrox doesn't currently support fading out
-            media.stop_looping_sound(scene, "theme"); // ^^ remove once fadeout is implemented
-            media.play_looping_sound(scene, "crowd");
-            media.play_sound(scene, "start", &[]);
-        } else {
-            //# No players - we must be on the menu. Play title music.
-            media.play_looping_sound(scene, "theme");
-            media.stop_looping_sound(scene, "crowd");
-        }
+        let teams = vec![];
+        let placeholder_difficulty = DIFFICULTY[difficulty as usize];
 
         let score_timer = 0;
         let scoring_team = 1;
@@ -68,8 +57,12 @@ impl Game {
             .iter()
             .flat_map(|(_, _)| {
                 [
-                    pools.players.spawn(Player::new(0., 0., 0)),
-                    pools.players.spawn(Player::new(0., 0., 1)),
+                    pools
+                        .players
+                        .spawn(Player::new(0., 0., 0, &mut scene.graph)),
+                    pools
+                        .players
+                        .spawn(Player::new(0., 0., 1, &mut scene.graph)),
                 ]
             })
             .collect::<Vec<_>>();
@@ -83,38 +76,78 @@ impl Game {
         //# Create two goals
         let goals = (0..2)
             .into_iter()
-            .map(|i| pools.goals.spawn(Goal::new(i)))
+            .map(|i| pools.goals.spawn(Goal::new(i, &mut scene.graph)))
             .collect();
 
         let kickoff_player = None;
 
         //# Create ball
-        let ball = Ball::new();
+        let ball = Ball::new(&mut scene.graph);
+
+        let arrows = vec![None, None];
 
         //# Focus camera on ball - copy ball pos
         let camera_focus = ball.vpos.clone();
 
         let mut instance = Self {
             teams,
-            difficulty,
+            difficulty: placeholder_difficulty,
             score_timer,
             scoring_team,
             players,
             goals,
             kickoff_player,
             ball,
+            arrows,
             camera_focus,
             pools,
         };
 
-        instance.reset();
+        instance.reset_game(p1_controls, p2_controls, difficulty, scene, media);
+
+        // The pitch is always present, so we draw it only once.
+        add_image_node(
+            media,
+            scene,
+            "pitch",
+            &[],
+            0.,
+            0.,
+            DRAW_PITCH_Z,
+            Anchor::TopLeft,
+        );
 
         instance
     }
 
-    fn reset(&mut self) {
-        //# Called at game start, and after a goal has been scored
+    pub fn reset_game(
+        &mut self,
+        p1_controls: Option<Controls>,
+        p2_controls: Option<Controls>,
+        difficulty: u8,
+        scene: &mut Scene,
+        media: &mut Media,
+    ) {
+        self.teams = vec![Team::new(p1_controls), Team::new(p2_controls)];
 
+        self.difficulty = DIFFICULTY[difficulty as usize];
+
+        if self.teams[0].human() {
+            //# Beginning a game with at least 1 human player
+            //# music.fadeout(1); // WRITEME: Fyrox doesn't currently support fading out
+            media.stop_looping_sound(scene, "theme"); // ^^ remove once fadeout is implemented
+            media.play_looping_sound(scene, "crowd");
+            media.play_sound(scene, "start", &[]);
+        } else {
+            //# No players - we must be on the menu. Play title music.
+            media.play_looping_sound(scene, "theme");
+            media.stop_looping_sound(scene, "crowd");
+        }
+
+        self.reset_field(&mut scene.graph);
+    }
+
+    fn reset_field(&mut self, graph: &mut Graph) {
         //# Set up players list/positions
         //# The lambda function is used to give the player start positions a slight random offset so they're not
         //# perfectly aligned to their starting spots
@@ -137,12 +170,13 @@ impl Game {
 
             let (player0, player1) = self.pools.players.borrow_two_mut((*player0_h, *player1_h));
 
-            player0.reset(random_offset(pos.0), random_offset(pos.1), 0);
+            player0.reset(random_offset(pos.0), random_offset(pos.1), 0, graph);
 
             player1.reset(
                 random_offset(LEVEL_W - pos.0),
                 random_offset(LEVEL_H - pos.1),
                 1,
+                graph,
             );
         }
 
@@ -168,6 +202,22 @@ impl Game {
         //# Reset ball
         self.ball.reset();
 
+        self.arrows = self
+            .arrows
+            .iter()
+            .enumerate()
+            .map(|(i, arrow)| {
+                if let Some(arrow) = arrow {
+                    graph.remove_node(arrow.rectangle_h());
+                }
+
+                //# Only show arrow for human teams
+                self.teams[i]
+                    .human()
+                    .then(|| BareActor::new("arrow", Some(i as u8), Anchor::TopLeft, graph))
+            })
+            .collect();
+
         //# Focus camera on ball - copy ball pos
         self.camera_focus = self.ball.vpos.clone();
     }
@@ -177,7 +227,7 @@ impl Game {
 
         if self.score_timer == 0 {
             //# Reset for new kick-off after goal scored
-            self.reset();
+            self.reset_field(&mut scene.graph);
         } else if self.score_timer < 0 && (self.ball.vpos.y - HALF_LEVEL_H).abs() > HALF_PITCH_H {
             media.play_sound(scene, "goal", &[thread_rng().gen_range(0..2)]);
 
@@ -362,6 +412,18 @@ impl Game {
             }
         }
 
+        for (arrow, team) in self.arrows.iter_mut().zip(self.teams.iter()) {
+            if let Some(arrow) = arrow {
+                let arrow_pos = self
+                    .pools
+                    .players
+                    .borrow(team.active_control_player.unwrap())
+                    .vpos()
+                    - Vector2::new(11., 45.);
+                *arrow.vpos_mut() = arrow_pos;
+            }
+        }
+
         //# Get vector between current camera pos and ball pos
         let (camera_ball_vec, distance) = safe_normalise(&(self.camera_focus - self.ball.vpos));
         if distance > 0.0 {
@@ -373,7 +435,7 @@ impl Game {
 
     // Returns the camera offset; hopefully, it can be removed if Image widgets support transparency.
     //
-    pub fn draw(
+    pub fn prepare_draw(
         &self,
         scene: &mut Scene,
         camera_h: Handle<Node>,
@@ -391,8 +453,6 @@ impl Game {
                 .build(),
         );
 
-        media.draw_image(scene, "pitch", &[], 0., 0., DRAW_PITCH_Z, Anchor::TopLeft);
-
         //# Prepare to draw all objects
         //# 1. Create a list of all players and the ball, sorted based on their Y positions
         //# 2. Add object shadows to the list
@@ -406,7 +466,7 @@ impl Game {
         self.pools
             .goals
             .borrow(self.goals[0])
-            .draw(scene, media, DRAW_GOAL_0_Z);
+            .prepare_draw(scene, media, DRAW_GOAL_0_Z);
 
         // Min/max also include the ball.
         let min_player_y = self
@@ -431,48 +491,33 @@ impl Game {
 
         for player in self.pools.players.iter() {
             let player_z = DRAW_PLAYERS_Z.0 + (player.vpos.y - min_player_y) * players_z_unit;
-            player.draw(scene, media, player_z);
+            player.prepare_draw(scene, media, player_z);
 
             let player_shadow_z =
                 DRAW_SHADOWS_Z.0 + (player.shadow.vpos.y - min_player_y) * players_z_unit;
-            player.shadow.draw(scene, media, player_shadow_z);
+            player.shadow.prepare_draw(scene, media, player_shadow_z);
         }
 
         let ball_z = DRAW_PLAYERS_Z.0 + (self.ball.vpos.y - min_player_y) * players_z_unit;
-        self.ball.draw(scene, media, ball_z);
+        self.ball.prepare_draw(scene, media, ball_z);
 
         let ball_shadow_z =
             DRAW_PLAYERS_Z.0 + (self.ball.shadow.vpos.y - min_player_y) * players_z_unit;
-        self.ball.shadow.draw(scene, media, ball_shadow_z);
+        self.ball.shadow.prepare_draw(scene, media, ball_shadow_z);
 
         self.pools
             .goals
             .borrow(self.goals[0])
-            .draw(scene, media, DRAW_GOAL_0_Z);
+            .prepare_draw(scene, media, DRAW_GOAL_0_Z);
         self.pools
             .goals
             .borrow(self.goals[1])
-            .draw(scene, media, DRAW_GOAL_1_Z);
+            .prepare_draw(scene, media, DRAW_GOAL_1_Z);
 
         //# Show active players
-        for t in 0..2 {
-            //# Only show arrow for human teams
-            if self.teams[t].human() {
-                let arrow_pos = self
-                    .pools
-                    .players
-                    .borrow(self.teams[t].active_control_player.unwrap())
-                    .vpos()
-                    - Vector2::new(11., 45.);
-                media.draw_image(
-                    scene,
-                    "arrow",
-                    &[t as u8],
-                    arrow_pos.x,
-                    arrow_pos.y,
-                    DRAW_ARROWS_Z,
-                    Anchor::TopLeft,
-                );
+        for arrow in &self.arrows {
+            if let Some(arrow) = arrow {
+                arrow.prepare_draw(scene, media, DRAW_ARROWS_Z);
             }
         }
 

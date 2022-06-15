@@ -121,10 +121,9 @@ pub struct Ball {
 }
 
 impl Ball {
-    pub fn new() -> Self {
+    pub fn new(graph: &mut Graph) -> Self {
         let img_base = "ball";
         let img_indexes = vec![];
-        let shadow = BareActor::new("balls", Anchor::Center);
 
         // Placeholders - reset below.
         //
@@ -132,6 +131,9 @@ impl Ball {
         let vel = Vector2::zero();
         let owner = None;
         let timer = 0;
+
+        let shadow = BareActor::new("balls", None, Anchor::Center, graph);
+        let rectangle_h = RectangleBuilder::new(BaseBuilder::new()).build(graph);
 
         let mut instance = Self {
             img_base,
@@ -142,6 +144,7 @@ impl Ball {
             owner,
             timer,
             shadow,
+            rectangle_h,
         };
 
         instance.reset();

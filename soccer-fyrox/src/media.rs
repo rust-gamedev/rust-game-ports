@@ -1,25 +1,10 @@
-use std::{
-    collections::{HashMap, HashSet},
-    fmt::Display,
-    fs::read_dir,
-    path::PathBuf,
-};
+use std::{collections::HashMap, fmt::Display, fs::read_dir, path::PathBuf};
 
 use fyrox::{
     core::futures::{executor::block_on, future::join_all},
     engine::resource_manager::ResourceManager,
-    gui::{
-        image::ImageBuilder,
-        message::MessageDirection,
-        widget::{WidgetBuilder, WidgetMessage},
-        UiNode, UserInterface,
-    },
-    resource::texture::{Texture, TextureKind},
-    scene::{
-        dim2::rectangle::RectangleBuilder,
-        sound::{SoundBufferResource, SoundBuilder, Status},
-    },
-    utils::into_gui_texture,
+    resource::texture::Texture,
+    scene::sound::{SoundBufferResource, SoundBuilder, Status},
 };
 
 use crate::prelude::*;
@@ -48,7 +33,6 @@ pub struct Media {
     image_textures: HashMap<String, Texture>,
     sound_resources: HashMap<String, SoundBufferResource>,
     looping_sounds: HashMap<String, Handle<Node>>,
-    widget_handles: HashSet<Handle<UiNode>>,
 }
 
 impl Media {
@@ -125,132 +109,10 @@ impl Media {
 
         let looping_sounds = HashMap::new();
 
-        let widget_handles = HashSet::new();
-
         Self {
             image_textures,
             sound_resources,
             looping_sounds,
-            widget_handles,
-        }
-    }
-
-    pub fn clear_images(&mut self, scene: &mut Scene, user_interface: &mut UserInterface) {
-        for widget_h in &self.widget_handles {
-            user_interface
-                .send_message(WidgetMessage::remove(*widget_h, MessageDirection::ToWidget));
-        }
-
-        self.widget_handles.clear();
-
-        let root = scene.graph.get_root();
-
-        for child in scene.graph[root].children().to_vec() {
-            if scene.graph[child].is_rectangle() {
-                scene.graph.remove_node(child);
-            }
-        }
-    }
-
-    pub fn draw_gui_image(
-        &mut self,
-        user_interface: &mut UserInterface,
-        base: &str,
-        indexes: &[u8],
-        std_x: f32,
-        std_y: f32,
-    ) {
-        let texture = self.image(base, indexes);
-        let texture_kind = texture.data_ref().kind();
-
-        if let TextureKind::Rectangle {
-            width: texture_width,
-            height: texture_height,
-        } = texture_kind
-        {
-            let widget_h = ImageBuilder::new(
-                WidgetBuilder::new()
-                    .with_width(texture_width as f32)
-                    .with_height(texture_height as f32)
-                    .with_desired_position(Vector2::new(std_x, std_y)),
-            )
-            .with_texture(into_gui_texture(texture))
-            .build(&mut user_interface.build_ctx());
-
-            self.widget_handles.insert(widget_h);
-        } else {
-            panic!("Texture is not a rectangle!")
-        }
-    }
-
-    // Draws the image (loads the texture, adds the node to the scene, and links it to the root).
-    //
-    // The coordinates ("std" = "standard") are the typical orientation used for 2d libraries (center
-    // at top left, x -> right, y -> down).
-    //
-    // This is difficult to name, since the semantics of Fyrox and (simple) 2d games are different.
-    //
-    pub fn draw_image(
-        &mut self,
-        scene: &mut Scene,
-        base: &str,
-        indexes: &[u8],
-        std_x: f32,
-        std_y: f32,
-        z: f32,
-        anchor: Anchor,
-    ) {
-        if base == BLANK_IMAGE {
-            return;
-        }
-
-        let texture = self.image(base, indexes);
-        let texture_kind = texture.data_ref().kind();
-
-        if let TextureKind::Rectangle {
-            width: texture_width,
-            height: texture_height,
-        } = texture_kind
-        {
-            use Anchor::*;
-
-            let (texture_width, texture_height) = (texture_width as f32, texture_height as f32);
-
-            // As a base, we start with the top left corner of the screen, and we subtract the "standard"
-            // coordinates, since they go to the opposite direction to the Fyrox ones.
-            //
-            let (mut fyrox_x, mut fyrox_y) = (WIDTH / 2. - std_x, HEIGHT / 2. - std_y);
-
-            match anchor {
-                Center => {
-                    // Do nothing
-                }
-                TopLeft => {
-                    // Shift the texture, to the bottom right, of half texture.
-                    //
-                    fyrox_x = fyrox_x - texture_width / 2.;
-                    fyrox_y = fyrox_y - texture_height / 2.;
-                }
-                Custom(anchor) => {
-                    // Shift bottom right like TopLeft, then shift top left according to the anchor.
-                    //
-                    fyrox_x = fyrox_x - texture_width / 2. + anchor.x;
-                    fyrox_y = fyrox_y - texture_height / 2. + anchor.y;
-                }
-            };
-
-            RectangleBuilder::new(
-                BaseBuilder::new().with_local_transform(
-                    TransformBuilder::new()
-                        .with_local_position(Vector3::new(fyrox_x, fyrox_y, z))
-                        .with_local_scale(Vector3::new(texture_width, texture_height, f32::EPSILON))
-                        .build(),
-                ),
-            )
-            .with_texture(texture)
-            .build(&mut scene.graph);
-        } else {
-            panic!("Texture is not a rectangle!")
         }
     }
 
@@ -300,7 +162,7 @@ impl Media {
         }
     }
 
-    fn image<S: AsRef<str> + Display>(&self, base: S, indexes: &[u8]) -> Texture {
+    pub fn image<S: AsRef<str> + Display>(&self, base: S, indexes: &[u8]) -> Texture {
         if indexes.len() > 3 {
             panic!();
         }

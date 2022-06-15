@@ -19,10 +19,13 @@ pub struct GameGlobal {
     camera: Handle<Node>,
     input: InputController,
     game: Game,
+    game_hud: GameHud,
     state: State,
+    menu_screen: MenuScreen,
     menu_state: Option<MenuState>,
     menu_num_players: u8,
     menu_difficulty: u8,
+    game_over_screen: GameOverScreen,
 
     // For debugging; can be set via env var `SOCCER_WIN_SCORE`.
     win_score: u8,
@@ -41,8 +44,13 @@ impl GameState for GameGlobal {
         let input = InputController::new();
 
         let game = Game::new(None, None, DEFAULT_DIFFICULTY, &mut scene, &mut media);
+        let game_hud = GameHud::new(&mut engine.user_interface, &mut media);
+
         let state = State::Menu;
+        let menu_screen = MenuScreen::new(&mut engine.user_interface, &mut media);
         let menu_state = Some(MenuState::NumPlayers);
+
+        let game_over_screen = GameOverScreen::new(&mut engine.user_interface, &media);
 
         let scene_h = engine.scenes.add(scene);
 
@@ -57,23 +65,21 @@ impl GameState for GameGlobal {
             camera,
             input,
             game,
+            game_hud,
             state,
+            menu_screen,
             menu_state,
             menu_num_players: 1,
             menu_difficulty: 0,
+            game_over_screen,
             win_score,
         }
     }
 
     fn on_tick(&mut self, engine: &mut Engine, _dt: f32, _control_flow: &mut ControlFlow) {
-        let mut scene = &mut engine.scenes[self.scene];
-        let mut user_interface = &mut engine.user_interface;
-
-        self.media.clear_images(&mut scene, &mut user_interface);
-
         self.update(engine);
 
-        self.draw(engine, self.camera);
+        self.prepare_draw(engine, self.camera);
 
         self.input.flush_event_received_state();
     }
@@ -115,6 +121,7 @@ impl GameGlobal {
         use {MenuState::*, State::*};
 
         let mut scene = &mut engine.scenes[self.scene];
+        let user_interface = &mut engine.user_interface;
 
         match &self.state {
             Menu => {
@@ -125,9 +132,12 @@ impl GameGlobal {
                             self.menu_state = Some(MenuState::Difficulty);
                         } else {
                             //# Start 2P game
+                            self.menu_screen.clear(user_interface);
+                            self.game_hud = GameHud::new(user_interface, &mut self.media);
+
                             self.state = State::Play;
                             self.menu_state = None;
-                            self.game = Game::new(
+                            self.game.reset_game(
                                 Some(Controls::new(0)),
                                 Some(Controls::new(1)),
                                 DEFAULT_DIFFICULTY,
@@ -137,9 +147,12 @@ impl GameGlobal {
                         }
                     } else {
                         //# Start 1P game
+                        self.menu_screen.clear(user_interface);
+                        self.game_hud = GameHud::new(user_interface, &mut self.media);
+
                         self.state = State::Play;
                         self.menu_state = None;
-                        self.game = Game::new(
+                        self.game.reset_game(
                             Some(Controls::new(0)),
                             None,
                             self.menu_difficulty,
@@ -175,6 +188,9 @@ impl GameGlobal {
                 if self.win_score == 0
                     || (max_score == self.win_score && self.game.score_timer == 1)
                 {
+                    self.game_hud.clear(user_interface);
+                    self.game_over_screen = GameOverScreen::new(user_interface, &mut self.media);
+
                     self.state = State::GameOver;
                 } else {
                     self.game.update(&self.media, scene, &self.input);
@@ -182,20 +198,28 @@ impl GameGlobal {
             }
             GameOver => {
                 if self.input.is_key_just_pressed(Space) {
+                    self.game_over_screen.clear(user_interface);
+                    self.menu_screen = MenuScreen::new(user_interface, &mut self.media);
+
                     //# Switch to menu state, and create a new game object without a player
                     self.state = State::Menu;
                     self.menu_state = Some(MenuState::NumPlayers);
-                    self.game =
-                        Game::new(None, None, DEFAULT_DIFFICULTY, &mut scene, &mut self.media);
+                    self.game.reset_game(
+                        None,
+                        None,
+                        DEFAULT_DIFFICULTY,
+                        &mut scene,
+                        &mut self.media,
+                    );
                 }
             }
         }
     }
 
-    fn draw(&mut self, engine: &mut Engine, camera: Handle<Node>) {
+    fn prepare_draw(&mut self, engine: &mut Engine, camera: Handle<Node>) {
         let scene = &mut engine.scenes[self.scene];
 
-        self.game.draw(scene, camera, &mut self.media);
+        self.game.prepare_draw(scene, camera, &mut self.media);
 
         use {MenuState::*, State::*};
 
@@ -206,61 +230,43 @@ impl GameGlobal {
                     Difficulty => (1, self.menu_difficulty),
                 };
 
-                self.media.draw_gui_image(
-                    &mut engine.user_interface,
-                    "menu",
+                self.menu_screen.prepare_draw(
                     &[image_i1, image_i2],
-                    0.,
-                    0.,
+                    &self.media,
+                    &mut engine.user_interface,
                 );
             }
             Play => {
-                //# Display score bar at top
-                self.media.draw_gui_image(
-                    &mut engine.user_interface,
-                    "bar",
-                    &[],
-                    HALF_WINDOW_W - 176.,
-                    0.,
-                );
-                //# Show score for each team
-                for i in 0..2 {
-                    self.media.draw_gui_image(
-                        &mut engine.user_interface,
-                        "s",
-                        &[self.game.teams[i].score],
-                        HALF_WINDOW_W + 7. - 39. * (i as f32),
-                        6.,
-                    );
-                }
+                let team_scores = self
+                    .game
+                    .teams
+                    .iter()
+                    .map(|team| team.score)
+                    .collect::<Vec<_>>();
+                let display_goal = self.game.score_timer > 0;
 
-                //# Show GOAL image if a goal has recently been scored
-                if self.game.score_timer > 0 {
-                    self.media.draw_gui_image(
-                        &mut engine.user_interface,
-                        "goal",
-                        &[],
-                        HALF_WINDOW_W - 300.,
-                        HEIGHT / 2. - 88.,
-                    );
-                }
+                self.game_hud.prepare_draw(
+                    &team_scores,
+                    display_goal,
+                    &self.media,
+                    &mut engine.user_interface,
+                );
             }
             GameOver => {
-                //# Display "Game Over" image
-                let index = (self.game.teams[1].score > self.game.teams[0].score) as u8;
-                self.media
-                    .draw_gui_image(&mut engine.user_interface, "over", &[index], 0., 0.);
+                let background_index = (self.game.teams[1].score > self.game.teams[0].score) as u8;
+                let team_scores = self
+                    .game
+                    .teams
+                    .iter()
+                    .map(|team| team.score)
+                    .collect::<Vec<_>>();
 
-                //# Show score for each team
-                for i in 0..2 {
-                    self.media.draw_gui_image(
-                        &mut engine.user_interface,
-                        "l",
-                        &[i as u8, self.game.teams[i as usize].score],
-                        HALF_WINDOW_W + 25. - 125. * i as f32,
-                        144.,
-                    );
-                }
+                self.game_over_screen.prepare_draw(
+                    background_index,
+                    &team_scores,
+                    &mut self.media,
+                    &mut engine.user_interface,
+                );
             }
         }
     }
