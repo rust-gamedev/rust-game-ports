@@ -435,7 +435,7 @@ impl Game {
 
     // Returns the camera offset; hopefully, it can be removed if Image widgets support transparency.
     //
-    pub fn draw(
+    pub fn prepare_draw(
         &self,
         scene: &mut Scene,
         camera_h: Handle<Node>,
@@ -466,7 +466,7 @@ impl Game {
         self.pools
             .goals
             .borrow(self.goals[0])
-            .draw(scene, media, DRAW_GOAL_0_Z);
+            .prepare_draw(scene, media, DRAW_GOAL_0_Z);
 
         // Min/max also include the ball.
         let min_player_y = self
@@ -491,33 +491,33 @@ impl Game {
 
         for player in self.pools.players.iter() {
             let player_z = DRAW_PLAYERS_Z.0 + (player.vpos.y - min_player_y) * players_z_unit;
-            player.draw(scene, media, player_z);
+            player.prepare_draw(scene, media, player_z);
 
             let player_shadow_z =
                 DRAW_SHADOWS_Z.0 + (player.shadow.vpos.y - min_player_y) * players_z_unit;
-            player.shadow.draw(scene, media, player_shadow_z);
+            player.shadow.prepare_draw(scene, media, player_shadow_z);
         }
 
         let ball_z = DRAW_PLAYERS_Z.0 + (self.ball.vpos.y - min_player_y) * players_z_unit;
-        self.ball.draw(scene, media, ball_z);
+        self.ball.prepare_draw(scene, media, ball_z);
 
         let ball_shadow_z =
             DRAW_PLAYERS_Z.0 + (self.ball.shadow.vpos.y - min_player_y) * players_z_unit;
-        self.ball.shadow.draw(scene, media, ball_shadow_z);
+        self.ball.shadow.prepare_draw(scene, media, ball_shadow_z);
 
         self.pools
             .goals
             .borrow(self.goals[0])
-            .draw(scene, media, DRAW_GOAL_0_Z);
+            .prepare_draw(scene, media, DRAW_GOAL_0_Z);
         self.pools
             .goals
             .borrow(self.goals[1])
-            .draw(scene, media, DRAW_GOAL_1_Z);
+            .prepare_draw(scene, media, DRAW_GOAL_1_Z);
 
         //# Show active players
         for arrow in &self.arrows {
             if let Some(arrow) = arrow {
-                arrow.draw(scene, media, DRAW_ARROWS_Z);
+                arrow.prepare_draw(scene, media, DRAW_ARROWS_Z);
             }
         }
 

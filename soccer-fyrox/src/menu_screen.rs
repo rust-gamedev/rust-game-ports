@@ -15,7 +15,7 @@ impl MenuScreen {
         Self { widget_h }
     }
 
-    pub fn draw(&self, indexes: &[u8], media: &Media, user_interface: &mut UserInterface) {
+    pub fn prepare_draw(&self, indexes: &[u8], media: &Media, user_interface: &mut UserInterface) {
         draw_widget(
             self.widget_h,
             media,

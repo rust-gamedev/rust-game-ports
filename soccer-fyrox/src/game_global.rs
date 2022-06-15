@@ -79,7 +79,7 @@ impl GameState for GameGlobal {
     fn on_tick(&mut self, engine: &mut Engine, _dt: f32, _control_flow: &mut ControlFlow) {
         self.update(engine);
 
-        self.draw(engine, self.camera);
+        self.prepare_draw(engine, self.camera);
 
         self.input.flush_event_received_state();
     }
@@ -216,10 +216,10 @@ impl GameGlobal {
         }
     }
 
-    fn draw(&mut self, engine: &mut Engine, camera: Handle<Node>) {
+    fn prepare_draw(&mut self, engine: &mut Engine, camera: Handle<Node>) {
         let scene = &mut engine.scenes[self.scene];
 
-        self.game.draw(scene, camera, &mut self.media);
+        self.game.prepare_draw(scene, camera, &mut self.media);
 
         use {MenuState::*, State::*};
 
@@ -230,7 +230,7 @@ impl GameGlobal {
                     Difficulty => (1, self.menu_difficulty),
                 };
 
-                self.menu_screen.draw(
+                self.menu_screen.prepare_draw(
                     &[image_i1, image_i2],
                     &self.media,
                     &mut engine.user_interface,
@@ -245,7 +245,7 @@ impl GameGlobal {
                     .collect::<Vec<_>>();
                 let display_goal = self.game.score_timer > 0;
 
-                self.game_hud.draw(
+                self.game_hud.prepare_draw(
                     &team_scores,
                     display_goal,
                     &self.media,
@@ -261,7 +261,7 @@ impl GameGlobal {
                     .map(|team| team.score)
                     .collect::<Vec<_>>();
 
-                self.game_over_screen.draw(
+                self.game_over_screen.prepare_draw(
                     background_index,
                     &team_scores,
                     &mut self.media,

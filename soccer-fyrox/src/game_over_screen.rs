@@ -36,7 +36,7 @@ impl GameOverScreen {
         }
     }
 
-    pub fn draw(
+    pub fn prepare_draw(
         &self,
         background_index: u8,
         team_scores: &[u8],

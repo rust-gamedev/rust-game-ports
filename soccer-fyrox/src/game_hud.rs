@@ -54,7 +54,7 @@ impl GameHud {
         }
     }
 
-    pub fn draw(
+    pub fn prepare_draw(
         &self,
         team_scores: &[u8],
         display_goal: bool,
