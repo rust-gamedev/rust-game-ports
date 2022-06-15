@@ -6,6 +6,7 @@ use crate::prelude::*;
 //# self.y) based on vpos, but taking scrolling into account.
 pub trait MyActor {
     fn vpos(&self) -> Vector2<f32>;
+    fn vpos_mut(&mut self) -> &mut Vector2<f32>;
     fn img_base(&self) -> &'static str;
     fn img_indexes(&self) -> &[u8];
     fn anchor(&self) -> Anchor;

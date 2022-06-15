@@ -45,6 +45,10 @@ pub fn my_actor_based(args: TokenStream, input: TokenStream) -> TokenStream {
                 self.vpos
             }
 
+            fn vpos_mut(&mut self) -> &mut Vector2<f32> {
+                &mut self.vpos
+            }
+
             fn img_base(&self) -> &'static str {
                 self.img_base
             }
