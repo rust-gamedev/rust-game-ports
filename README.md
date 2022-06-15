@@ -58,12 +58,14 @@ I'm writing a mini book, ["Learn Bevy's ECS by ripping off someone else's projec
 
 ![Soccer](/images/readme/soccer.png?raw=true)
 
-This port has designed in a pseudo-immediate mode (to reflect the original logic) - all nodes are added/removed from the scene graph on each cycle; idiomatic Fyrox projects should instead use scene graphs.
+This port required a non-trivial restructuring, in order to move to a scene-graph based design.
 
 The port suffers from two Fyrox bugs:
 
 - at least one sound plays with a delay (reported [here](https://github.com/FyroxEngine/Fyrox/issues/324));
 - some images render incorrectly (reported [here](https://github.com/FyroxEngine/Fyrox/issues/320)).
+
+A small part of the port (GUI widgets) still uses a pseudo-immediate mode design; this will be restuctured soon, but the game works regardless of this.
 
 ## Source Projects/Libraries
 
