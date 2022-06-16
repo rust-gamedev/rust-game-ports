@@ -22,7 +22,7 @@ impl MenuScreen {
     }
 
     pub fn display(&mut self, media: &Media, user_interface: &mut UserInterface) {
-        self.widget_h = add_widget_node(media, IMG_BASE, &[0, 1], 0., 0., user_interface);
+        self.widget_h = add_widget_node(0., 0., user_interface);
         self.update_selection(MenuState::NumPlayers, 1, 1, media, user_interface);
     }
 

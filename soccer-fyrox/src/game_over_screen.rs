@@ -30,14 +30,7 @@ impl GameOverScreen {
         media: &Media,
         user_interface: &mut UserInterface,
     ) {
-        self.background_h = add_widget_node(
-            media,
-            BACKGROUND_IMG_BASE,
-            &[background_index],
-            0.,
-            0.,
-            user_interface,
-        );
+        self.background_h = add_widget_node(0., 0., user_interface);
 
         update_widget_texture(
             self.background_h,
@@ -51,14 +44,8 @@ impl GameOverScreen {
             .iter()
             .enumerate()
             .map(|(i, team_score)| {
-                let widget_h = add_widget_node(
-                    media,
-                    SCORE_IMG_BASE,
-                    &[i as u8, *team_score],
-                    HALF_WINDOW_W + 25. - 125. * i as f32,
-                    144.,
-                    user_interface,
-                );
+                let widget_h =
+                    add_widget_node(HALF_WINDOW_W + 25. - 125. * i as f32, 144., user_interface);
 
                 update_widget_texture(
                     widget_h,

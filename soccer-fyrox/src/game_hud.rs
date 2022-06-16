@@ -28,34 +28,13 @@ impl GameHud {
     }
 
     pub fn display(&mut self, media: &Media, user_interface: &mut UserInterface) {
-        self.bar_h = add_widget_node(
-            media,
-            BAR_IMG_BASE,
-            &[],
-            HALF_WINDOW_W - 176.,
-            0.,
-            user_interface,
-        );
+        self.bar_h = add_widget_node(HALF_WINDOW_W - 176., 0., user_interface);
 
         for (i, score_h) in self.score_hs.iter_mut().enumerate() {
-            *score_h = add_widget_node(
-                media,
-                SCORE_IMG_BASE,
-                &[0],
-                HALF_WINDOW_W + 7. - 39. * (i as f32),
-                6.,
-                user_interface,
-            );
+            *score_h = add_widget_node(HALF_WINDOW_W + 7. - 39. * (i as f32), 6., user_interface);
         }
 
-        self.goal_h = add_widget_node(
-            media,
-            GOAL_IMG_BASE,
-            &[],
-            HALF_WINDOW_W - 300.,
-            HEIGHT / 2. - 88.,
-            user_interface,
-        );
+        self.goal_h = add_widget_node(HALF_WINDOW_W - 300., HEIGHT / 2. - 88., user_interface);
 
         self.update(&[0, 0], false, media, user_interface);
     }

@@ -49,33 +49,11 @@ pub fn add_image_node(
     .build(&mut scene.graph);
 }
 
-pub fn add_widget_node(
-    media: &Media,
-    base: &str,
-    indexes: &[u8],
-    x: f32,
-    y: f32,
-    user_interface: &mut UserInterface,
-) -> Handle<UiNode> {
-    let texture_kind = media.image(base, indexes).data_ref().kind();
-
-    if let TextureKind::Rectangle {
-        width: texture_width,
-        height: texture_height,
-    } = texture_kind
-    {
-        let widget_h = ImageBuilder::new(
-            WidgetBuilder::new()
-                .with_width(texture_width as f32)
-                .with_height(texture_height as f32)
-                .with_desired_position(Vector2::new(x, y)),
-        )
-        .build(&mut user_interface.build_ctx());
-
-        widget_h
-    } else {
-        panic!()
-    }
+// WATCH OUT! Doesn't add any texture; use update_widget_texture() for that.
+//
+pub fn add_widget_node(x: f32, y: f32, user_interface: &mut UserInterface) -> Handle<UiNode> {
+    ImageBuilder::new(WidgetBuilder::new().with_desired_position(Vector2::new(x, y)))
+        .build(&mut user_interface.build_ctx())
 }
 
 pub fn update_widget_texture(
@@ -87,15 +65,27 @@ pub fn update_widget_texture(
 ) {
     let texture = media.image(base, indexes);
 
-    let mut context = user_interface.build_ctx();
-    let widget = context
-        .try_get_node_mut(widget_h)
-        .unwrap()
-        .as_any_mut()
-        .downcast_mut::<Image>()
-        .unwrap();
+    let texture_kind = media.image(base, indexes).data_ref().kind();
 
-    widget.set_texture(into_gui_texture(texture));
+    if let TextureKind::Rectangle {
+        width: texture_width,
+        height: texture_height,
+    } = texture_kind
+    {
+        let mut context = user_interface.build_ctx();
+        let widget = context
+            .try_get_node_mut(widget_h)
+            .unwrap()
+            .as_any_mut()
+            .downcast_mut::<Image>()
+            .unwrap();
+
+        widget.set_width(texture_width as f32);
+        widget.set_height(texture_height as f32);
+        widget.set_texture(into_gui_texture(texture));
+    } else {
+        panic!()
+    }
 }
 
 // For convenience, returns Handle::NONE.
