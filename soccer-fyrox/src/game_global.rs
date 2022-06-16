@@ -249,6 +249,13 @@ impl GameGlobal {
         }
     }
 
+    // This stage sets:
+    //
+    // - the camera location
+    // - the animation frames/GUI widget textures
+    // - the sprite Z depths
+    // - the enable state of transient sprites, e.g. "GOAL" image
+    //
     fn prepare_draw(&mut self, engine: &mut Engine, camera: Handle<Node>) {
         let scene = &mut engine.scenes[self.scene];
 
