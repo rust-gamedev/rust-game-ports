@@ -1,4 +1,4 @@
-use fyrox::gui::{message::MessageDirection, widget::WidgetMessage, UiNode, UserInterface};
+use fyrox::gui::{UiNode, UserInterface};
 
 use crate::prelude::*;
 
@@ -15,21 +15,16 @@ impl MenuScreen {
         Self { widget_h }
     }
 
-    pub fn prepare_draw(&self, indexes: &[u8], media: &Media, user_interface: &mut UserInterface) {
-        enable_widget(
-            self.widget_h,
-            media,
-            IMG_BASE,
-            indexes,
-            0.,
-            0.,
-            user_interface,
-        );
+    pub fn prepare_draw(
+        &mut self,
+        indexes: &[u8],
+        media: &Media,
+        user_interface: &mut UserInterface,
+    ) {
+        self.widget_h = add_widget_node(media, IMG_BASE, indexes, 0., 0., user_interface);
     }
+
     pub fn clear(&self, user_interface: &mut UserInterface) {
-        user_interface.send_message(WidgetMessage::remove(
-            self.widget_h,
-            MessageDirection::ToWidget,
-        ));
+        remove_widget_node(self.widget_h, user_interface);
     }
 }

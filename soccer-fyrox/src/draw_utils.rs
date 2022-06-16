@@ -1,8 +1,13 @@
-use fyrox::gui::image::{Image, ImageBuilder};
-use fyrox::gui::widget::WidgetBuilder;
-use fyrox::gui::{UiNode, UserInterface};
-use fyrox::resource::texture::{Texture, TextureKind};
-use fyrox::utils::into_gui_texture;
+use fyrox::{
+    gui::{
+        image::{Image, ImageBuilder},
+        message::MessageDirection,
+        widget::{WidgetBuilder, WidgetMessage},
+        {UiNode, UserInterface},
+    },
+    resource::texture::{Texture, TextureKind},
+    utils::into_gui_texture,
+};
 
 use crate::prelude::*;
 
@@ -63,8 +68,7 @@ pub fn add_widget_node(
             WidgetBuilder::new()
                 .with_width(texture_width as f32)
                 .with_height(texture_height as f32)
-                .with_desired_position(Vector2::new(x, y))
-                .with_opacity(Some(0.0)),
+                .with_desired_position(Vector2::new(x, y)),
         )
         .build(&mut user_interface.build_ctx());
 
@@ -74,13 +78,11 @@ pub fn add_widget_node(
     }
 }
 
-pub fn enable_widget(
+pub fn update_widget_texture(
     widget_h: Handle<UiNode>,
     media: &Media,
     base: &str,
     indexes: &[u8],
-    x: f32,
-    y: f32,
     user_interface: &mut UserInterface,
 ) {
     let texture = media.image(base, indexes);
@@ -93,21 +95,17 @@ pub fn enable_widget(
         .downcast_mut::<Image>()
         .unwrap();
 
-    widget.set_opacity(Some(1.0));
-    widget.set_desired_local_position(Vector2::new(x, y));
     widget.set_texture(into_gui_texture(texture));
 }
 
-pub fn disable_widget(widget_h: Handle<UiNode>, user_interface: &mut UserInterface) {
-    let mut context = user_interface.build_ctx();
-    let widget = context
-        .try_get_node_mut(widget_h)
-        .unwrap()
-        .as_any_mut()
-        .downcast_mut::<Image>()
-        .unwrap();
-
-    widget.set_opacity(Some(0.0));
+// For convenience, returns Handle::NONE.
+//
+pub fn remove_widget_node(
+    widget_h: Handle<UiNode>,
+    user_interface: &mut UserInterface,
+) -> Handle<UiNode> {
+    user_interface.send_message(WidgetMessage::remove(widget_h, MessageDirection::ToWidget));
+    Handle::NONE
 }
 
 pub fn to_fyrox_coordinates(

@@ -1,4 +1,4 @@
-use fyrox::gui::{message::MessageDirection, widget::WidgetMessage, UiNode, UserInterface};
+use fyrox::gui::{UiNode, UserInterface};
 
 use crate::prelude::*;
 
@@ -37,14 +37,13 @@ impl GameOverScreen {
     }
 
     pub fn prepare_draw(
-        &self,
+        &mut self,
         background_index: u8,
         team_scores: &[u8],
         media: &Media,
         user_interface: &mut UserInterface,
     ) {
-        enable_widget(
-            self.background_h,
+        self.background_h = add_widget_node(
             media,
             BACKGROUND_IMG_BASE,
             &[background_index],
@@ -53,9 +52,10 @@ impl GameOverScreen {
             user_interface,
         );
 
-        for (i, (score_h, team_score)) in self.score_hs.iter().zip(team_scores.iter()).enumerate() {
-            enable_widget(
-                *score_h,
+        for (i, (score_h, team_score)) in
+            self.score_hs.iter_mut().zip(team_scores.iter()).enumerate()
+        {
+            *score_h = add_widget_node(
                 media,
                 SCORE_IMG_BASE,
                 &[i as u8, *team_score],
@@ -67,12 +67,9 @@ impl GameOverScreen {
     }
 
     pub fn clear(&self, user_interface: &mut UserInterface) {
-        user_interface.send_message(WidgetMessage::remove(
-            self.background_h,
-            MessageDirection::ToWidget,
-        ));
+        remove_widget_node(self.background_h, user_interface);
         for score_h in self.score_hs {
-            user_interface.send_message(WidgetMessage::remove(score_h, MessageDirection::ToWidget));
+            remove_widget_node(score_h, user_interface);
         }
     }
 }

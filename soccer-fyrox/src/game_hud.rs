@@ -1,4 +1,4 @@
-use fyrox::gui::{message::MessageDirection, widget::WidgetMessage, UiNode, UserInterface};
+use fyrox::gui::{UiNode, UserInterface};
 
 use crate::prelude::*;
 
@@ -55,14 +55,13 @@ impl GameHud {
     }
 
     pub fn prepare_draw(
-        &self,
+        &mut self,
         team_scores: &[u8],
         display_goal: bool,
         media: &Media,
         user_interface: &mut UserInterface,
     ) {
-        enable_widget(
-            self.bar_h,
+        self.bar_h = add_widget_node(
             media,
             BAR_IMG_BASE,
             &[],
@@ -71,9 +70,8 @@ impl GameHud {
             user_interface,
         );
 
-        for (i, score_h) in self.score_hs.iter().enumerate() {
-            enable_widget(
-                *score_h,
+        for (i, score_h) in self.score_hs.iter_mut().enumerate() {
+            *score_h = add_widget_node(
                 media,
                 SCORE_IMG_BASE,
                 &[team_scores[i]],
@@ -84,8 +82,7 @@ impl GameHud {
         }
 
         if display_goal {
-            enable_widget(
-                self.goal_h,
+            self.goal_h = add_widget_node(
                 media,
                 GOAL_IMG_BASE,
                 &[],
@@ -94,21 +91,15 @@ impl GameHud {
                 user_interface,
             );
         } else {
-            disable_widget(self.goal_h, user_interface);
+            remove_widget_node(self.goal_h, user_interface);
         }
     }
 
     pub fn clear(&self, user_interface: &mut UserInterface) {
-        user_interface.send_message(WidgetMessage::remove(
-            self.bar_h,
-            MessageDirection::ToWidget,
-        ));
+        remove_widget_node(self.bar_h, user_interface);
         for score_h in self.score_hs {
-            user_interface.send_message(WidgetMessage::remove(score_h, MessageDirection::ToWidget));
+            remove_widget_node(score_h, user_interface);
         }
-        user_interface.send_message(WidgetMessage::remove(
-            self.goal_h,
-            MessageDirection::ToWidget,
-        ));
+        remove_widget_node(self.goal_h, user_interface);
     }
 }
