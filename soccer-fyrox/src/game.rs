@@ -140,8 +140,8 @@ impl Game {
             media.play_sound(scene, "start", &[]);
         } else {
             //# No players - we must be on the menu. Play title music.
-            media.play_looping_sound(scene, "theme");
             media.stop_looping_sound(scene, "crowd");
+            media.play_looping_sound(scene, "theme");
         }
 
         self.reset_field(&mut scene.graph);
@@ -463,6 +463,8 @@ impl Game {
         // We deviate from the source project here, by taking advantage of the z-depth, which considerably
         // simplifies the port.
 
+        // TODO: Goals don't need a draw prepare, as the textures and their positions are fixed; they
+        // are better prepared at the beginning of the Play game state.
         self.pools
             .goals
             .borrow(self.goals[0])

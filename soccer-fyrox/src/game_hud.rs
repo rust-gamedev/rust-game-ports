@@ -1,4 +1,4 @@
-use fyrox::gui::{message::MessageDirection, widget::WidgetMessage, UiNode, UserInterface};
+use fyrox::gui::{UiNode, UserInterface};
 
 use crate::prelude::*;
 
@@ -8,44 +8,17 @@ const GOAL_IMG_BASE: &str = "goal";
 
 pub struct GameHud {
     bar_h: Handle<UiNode>,
-    score_hs: [Handle<UiNode>; 2],
+    score_hs: Vec<Handle<UiNode>>,
     goal_h: Handle<UiNode>,
 }
 
 impl GameHud {
-    pub fn new(user_interface: &mut UserInterface, media: &Media) -> Self {
-        let bar_h = add_widget_node(
-            media,
-            BAR_IMG_BASE,
-            &[],
-            HALF_WINDOW_W - 176.,
-            0.,
-            user_interface,
-        );
-
-        let score_hs = (0..2)
-            .map(|i| {
-                add_widget_node(
-                    media,
-                    SCORE_IMG_BASE,
-                    &[0],
-                    HALF_WINDOW_W + 7. - 39. * (i as f32),
-                    6.,
-                    user_interface,
-                )
-            })
-            .collect::<Vec<_>>()
-            .try_into()
-            .unwrap();
-
-        let goal_h = add_widget_node(
-            media,
-            GOAL_IMG_BASE,
-            &[],
-            HALF_WINDOW_W - 300.,
-            HEIGHT / 2. - 88.,
-            user_interface,
-        );
+    // Doesn't display the screen or perform any instantiation.
+    //
+    pub fn new() -> Self {
+        let bar_h = Handle::NONE;
+        let score_hs = vec![Handle::NONE, Handle::NONE];
+        let goal_h = Handle::NONE;
 
         Self {
             bar_h,
@@ -54,61 +27,51 @@ impl GameHud {
         }
     }
 
-    pub fn prepare_draw(
-        &self,
+    pub fn display(&mut self, media: &Media, user_interface: &mut UserInterface) {
+        self.bar_h = add_widget_node(HALF_WINDOW_W - 176., 0., user_interface);
+        update_widget_texture(self.bar_h, media, BAR_IMG_BASE, &[], user_interface);
+
+        for (i, score_h) in self.score_hs.iter_mut().enumerate() {
+            *score_h = add_widget_node(HALF_WINDOW_W + 7. - 39. * (i as f32), 6., user_interface);
+        }
+
+        self.goal_h = add_widget_node(HALF_WINDOW_W - 300., HEIGHT / 2. - 88., user_interface);
+        update_widget_texture(self.goal_h, media, GOAL_IMG_BASE, &[], user_interface);
+
+        self.update(&[0, 0], false, media, user_interface);
+    }
+
+    pub fn update(
+        &mut self,
         team_scores: &[u8],
         display_goal: bool,
         media: &Media,
         user_interface: &mut UserInterface,
     ) {
-        enable_widget(
-            self.bar_h,
-            media,
-            BAR_IMG_BASE,
-            &[],
-            HALF_WINDOW_W - 176.,
-            0.,
-            user_interface,
-        );
-
-        for (i, score_h) in self.score_hs.iter().enumerate() {
-            enable_widget(
+        for (i, score_h) in self.score_hs.iter_mut().enumerate() {
+            update_widget_texture(
                 *score_h,
                 media,
                 SCORE_IMG_BASE,
                 &[team_scores[i]],
-                HALF_WINDOW_W + 7. - 39. * (i as f32),
-                6.,
                 user_interface,
             );
         }
 
         if display_goal {
-            enable_widget(
-                self.goal_h,
-                media,
-                GOAL_IMG_BASE,
-                &[],
-                HALF_WINDOW_W - 300.,
-                HEIGHT / 2. - 88.,
-                user_interface,
-            );
+            enable_widget_node(self.goal_h, user_interface);
         } else {
-            disable_widget(self.goal_h, user_interface);
+            disable_widget_node(self.goal_h, user_interface);
         }
     }
 
-    pub fn clear(&self, user_interface: &mut UserInterface) {
-        user_interface.send_message(WidgetMessage::remove(
-            self.bar_h,
-            MessageDirection::ToWidget,
-        ));
-        for score_h in self.score_hs {
-            user_interface.send_message(WidgetMessage::remove(score_h, MessageDirection::ToWidget));
+    pub fn clear(&mut self, user_interface: &mut UserInterface) {
+        self.bar_h = remove_widget_node(self.bar_h, user_interface);
+
+        for score_h in &mut self.score_hs {
+            *score_h = remove_widget_node(*score_h, user_interface);
         }
-        user_interface.send_message(WidgetMessage::remove(
-            self.goal_h,
-            MessageDirection::ToWidget,
-        ));
+
+        self.goal_h = remove_widget_node(self.goal_h, user_interface);
     }
 }
