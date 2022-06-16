@@ -16,23 +16,38 @@ impl MenuScreen {
 
         let mut instance = Self { widget_h };
 
-        instance.display(&[0, 1], media, user_interface);
+        instance.display(media, user_interface);
 
         instance
     }
 
-    pub fn display(&mut self, indexes: &[u8], media: &Media, user_interface: &mut UserInterface) {
+    pub fn display(&mut self, media: &Media, user_interface: &mut UserInterface) {
         self.widget_h = add_widget_node(media, IMG_BASE, &[0, 1], 0., 0., user_interface);
-        self.update_selection(indexes, media, user_interface);
+        self.update_selection(MenuState::NumPlayers, 1, 1, media, user_interface);
     }
 
     pub fn update_selection(
         &self,
-        indexes: &[u8],
+        menu_state: MenuState,
+        menu_num_players: u8,
+        menu_difficulty: u8,
         media: &Media,
         user_interface: &mut UserInterface,
     ) {
-        update_widget_texture(self.widget_h, media, IMG_BASE, indexes, user_interface);
+        use MenuState::*;
+
+        let image_indexes = match menu_state {
+            NumPlayers => [0, menu_num_players],
+            Difficulty => [1, menu_difficulty],
+        };
+
+        update_widget_texture(
+            self.widget_h,
+            media,
+            IMG_BASE,
+            &image_indexes,
+            user_interface,
+        );
     }
 
     pub fn clear(&mut self, user_interface: &mut UserInterface) {

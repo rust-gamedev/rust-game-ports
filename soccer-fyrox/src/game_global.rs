@@ -131,13 +131,10 @@ impl GameGlobal {
                         if self.menu_num_players == 1 {
                             self.menu_state = Some(MenuState::Difficulty);
 
-                            let (image_i1, image_i2) = match self.menu_state.as_ref().unwrap() {
-                                NumPlayers => (0, self.menu_num_players),
-                                Difficulty => (1, self.menu_difficulty),
-                            };
-
                             self.menu_screen.update_selection(
-                                &[image_i1, image_i2],
+                                self.menu_state.unwrap(),
+                                self.menu_num_players,
+                                self.menu_difficulty,
                                 &self.media,
                                 &mut engine.user_interface,
                             );
@@ -189,13 +186,10 @@ impl GameGlobal {
                                 (self.menu_difficulty as i8 + selection_change).rem_euclid(3) as u8
                         }
 
-                        let (image_i1, image_i2) = match self.menu_state.as_ref().unwrap() {
-                            NumPlayers => (0, self.menu_num_players),
-                            Difficulty => (1, self.menu_difficulty),
-                        };
-
                         self.menu_screen.update_selection(
-                            &[image_i1, image_i2],
+                            self.menu_state.unwrap(),
+                            self.menu_num_players,
+                            self.menu_difficulty,
                             &self.media,
                             &mut engine.user_interface,
                         );
@@ -234,16 +228,8 @@ impl GameGlobal {
                         &mut self.media,
                     );
 
-                    let (image_i1, image_i2) = match self.menu_state.as_ref().unwrap() {
-                        NumPlayers => (0, self.menu_num_players),
-                        Difficulty => (1, self.menu_difficulty),
-                    };
-
-                    self.menu_screen.display(
-                        &[image_i1, image_i2],
-                        &self.media,
-                        &mut engine.user_interface,
-                    );
+                    self.menu_screen
+                        .display(&self.media, &mut engine.user_interface);
                 }
             }
         }
