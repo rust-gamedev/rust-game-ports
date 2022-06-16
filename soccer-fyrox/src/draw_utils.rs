@@ -108,6 +108,30 @@ pub fn remove_widget_node(
     Handle::NONE
 }
 
+pub fn enable_widget_node(widget_h: Handle<UiNode>, user_interface: &mut UserInterface) {
+    let mut context = user_interface.build_ctx();
+    let widget = context
+        .try_get_node_mut(widget_h)
+        .unwrap()
+        .as_any_mut()
+        .downcast_mut::<Image>()
+        .unwrap();
+
+    widget.set_opacity(Some(1.));
+}
+
+pub fn disable_widget_node(widget_h: Handle<UiNode>, user_interface: &mut UserInterface) {
+    let mut context = user_interface.build_ctx();
+    let widget = context
+        .try_get_node_mut(widget_h)
+        .unwrap()
+        .as_any_mut()
+        .downcast_mut::<Image>()
+        .unwrap();
+
+    widget.set_opacity(Some(0.));
+}
+
 pub fn to_fyrox_coordinates(
     std_x: f32,
     std_y: f32,
