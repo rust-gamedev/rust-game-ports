@@ -44,7 +44,7 @@ impl GameState for GameGlobal {
         let input = InputController::new();
 
         let game = Game::new(None, None, DEFAULT_DIFFICULTY, &mut scene, &mut media);
-        let game_hud = GameHud::new(&mut engine.user_interface, &mut media);
+        let game_hud = GameHud::new();
 
         let state = State::Menu;
         let menu_screen = MenuScreen::new(&mut engine.user_interface, &mut media);
@@ -141,7 +141,7 @@ impl GameGlobal {
                         } else {
                             //# Start 2P game
                             self.menu_screen.clear(user_interface);
-                            self.game_hud = GameHud::new(user_interface, &mut self.media);
+                            self.game_hud.display(&self.media, user_interface);
 
                             self.state = State::Play;
                             self.menu_state = None;
@@ -156,7 +156,7 @@ impl GameGlobal {
                     } else {
                         //# Start 1P game
                         self.menu_screen.clear(user_interface);
-                        self.game_hud = GameHud::new(user_interface, &mut self.media);
+                        self.game_hud.display(&self.media, user_interface);
 
                         self.state = State::Play;
                         self.menu_state = None;
@@ -254,27 +254,21 @@ impl GameGlobal {
 
         self.game.prepare_draw(scene, camera, &mut self.media);
 
-        use State::*;
+        if let State::Play = &self.state {
+            let team_scores = self
+                .game
+                .teams
+                .iter()
+                .map(|team| team.score)
+                .collect::<Vec<_>>();
+            let display_goal = self.game.score_timer > 0;
 
-        match &self.state {
-            Menu => {}
-            Play => {
-                let team_scores = self
-                    .game
-                    .teams
-                    .iter()
-                    .map(|team| team.score)
-                    .collect::<Vec<_>>();
-                let display_goal = self.game.score_timer > 0;
-
-                self.game_hud.prepare_draw(
-                    &team_scores,
-                    display_goal,
-                    &self.media,
-                    &mut engine.user_interface,
-                );
-            }
-            GameOver => {}
+            self.game_hud.update(
+                &team_scores,
+                display_goal,
+                &self.media,
+                &mut engine.user_interface,
+            );
         }
     }
 
