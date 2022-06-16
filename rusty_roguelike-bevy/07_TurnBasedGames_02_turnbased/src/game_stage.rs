@@ -8,7 +8,6 @@ use crate::prelude::*;
 pub enum GameStage {
     // The first stage is the standard Update
     MovePlayer,
-    PlayerCollisions,
     MoveMonsters,
     MonsterCollisions,
 }

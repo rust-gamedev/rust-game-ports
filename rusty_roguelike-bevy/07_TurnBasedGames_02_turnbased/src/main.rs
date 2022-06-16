@@ -51,8 +51,7 @@ impl State {
         ecs.insert_resource(Camera::new(map_builder.player_start));
         // Set the additional stages
         ecs.add_stage_after(CoreStage::Update, MovePlayer, SystemStage::parallel())
-            .add_stage_after(MovePlayer, PlayerCollisions, SystemStage::parallel())
-            .add_stage_after(PlayerCollisions, MoveMonsters, SystemStage::parallel())
+            .add_stage_after(MovePlayer, MoveMonsters, SystemStage::parallel())
             .add_stage_after(MoveMonsters, MonsterCollisions, SystemStage::parallel());
         // Set the startup state.
         ecs.add_loopless_state(TurnState::AwaitingInput);
