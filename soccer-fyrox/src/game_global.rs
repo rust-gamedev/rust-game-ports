@@ -130,6 +130,17 @@ impl GameGlobal {
                         //# If we're doing a 2 player game, skip difficulty selection
                         if self.menu_num_players == 1 {
                             self.menu_state = Some(MenuState::Difficulty);
+
+                            let (image_i1, image_i2) = match self.menu_state.as_ref().unwrap() {
+                                NumPlayers => (0, self.menu_num_players),
+                                Difficulty => (1, self.menu_difficulty),
+                            };
+
+                            self.menu_screen.update_selection(
+                                &[image_i1, image_i2],
+                                &self.media,
+                                &mut engine.user_interface,
+                            );
                         } else {
                             //# Start 2P game
                             self.menu_screen.clear(user_interface);
@@ -170,12 +181,24 @@ impl GameGlobal {
                     }
                     if selection_change != 0 {
                         self.media.play_sound(&mut scene, "move", &[]);
+
                         if let Some(MenuState::NumPlayers) = self.menu_state {
                             self.menu_num_players = if self.menu_num_players == 1 { 2 } else { 1 };
                         } else {
                             self.menu_difficulty =
                                 (self.menu_difficulty as i8 + selection_change).rem_euclid(3) as u8
                         }
+
+                        let (image_i1, image_i2) = match self.menu_state.as_ref().unwrap() {
+                            NumPlayers => (0, self.menu_num_players),
+                            Difficulty => (1, self.menu_difficulty),
+                        };
+
+                        self.menu_screen.update_selection(
+                            &[image_i1, image_i2],
+                            &self.media,
+                            &mut engine.user_interface,
+                        );
                     }
                 }
 
@@ -199,7 +222,6 @@ impl GameGlobal {
             GameOver => {
                 if self.input.is_key_just_pressed(Space) {
                     self.game_over_screen.clear(user_interface);
-                    self.menu_screen = MenuScreen::new(user_interface, &mut self.media);
 
                     //# Switch to menu state, and create a new game object without a player
                     self.state = State::Menu;
@@ -211,6 +233,17 @@ impl GameGlobal {
                         &mut scene,
                         &mut self.media,
                     );
+
+                    let (image_i1, image_i2) = match self.menu_state.as_ref().unwrap() {
+                        NumPlayers => (0, self.menu_num_players),
+                        Difficulty => (1, self.menu_difficulty),
+                    };
+
+                    self.menu_screen.display(
+                        &[image_i1, image_i2],
+                        &self.media,
+                        &mut engine.user_interface,
+                    );
                 }
             }
         }
@@ -221,21 +254,10 @@ impl GameGlobal {
 
         self.game.prepare_draw(scene, camera, &mut self.media);
 
-        use {MenuState::*, State::*};
+        use State::*;
 
         match &self.state {
-            Menu => {
-                let (image_i1, image_i2) = match self.menu_state.as_ref().unwrap() {
-                    NumPlayers => (0, self.menu_num_players),
-                    Difficulty => (1, self.menu_difficulty),
-                };
-
-                self.menu_screen.prepare_draw(
-                    &[image_i1, image_i2],
-                    &self.media,
-                    &mut engine.user_interface,
-                );
-            }
+            Menu => {}
             Play => {
                 let team_scores = self
                     .game
