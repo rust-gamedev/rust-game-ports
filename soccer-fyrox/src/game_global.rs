@@ -50,7 +50,7 @@ impl GameState for GameGlobal {
         let menu_screen = MenuScreen::new(&mut engine.user_interface, &mut media);
         let menu_state = Some(MenuState::NumPlayers);
 
-        let game_over_screen = GameOverScreen::new(&mut engine.user_interface, &media);
+        let game_over_screen = GameOverScreen::new();
 
         let scene_h = engine.scenes.add(scene);
 
@@ -205,10 +205,24 @@ impl GameGlobal {
                 if self.win_score == 0
                     || (max_score == self.win_score && self.game.score_timer == 1)
                 {
-                    self.game_hud.clear(user_interface);
-                    self.game_over_screen = GameOverScreen::new(user_interface, &mut self.media);
-
                     self.state = State::GameOver;
+
+                    let background_index =
+                        (self.game.teams[1].score > self.game.teams[0].score) as u8;
+                    let team_scores = self
+                        .game
+                        .teams
+                        .iter()
+                        .map(|team| team.score)
+                        .collect::<Vec<_>>();
+
+                    self.game_hud.clear(user_interface);
+                    self.game_over_screen.display(
+                        background_index,
+                        &team_scores,
+                        &mut self.media,
+                        &mut engine.user_interface,
+                    );
                 } else {
                     self.game.update(&self.media, scene, &self.input);
                 }
@@ -260,22 +274,7 @@ impl GameGlobal {
                     &mut engine.user_interface,
                 );
             }
-            GameOver => {
-                let background_index = (self.game.teams[1].score > self.game.teams[0].score) as u8;
-                let team_scores = self
-                    .game
-                    .teams
-                    .iter()
-                    .map(|team| team.score)
-                    .collect::<Vec<_>>();
-
-                self.game_over_screen.prepare_draw(
-                    background_index,
-                    &team_scores,
-                    &mut self.media,
-                    &mut engine.user_interface,
-                );
-            }
+            GameOver => {}
         }
     }
 
