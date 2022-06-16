@@ -107,6 +107,9 @@ pub fn enable_widget_node(widget_h: Handle<UiNode>, user_interface: &mut UserInt
         .downcast_mut::<Image>()
         .unwrap();
 
+    // There may be a bug (under investigation), where enablig/disabling textures cause strange effects
+    // (e.g. texture still being displayed), so as workaround, we use opacity.
+    //
     widget.set_opacity(Some(1.));
 }
 
@@ -119,6 +122,8 @@ pub fn disable_widget_node(widget_h: Handle<UiNode>, user_interface: &mut UserIn
         .downcast_mut::<Image>()
         .unwrap();
 
+    // See enable_widget_node() note.
+    //
     widget.set_opacity(Some(0.));
 }
 
