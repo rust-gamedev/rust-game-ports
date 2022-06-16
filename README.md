@@ -4,6 +4,7 @@ My ports of open source games to Rust, using different pure-Rust game engines.
 
 - [Rust Game Ports](#rust-game-ports)
   - [Summary](#summary)
+  - [Notes](#notes)
   - [Games](#games)
     - [Boing/ggez](#boingggez)
     - [Cavern/Macroquad](#cavernmacroquad)
@@ -16,14 +17,18 @@ My ports of open source games to Rust, using different pure-Rust game engines.
 
 The completed ports are:
 
-| Source                               |      Game       |  Engine   |
-| ------------------------------------ | :-------------: | :-------: |
-| Code the Classics Vol. 1             |      Boing      |   ggez    |
-| Code the Classics Vol. 1             |     Cavern      | Macroquad |
-| Hands-on Rust: Effective Learning... | Rusty Roguelike |   Bevy    |
-| Code the Classics Vol. 1             |     Soccer      |   Fyrox   |
+| Source                               |      Game       |   Engine   |
+| ------------------------------------ | :-------------: | :--------: |
+| Code the Classics Vol. 1             |      Boing      |    ggez    |
+| Code the Classics Vol. 1             |     Cavern      | Macroquad  |
+| Hands-on Rust: Effective Learning... | Rusty Roguelike | Bevy (ECS) |
+| Code the Classics Vol. 1             |     Soccer      |   Fyrox    |
 
 I currently don't plan any further ports.
+
+## Notes
+
+Nightly Rust may be required for some games.
 
 ## Games
 
@@ -64,8 +69,6 @@ The port suffers from two Fyrox bugs:
 
 - at least one sound plays with a delay (reported [here](https://github.com/FyroxEngine/Fyrox/issues/324));
 - some images render incorrectly (reported [here](https://github.com/FyroxEngine/Fyrox/issues/320)).
-
-A small part of the port (GUI widgets) still uses a pseudo-immediate mode design; this will be restuctured soon, but the game works regardless of this.
 
 ## Source Projects/Libraries
 
