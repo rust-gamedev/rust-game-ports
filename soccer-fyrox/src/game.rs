@@ -140,8 +140,8 @@ impl Game {
             media.play_sound(scene, "start", &[]);
         } else {
             //# No players - we must be on the menu. Play title music.
-            media.play_looping_sound(scene, "theme");
             media.stop_looping_sound(scene, "crowd");
+            media.play_looping_sound(scene, "theme");
         }
 
         self.reset_field(&mut scene.graph);
