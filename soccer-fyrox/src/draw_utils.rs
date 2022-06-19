@@ -99,32 +99,19 @@ pub fn remove_widget_node(
 }
 
 pub fn enable_widget_node(widget_h: Handle<UiNode>, user_interface: &mut UserInterface) {
-    let mut context = user_interface.build_ctx();
-    let widget = context
-        .try_get_node_mut(widget_h)
-        .unwrap()
-        .as_any_mut()
-        .downcast_mut::<Image>()
-        .unwrap();
-
-    // There may be a bug (under investigation), where enablig/disabling textures cause strange effects
-    // (e.g. texture still being displayed), so as workaround, we use opacity.
-    //
-    widget.set_opacity(Some(1.));
+    user_interface.send_message(WidgetMessage::visibility(
+        widget_h,
+        MessageDirection::ToWidget,
+        true,
+    ));
 }
 
 pub fn disable_widget_node(widget_h: Handle<UiNode>, user_interface: &mut UserInterface) {
-    let mut context = user_interface.build_ctx();
-    let widget = context
-        .try_get_node_mut(widget_h)
-        .unwrap()
-        .as_any_mut()
-        .downcast_mut::<Image>()
-        .unwrap();
-
-    // See enable_widget_node() note.
-    //
-    widget.set_opacity(Some(0.));
+    user_interface.send_message(WidgetMessage::visibility(
+        widget_h,
+        MessageDirection::ToWidget,
+        false,
+    ));
 }
 
 pub fn to_fyrox_coordinates(
