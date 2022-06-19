@@ -1,5 +1,3 @@
-use fyrox::gui::{UiNode, UserInterface};
-
 use crate::prelude::*;
 
 const BAR_IMG_BASE: &str = "bar";

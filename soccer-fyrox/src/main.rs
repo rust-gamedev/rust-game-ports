@@ -30,9 +30,11 @@ pub mod prelude {
     pub use fyrox::{
         core::{
             algebra::{Vector2, Vector3},
+            num_traits::Zero,
             pool::{Handle, Pool},
         },
         event::VirtualKeyCode,
+        gui::{UiNode, UserInterface},
         scene::{
             base::BaseBuilder,
             dim2::rectangle::{Rectangle, RectangleBuilder},

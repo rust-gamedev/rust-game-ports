@@ -1,5 +1,3 @@
-use fyrox::core::num_traits::Zero;
-
 use crate::prelude::*;
 
 const ANCHOR: Vector2<f32> = Vector2::new(25., 37.);
