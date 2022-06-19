@@ -10,6 +10,7 @@ pub struct GameHud {
     bar_h: Handle<UiNode>,
     score_hs: Vec<Handle<UiNode>>,
     goal_h: Handle<UiNode>,
+    goal_displayed: bool,
 }
 
 impl GameHud {
@@ -19,11 +20,13 @@ impl GameHud {
         let bar_h = Handle::NONE;
         let score_hs = vec![Handle::NONE, Handle::NONE];
         let goal_h = Handle::NONE;
+        let goal_displayed = false;
 
         Self {
             bar_h,
             score_hs,
             goal_h,
+            goal_displayed,
         }
     }
 
@@ -37,6 +40,7 @@ impl GameHud {
 
         self.goal_h = add_widget_node(HALF_WINDOW_W - 300., HEIGHT / 2. - 88., user_interface);
         update_widget_texture(self.goal_h, media, GOAL_IMG_BASE, &[], user_interface);
+        disable_widget_node(self.goal_h, user_interface);
 
         self.update(&[0, 0], false, media, user_interface);
     }
@@ -58,10 +62,15 @@ impl GameHud {
             );
         }
 
-        if display_goal {
-            enable_widget_node(self.goal_h, user_interface);
-        } else {
-            disable_widget_node(self.goal_h, user_interface);
+        // This check is not strictly necessary, but sending the enabling event on each frame is not
+        // (design-wise) pretty, either.
+        if display_goal != self.goal_displayed {
+            if display_goal {
+                enable_widget_node(self.goal_h, user_interface);
+            } else {
+                disable_widget_node(self.goal_h, user_interface);
+            }
+            self.goal_displayed = display_goal;
         }
     }
 
