@@ -135,8 +135,8 @@ function check_params {
       exit 1
     fi
     ;;
-  "$c_compare_port_prev_mode")
-    if [[ $# -ne 2 ]]; then
+  "$c_compare_port_prev_mode"|"$c_compare_source_prev_mode")
+    if [[ $# -lt 1 || $# -gt 2 ]]; then
       echo "$c_help"
       exit 1
     fi
@@ -167,8 +167,8 @@ function set_param_variables {
   "$c_compare_curr_mode")
     v_current_step_pattern=${2:-}
     ;;
-  "$c_compare_port_prev_mode")
-    v_current_step_pattern=$2
+  "$c_compare_source_prev_mode"|"$c_compare_port_prev_mode")
+    v_current_step_pattern=${2:-}
     ;;
   esac
 
@@ -219,13 +219,13 @@ function find_step {
 function compare_current_steps {
   local current_step=$1
 
-  "$c_compare_program" "$c_source_base_dir/$current_step" "$c_port_base_dir/$current_step"
+  "$c_compare_program" {"$c_source_base_dir","$c_port_base_dir"}/"$current_step"
 }
 
 function compare_source_steps {
   local previous_step=$1 current_step=$2
 
-  "$c_compare_program" "$c_source_base_dir/$previous_step" "$c_source_base_dir/$current_step"
+  "$c_compare_program" "$c_source_base_dir"/{"$previous_step","$current_step"}
 }
 
 function compare_port_steps {
