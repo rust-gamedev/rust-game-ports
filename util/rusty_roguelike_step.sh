@@ -219,13 +219,13 @@ function find_step {
 function compare_current_steps {
   local current_step=$1
 
-  "$c_compare_program" "$c_source_base_dir/$current_step" "$c_port_base_dir/$current_step"
+  "$c_compare_program" {"$c_source_base_dir","$c_port_base_dir"}/"$current_step"
 }
 
 function compare_source_steps {
   local previous_step=$1 current_step=$2
 
-  "$c_compare_program" "$c_source_base_dir/$previous_step" "$c_source_base_dir/$current_step"
+  "$c_compare_program" "$c_source_base_dir"/{"$previous_step","$current_step"}
 }
 
 function compare_port_steps {
