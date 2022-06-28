@@ -135,7 +135,7 @@ function check_params {
       exit 1
     fi
     ;;
-  "$c_compare_port_prev_mode")
+  "$c_compare_port_prev_mode"|"$c_compare_source_prev_mode")
     if [[ $# -ne 2 ]]; then
       echo "$c_help"
       exit 1
@@ -167,7 +167,7 @@ function set_param_variables {
   "$c_compare_curr_mode")
     v_current_step_pattern=${2:-}
     ;;
-  "$c_compare_port_prev_mode")
+  "$c_compare_source_prev_mode"|"$c_compare_port_prev_mode")
     v_current_step_pattern=$2
     ;;
   esac
