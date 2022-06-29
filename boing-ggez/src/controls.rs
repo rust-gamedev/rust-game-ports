@@ -45,7 +45,11 @@ pub fn is_pad_down_pressed(context: &Context, pad_number: PadNum) -> bool {
 }
 
 pub fn is_fire_button_pressed(context: &Context, pad_number: PadNum) -> bool {
-    pad_input(context, pad_number, |pad| pad.is_pressed(Button::North))
+    // Oddly, on two pads tested, X was mapped to a different button, so we catch both.
+    //
+    pad_input(context, pad_number, |pad| {
+        pad.is_pressed(Button::West) || pad.is_pressed(Button::North)
+    })
 }
 
 // Functional approach to controls; in a more type-oriented design, these are represented by a trait,
