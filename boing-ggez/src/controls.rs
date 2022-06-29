@@ -1,6 +1,9 @@
 use ggez::{
     event::{Axis, Button, KeyCode},
-    input::{gamepad, keyboard},
+    input::{
+        gamepad::{self, Gamepad},
+        keyboard,
+    },
     Context,
 };
 
@@ -9,25 +12,54 @@ use crate::{ball::Ball, bat::Bat, HALF_HEIGHT, HALF_WIDTH};
 const PLAYER_SPEED: f32 = 6.;
 const MAX_AI_SPEED: f32 = 6.;
 
-const ANALOG_STICK_MIN_MOVE: f32 = 0.1;
+pub enum PadNum {
+    Zero,
+    One,
+}
+
+pub const ANALOG_STICK_TOLERANCE: f32 = 0.1;
+
+// The pad functions are for convenience.
+//
+pub fn pad_input(context: &Context, pad_number: PadNum, test: fn(&Gamepad) -> bool) -> bool {
+    let mut pad_iter = gamepad::gamepads(context);
+
+    let pad = match pad_number {
+        PadNum::Zero => pad_iter.next(),
+        PadNum::One => pad_iter.skip(1).next(),
+    };
+
+    pad.is_some_and(|(_id, pad)| test(pad))
+}
+
+pub fn is_pad_up_pressed(context: &Context, pad_number: PadNum) -> bool {
+    pad_input(context, pad_number, |pad| {
+        pad.value(Axis::LeftStickY) > ANALOG_STICK_TOLERANCE
+    })
+}
+
+pub fn is_pad_down_pressed(context: &Context, pad_number: PadNum) -> bool {
+    pad_input(context, pad_number, |pad| {
+        pad.value(Axis::LeftStickY) < -ANALOG_STICK_TOLERANCE
+    })
+}
+
+pub fn is_fire_button_pressed(context: &Context, pad_number: PadNum) -> bool {
+    pad_input(context, pad_number, |pad| pad.is_pressed(Button::North))
+}
 
 // Functional approach to controls; in a more type-oriented design, these are represented by a trait,
 // but we currently keep close to the original design.
 
 pub fn p1_controls(context: &Context, _ball: &Ball, _ai_offset: f32, _bat: &Bat) -> f32 {
-    let pad_0 = gamepad::gamepads(context).next().map(|(_id, pad)| pad);
-
-    let (pad_0_up_pressed, pad_0_down_pressed) = if let Some(pad) = pad_0 {
-        // Note that some devices that are not actually analog (eg. a given arcade stick) may be reported
-        // as analog.
-        (
-            pad.is_pressed(Button::DPadUp) || pad.value(Axis::LeftStickY) > ANALOG_STICK_MIN_MOVE,
-            pad.is_pressed(Button::DPadDown)
-                || pad.value(Axis::LeftStickY) < -ANALOG_STICK_MIN_MOVE,
-        )
-    } else {
-        (false, false)
-    };
+    // Note that some devices that are not actually analog (eg. a given arcade stick) may be reported
+    // as analog.
+    let pad_0_up_pressed = pad_input(context, PadNum::Zero, |pad| {
+        pad.is_pressed(Button::DPadUp) || pad.value(Axis::LeftStickY) > ANALOG_STICK_TOLERANCE
+    });
+    let pad_0_down_pressed = pad_input(context, PadNum::Zero, |pad| {
+        pad.is_pressed(Button::DPadDown) || pad.value(Axis::LeftStickY) < -ANALOG_STICK_TOLERANCE
+    });
 
     let keys_pressed = keyboard::pressed_keys(context);
 
@@ -48,20 +80,12 @@ pub fn p1_controls(context: &Context, _ball: &Ball, _ai_offset: f32, _bat: &Bat)
 }
 
 pub fn p2_controls(context: &Context, _ball: &Ball, _ai_offset: f32, _bat: &Bat) -> f32 {
-    let pad_1 = gamepad::gamepads(context)
-        .skip(1)
-        .next()
-        .map(|(_id, pad)| pad);
-
-    let (pad_1_up_pressed, pad_1_down_pressed) = if let Some(pad) = pad_1 {
-        (
-            pad.is_pressed(Button::DPadUp) || pad.value(Axis::LeftStickY) > ANALOG_STICK_MIN_MOVE,
-            pad.is_pressed(Button::DPadDown)
-                || pad.value(Axis::LeftStickY) < -ANALOG_STICK_MIN_MOVE,
-        )
-    } else {
-        (false, false)
-    };
+    let pad_1_up_pressed = pad_input(context, PadNum::One, |pad| {
+        pad.is_pressed(Button::DPadUp) || pad.value(Axis::LeftStickY) > ANALOG_STICK_TOLERANCE
+    });
+    let pad_1_down_pressed = pad_input(context, PadNum::One, |pad| {
+        pad.is_pressed(Button::DPadDown) || pad.value(Axis::LeftStickY) < -ANALOG_STICK_TOLERANCE
+    });
 
     let keys_pressed = keyboard::pressed_keys(context);
 
