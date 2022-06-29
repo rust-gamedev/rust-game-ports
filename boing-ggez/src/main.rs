@@ -1,3 +1,5 @@
+#![feature(is_some_with)]
+
 mod audio_entity;
 mod ball;
 mod bat;
