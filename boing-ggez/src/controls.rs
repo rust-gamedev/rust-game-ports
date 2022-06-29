@@ -1,19 +1,46 @@
-use ggez::{event::KeyCode, input::keyboard, Context};
+use ggez::{
+    event::{Axis, Button, KeyCode},
+    input::{gamepad, keyboard},
+    Context,
+};
 
 use crate::{ball::Ball, bat::Bat, HALF_HEIGHT, HALF_WIDTH};
 
 const PLAYER_SPEED: f32 = 6.;
 const MAX_AI_SPEED: f32 = 6.;
 
+const ANALOG_STICK_MIN_MOVE: f32 = 0.1;
+
 // Functional approach to controls; in a more type-oriented design, these are represented by a trait,
 // but we currently keep close to the original design.
 
 pub fn p1_controls(context: &Context, _ball: &Ball, _ai_offset: f32, _bat: &Bat) -> f32 {
+    let pad_0 = gamepad::gamepads(context).next().map(|(_id, pad)| pad);
+
+    let (pad_0_up_pressed, pad_0_down_pressed) = if let Some(pad) = pad_0 {
+        // Note that some devices that are not actually analog (eg. a given arcade stick) may be reported
+        // as analog.
+        (
+            pad.is_pressed(Button::DPadUp) || pad.value(Axis::LeftStickY) > ANALOG_STICK_MIN_MOVE,
+            pad.is_pressed(Button::DPadDown)
+                || pad.value(Axis::LeftStickY) < -ANALOG_STICK_MIN_MOVE,
+        )
+    } else {
+        (false, false)
+    };
+
     let keys_pressed = keyboard::pressed_keys(context);
 
-    if keys_pressed.contains(&KeyCode::Z) || keys_pressed.contains(&KeyCode::Down) {
+    let move_down = pad_0_down_pressed
+        || keys_pressed.contains(&KeyCode::Z)
+        || keys_pressed.contains(&KeyCode::Down);
+    let move_up = pad_0_up_pressed
+        || keys_pressed.contains(&KeyCode::A)
+        || keys_pressed.contains(&KeyCode::Up);
+
+    if move_down {
         PLAYER_SPEED
-    } else if keys_pressed.contains(&KeyCode::A) || keys_pressed.contains(&KeyCode::Up) {
+    } else if move_up {
         -PLAYER_SPEED
     } else {
         0.
@@ -21,11 +48,29 @@ pub fn p1_controls(context: &Context, _ball: &Ball, _ai_offset: f32, _bat: &Bat)
 }
 
 pub fn p2_controls(context: &Context, _ball: &Ball, _ai_offset: f32, _bat: &Bat) -> f32 {
+    let pad_1 = gamepad::gamepads(context)
+        .skip(1)
+        .next()
+        .map(|(_id, pad)| pad);
+
+    let (pad_1_up_pressed, pad_1_down_pressed) = if let Some(pad) = pad_1 {
+        (
+            pad.is_pressed(Button::DPadUp) || pad.value(Axis::LeftStickY) > ANALOG_STICK_MIN_MOVE,
+            pad.is_pressed(Button::DPadDown)
+                || pad.value(Axis::LeftStickY) < -ANALOG_STICK_MIN_MOVE,
+        )
+    } else {
+        (false, false)
+    };
+
     let keys_pressed = keyboard::pressed_keys(context);
 
-    if keys_pressed.contains(&KeyCode::M) {
+    let move_down = pad_1_down_pressed || keys_pressed.contains(&KeyCode::M);
+    let move_up = pad_1_up_pressed || keys_pressed.contains(&KeyCode::K);
+
+    if move_down {
         PLAYER_SPEED
-    } else if keys_pressed.contains(&KeyCode::K) {
+    } else if move_up {
         -PLAYER_SPEED
     } else {
         0.
