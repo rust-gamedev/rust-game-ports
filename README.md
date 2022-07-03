@@ -30,6 +30,8 @@ I currently don't plan any further ports.
 
 Nightly Rust may be required for some games.
 
+The games have been carefully ported; some design details have been implemented non-idiomatically; this has been intentional, in order not to diverge too much from the original projects (and therefore, to make direct comparison not too hard). Nonetheless, if you have doubts/suggestions about the quality of the code, you're invited to open an issue 😄
+
 ## Games
 
 ### Boing/ggez
