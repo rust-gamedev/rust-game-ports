@@ -15,6 +15,20 @@ pub fn my_actor_based(args: TokenStream, input: TokenStream) -> TokenStream {
     let mut ast: DeriveInput = syn::parse(input).unwrap();
     let _ = parse_macro_input!(args as parse::Nothing);
 
+    add_fields(&mut ast);
+
+    let trait_impl = impl_trait(&ast);
+
+    let gen = quote! {
+        #ast
+
+        #trait_impl
+    };
+
+    gen.into()
+}
+
+fn add_fields(ast: &'_ mut DeriveInput) {
     if let Data::Struct(DataStruct {
         fields: Fields::Named(fields),
         ..
@@ -29,23 +43,12 @@ pub fn my_actor_based(args: TokenStream, input: TokenStream) -> TokenStream {
         ];
 
         for field_tokens in fields_tokens {
-            fields
-                .named
-                .push(syn::Field::parse_named.parse2(field_tokens).unwrap());
+            let field = syn::Field::parse_named.parse2(field_tokens).unwrap();
+            fields.named.push(field);
         }
     } else {
-        panic!("Unexpected input (missing curly braces?)");
+        panic!();
     }
-
-    let trait_impl = impl_trait(&ast);
-
-    let gen = quote! {
-        #ast
-
-        #trait_impl
-    };
-
-    gen.into()
 }
 
 fn impl_trait(ast: &'_ DeriveInput) -> TokenStream2 {
