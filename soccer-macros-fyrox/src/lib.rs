@@ -3,16 +3,49 @@ use quote::quote;
 use syn::{
     self,
     parse::{self, Parser},
-    parse_macro_input, Data, DataStruct, DeriveInput, Fields,
+    Data, DataStruct, DeriveInput, Fields,
 };
 
-// To be updated with the suggestions from the question.
-//
+type TokenStream2 = proc_macro2::TokenStream;
+
+macro_rules! bail {
+    ( $msg:expr $(,)? ) => {
+        return ::syn::Result::<_>::Err(::syn::Error::new(::proc_macro2::Span::call_site(), &$msg))
+    };
+
+    ( $msg:expr => $spanned:expr $(,)? ) => {
+        return ::syn::Result::<_>::Err(::syn::Error::new_spanned(&$spanned, &$msg))
+    };
+}
+
 #[proc_macro_attribute]
 pub fn my_actor_based(args: TokenStream, input: TokenStream) -> TokenStream {
-    let mut ast: DeriveInput = syn::parse(input).unwrap();
-    let _ = parse_macro_input!(args as parse::Nothing);
+    let my_actor_based_impl = impl_my_actor_based(args, input);
 
+    my_actor_based_impl
+        .unwrap_or_else(::syn::Error::into_compile_error)
+        .into()
+}
+
+fn impl_my_actor_based(
+    args: impl Into<TokenStream2>,
+    input: impl Into<TokenStream2>,
+) -> ::syn::Result<TokenStream2> {
+    let mut ast: DeriveInput = ::syn::parse2(input.into())?;
+    let _: parse::Nothing = ::syn::parse2(args.into())?;
+
+    add_fields(&mut ast)?;
+
+    let trait_impl = impl_trait(&ast)?;
+
+    Ok(quote!(
+        #ast
+
+        #trait_impl
+    ))
+}
+
+fn add_fields(ast: &'_ mut DeriveInput) -> ::syn::Result<()> {
     if let Data::Struct(DataStruct {
         fields: Fields::Named(fields),
         ..
@@ -27,20 +60,28 @@ pub fn my_actor_based(args: TokenStream, input: TokenStream) -> TokenStream {
         ];
 
         for field_tokens in fields_tokens {
-            fields
-                .named
-                .push(syn::Field::parse_named.parse2(field_tokens).unwrap());
+            let field = syn::Field::parse_named.parse2(field_tokens).unwrap();
+            fields.named.push(field);
         }
+
+        Ok(())
     } else {
-        panic!("Unexpected input (missing curly braces?)");
+        bail!("Unexpected input (missing curly braces?)")
     }
+}
 
-    let name = &ast.ident;
+fn impl_trait(ast: &'_ DeriveInput) -> ::syn::Result<TokenStream2> {
+    #[allow(non_snake_case)]
+    let TyName = &ast.ident;
+    let (intro_generics, forward_generics, maybe_where_clause) = ast.generics.split_for_impl();
 
-    let gen = quote! {
-        #ast
-
-        impl crate::my_actor::MyActor for #name {
+    Ok(quote!(
+        impl #intro_generics
+            crate::my_actor::MyActor
+        for
+            #TyName #forward_generics
+        #maybe_where_clause
+        {
             fn vpos(&self) -> Vector2<f32> {
                 self.vpos
             }
@@ -65,7 +106,5 @@ pub fn my_actor_based(args: TokenStream, input: TokenStream) -> TokenStream {
                 self.rectangle_h
             }
         }
-    };
-
-    gen.into()
+    ))
 }
