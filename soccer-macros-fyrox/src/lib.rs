@@ -18,21 +18,19 @@ macro_rules! bail {
     };
 }
 
-// To be updated with the suggestions from the question.
-//
 #[proc_macro_attribute]
 pub fn my_actor_based(args: TokenStream, input: TokenStream) -> TokenStream {
-    let my_actor_base_impl = impl_my_actor_based(args, input);
+    let my_actor_based_impl = impl_my_actor_based(args, input);
 
-    my_actor_base_impl
-        .unwrap_or_else(syn::Error::into_compile_error)
+    my_actor_based_impl
+        .unwrap_or_else(::syn::Error::into_compile_error)
         .into()
 }
 
 fn impl_my_actor_based(
-    args: TokenStream,
-    input: TokenStream,
-) -> Result<TokenStream2, ::syn::Error> {
+    args: impl Into<TokenStream2>,
+    input: impl Into<TokenStream2>,
+) -> ::syn::Result<TokenStream2> {
     let mut ast: DeriveInput = ::syn::parse2(input.into())?;
     let _: parse::Nothing = ::syn::parse2(args.into())?;
 
@@ -40,16 +38,14 @@ fn impl_my_actor_based(
 
     let trait_impl = impl_trait(&ast)?;
 
-    let gen = quote! {
+    Ok(quote!(
         #ast
 
         #trait_impl
-    };
-
-    Ok(gen.into())
+    ))
 }
 
-fn add_fields(ast: &'_ mut DeriveInput) -> Result<(), ::syn::Error> {
+fn add_fields(ast: &'_ mut DeriveInput) -> ::syn::Result<()> {
     if let Data::Struct(DataStruct {
         fields: Fields::Named(fields),
         ..
@@ -74,7 +70,7 @@ fn add_fields(ast: &'_ mut DeriveInput) -> Result<(), ::syn::Error> {
     }
 }
 
-fn impl_trait(ast: &'_ DeriveInput) -> Result<TokenStream2, ::syn::Error> {
+fn impl_trait(ast: &'_ DeriveInput) -> ::syn::Result<TokenStream2> {
     #[allow(non_snake_case)]
     let TyName = &ast.ident;
     let (intro_generics, forward_generics, maybe_where_clause) = ast.generics.split_for_impl();
