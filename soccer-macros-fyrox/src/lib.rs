@@ -6,6 +6,8 @@ use syn::{
     parse_macro_input, Data, DataStruct, DeriveInput, Fields,
 };
 
+type TokenStream2 = proc_macro2::TokenStream;
+
 // To be updated with the suggestions from the question.
 //
 #[proc_macro_attribute]
@@ -35,12 +37,29 @@ pub fn my_actor_based(args: TokenStream, input: TokenStream) -> TokenStream {
         panic!("Unexpected input (missing curly braces?)");
     }
 
-    let name = &ast.ident;
+    let trait_impl = impl_trait(&ast);
 
     let gen = quote! {
         #ast
 
-        impl crate::my_actor::MyActor for #name {
+        #trait_impl
+    };
+
+    gen.into()
+}
+
+fn impl_trait(ast: &'_ DeriveInput) -> TokenStream2 {
+    #[allow(non_snake_case)]
+    let TyName = &ast.ident;
+    let (intro_generics, forward_generics, maybe_where_clause) = ast.generics.split_for_impl();
+
+    quote!(
+        impl #intro_generics
+            crate::my_actor::MyActor
+        for
+            #TyName #forward_generics
+        #maybe_where_clause
+        {
             fn vpos(&self) -> Vector2<f32> {
                 self.vpos
             }
@@ -65,7 +84,5 @@ pub fn my_actor_based(args: TokenStream, input: TokenStream) -> TokenStream {
                 self.rectangle_h
             }
         }
-    };
-
-    gen.into()
+    )
 }
