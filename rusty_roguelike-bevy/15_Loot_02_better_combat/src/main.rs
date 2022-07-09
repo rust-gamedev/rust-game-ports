@@ -5,6 +5,7 @@ mod game_stage;
 mod map;
 mod map_builder;
 mod spawner;
+mod state_label;
 mod systems;
 mod turn_state;
 
@@ -24,6 +25,7 @@ mod prelude {
     pub use crate::map::*;
     pub use crate::map_builder::*;
     pub use crate::spawner::*;
+    pub use crate::state_label::*;
     pub use crate::systems::*;
     pub use crate::turn_state::*;
 }
@@ -62,7 +64,7 @@ impl State {
             .add_stage_after(MonsterCombat, MoveMonsters, SystemStage::parallel())
             .add_stage_after(MoveMonsters, MonsterFov, SystemStage::parallel());
         // Set the startup state.
-        ecs.add_loopless_state(TurnState::AwaitingInput);
+        ecs.insert_resource(TurnState::AwaitingInput);
         ecs.insert_resource(map_builder.theme);
         // In the source project, set of actions (`Schedule`s) are owned by State (`systems: Schedule`);
         // here, they're owned by the Bevy ECS, as `SystemSet`s.
@@ -94,7 +96,7 @@ impl State {
         self.ecs
             .insert_resource(Camera::new(map_builder.player_start));
         self.ecs
-            .insert_resource(NextState(TurnState::AwaitingInput));
+            .insert_resource(TurnState::AwaitingInput);
         self.ecs.insert_resource(map_builder.theme);
         // Don't forget! :)
         self.ecs.world.remove_resource::<VirtualKeyCode>();
@@ -159,7 +161,7 @@ impl State {
             .world
             .insert_resource(Camera::new(map_builder.player_start));
         self.ecs
-            .insert_resource(NextState(TurnState::AwaitingInput));
+            .insert_resource(TurnState::AwaitingInput);
         self.ecs.world.insert_resource(map_builder.theme);
     }
 
@@ -241,10 +243,10 @@ impl GameState for State {
         self.ecs.insert_resource(Point::from_tuple(ctx.mouse_pos()));
         // Unfortunately, with the current source project's design, without refactoring the world init
         // code into systems, we must leak the state into this abstraction.
-        match self.ecs.world.get_resource::<CurrentState<TurnState>>() {
-            Some(CurrentState(TurnState::GameOver)) => self.game_over(ctx),
-            Some(CurrentState(TurnState::Victory)) => self.victory(ctx),
-            Some(CurrentState(TurnState::NextLevel)) => self.advance_level(),
+        match self.ecs.world.get_resource::<TurnState>() {
+            Some(TurnState::GameOver) => self.game_over(ctx),
+            Some(TurnState::Victory) => self.victory(ctx),
+            Some(TurnState::NextLevel) => self.advance_level(),
             _ => {}
         }
         self.ecs.update();

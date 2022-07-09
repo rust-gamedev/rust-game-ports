@@ -37,6 +37,8 @@ pub fn build_system_sets(app: &mut App) {
     //
     // - instead of using a machine state that swaps schedulers (see the source project's `State#tick`),
     //   we use filters on systems/sets
+    // - the fov needs to be performed in the first stage, before map/entity rendering, due to the source
+    //   design
     // - rendering is performed in the first stage (of each frame, except in GameOver state); it does
     //   not make a difference from the user perspective, but it's clear from a design one; this is
     //   possible due to the single scheduler model
@@ -45,7 +47,16 @@ pub fn build_system_sets(app: &mut App) {
 
     app.add_system_set(
         ConditionSet::new()
-            .run_not_in_state(GameOver)
+            .label(StateLabel::Fov)
+            .run_unless_resource_equals(GameOver)
+            .with_system(fov::fov)
+            .into(),
+    );
+
+    app.add_system_set(
+        ConditionSet::new()
+            .run_unless_resource_equals(GameOver)
+            .after(StateLabel::Fov)
             .with_system(map_render::map_render)
             .with_system(entity_render::entity_render)
             .with_system(hud::hud)
@@ -57,16 +68,15 @@ pub fn build_system_sets(app: &mut App) {
 
     app.add_system_set(
         ConditionSet::new()
-            .run_in_state(AwaitingInput)
+            .run_if_resource_equals(AwaitingInput)
             .with_system(player_input::player_input)
-            .with_system(fov::fov)
             .into(),
     );
 
     app.add_system_set_to_stage(
         PlayerCombat,
         ConditionSet::new()
-            .run_in_state(PlayerTurn)
+            .run_if_resource_equals(PlayerTurn)
             .with_system(use_items::use_items)
             .with_system(combat::combat)
             .into(),
@@ -75,7 +85,7 @@ pub fn build_system_sets(app: &mut App) {
     app.add_system_set_to_stage(
         MovePlayer,
         ConditionSet::new()
-            .run_in_state(PlayerTurn)
+            .run_if_resource_equals(PlayerTurn)
             .with_system(movement::movement)
             .with_system(end_turn::end_turn)
             .into(),
@@ -84,7 +94,7 @@ pub fn build_system_sets(app: &mut App) {
     app.add_system_set_to_stage(
         PlayerFov,
         ConditionSet::new()
-            .run_in_state(PlayerTurn)
+            .run_if_resource_equals(PlayerTurn)
             .with_system(fov::fov)
             .into(),
     );
@@ -92,7 +102,7 @@ pub fn build_system_sets(app: &mut App) {
     app.add_system_set_to_stage(
         GenerateMonsterMoves,
         ConditionSet::new()
-            .run_in_state(MonsterTurn)
+            .run_if_resource_equals(MonsterTurn)
             .with_system(random_move::random_move)
             .with_system(chasing::chasing)
             .into(),
@@ -101,7 +111,7 @@ pub fn build_system_sets(app: &mut App) {
     app.add_system_set_to_stage(
         MonsterCombat,
         ConditionSet::new()
-            .run_in_state(MonsterTurn)
+            .run_if_resource_equals(MonsterTurn)
             .with_system(use_items::use_items)
             .with_system(combat::combat)
             .into(),
@@ -110,7 +120,7 @@ pub fn build_system_sets(app: &mut App) {
     app.add_system_set_to_stage(
         MoveMonsters,
         ConditionSet::new()
-            .run_in_state(MonsterTurn)
+            .run_if_resource_equals(MonsterTurn)
             .with_system(movement::movement)
             .with_system(end_turn::end_turn)
             .into(),
@@ -119,7 +129,7 @@ pub fn build_system_sets(app: &mut App) {
     app.add_system_set_to_stage(
         MonsterFov,
         ConditionSet::new()
-            .run_in_state(MonsterTurn)
+            .run_if_resource_equals(MonsterTurn)
             .with_system(fov::fov)
             .into(),
     );
