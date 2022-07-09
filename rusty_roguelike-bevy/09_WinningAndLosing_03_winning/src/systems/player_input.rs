@@ -54,7 +54,7 @@ pub fn player_input(
             // Using Bevy's query system, this logic is considerably simpler.
             player_health.current = i32::min(player_health.max, player_health.current + 1);
         }
-        commands.insert_resource(NextState(TurnState::PlayerTurn));
+        commands.insert_resource(TurnState::PlayerTurn);
 
         // WATCH OUT!! If they key resource is not removed, multiple keypresses will be detected over
         // the same frame. This is because a system (set) may run multiple times over a frame, due to

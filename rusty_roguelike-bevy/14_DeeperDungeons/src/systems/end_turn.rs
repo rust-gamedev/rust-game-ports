@@ -4,11 +4,11 @@ pub fn end_turn(
     mut commands: Commands,
     player_query: Query<(&Health, &PointC), With<Player>>,
     amulet_query: Query<&PointC, With<AmuletOfYala>>,
-    turn_state: Res<CurrentState<TurnState>>,
+    turn_state: Res<TurnState>,
     map: Res<Map>,
 ) {
     let (player_hp, player_pos) = player_query.single();
-    let mut new_state = match turn_state.0 {
+    let mut new_state = match *turn_state {
         TurnState::PlayerTurn => TurnState::MonsterTurn,
         TurnState::MonsterTurn => TurnState::AwaitingInput,
         // In the source project, AwaitingInput and GameOver return (themselves), however, they're actually
@@ -31,5 +31,5 @@ pub fn end_turn(
         new_state = TurnState::NextLevel;
     }
 
-    commands.insert_resource(NextState(new_state));
+    commands.insert_resource(new_state);
 }

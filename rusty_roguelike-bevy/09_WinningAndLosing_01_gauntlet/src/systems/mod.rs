@@ -51,12 +51,12 @@ pub fn build_system_sets(app: &mut App) {
             .with_system(tooltips::tooltips),
     );
 
-    app.add_system(player_input::player_input.run_in_state(AwaitingInput));
+    app.add_system(player_input::player_input.run_if_resource_equals(AwaitingInput));
 
     app.add_system_set_to_stage(
         PlayerCombat,
         ConditionSet::new()
-            .run_in_state(PlayerTurn)
+            .run_if_resource_equals(PlayerTurn)
             .with_system(combat::combat)
             .into(),
     );
@@ -64,7 +64,7 @@ pub fn build_system_sets(app: &mut App) {
     app.add_system_set_to_stage(
         MovePlayer,
         ConditionSet::new()
-            .run_in_state(PlayerTurn)
+            .run_if_resource_equals(PlayerTurn)
             .with_system(movement::movement)
             .with_system(end_turn::end_turn)
             .into(),
@@ -73,7 +73,7 @@ pub fn build_system_sets(app: &mut App) {
     app.add_system_set_to_stage(
         GenerateMonsterMoves,
         ConditionSet::new()
-            .run_in_state(MonsterTurn)
+            .run_if_resource_equals(MonsterTurn)
             .with_system(random_move::random_move)
             .with_system(chasing::chasing)
             .into(),
@@ -82,7 +82,7 @@ pub fn build_system_sets(app: &mut App) {
     app.add_system_set_to_stage(
         MonsterCombat,
         ConditionSet::new()
-            .run_in_state(MonsterTurn)
+            .run_if_resource_equals(MonsterTurn)
             .with_system(combat::combat)
             .into(),
     );
@@ -90,7 +90,7 @@ pub fn build_system_sets(app: &mut App) {
     app.add_system_set_to_stage(
         MoveMonsters,
         ConditionSet::new()
-            .run_in_state(MonsterTurn)
+            .run_if_resource_equals(MonsterTurn)
             .with_system(movement::movement)
             .with_system(end_turn::end_turn)
             .into(),

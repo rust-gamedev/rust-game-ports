@@ -61,7 +61,7 @@ impl State {
             .add_stage_after(GenerateMonsterMoves, MonsterCombat, SystemStage::parallel())
             .add_stage_after(MonsterCombat, MoveMonsters, SystemStage::parallel());
         // Set the startup state.
-        ecs.add_loopless_state(TurnState::AwaitingInput);
+        ecs.insert_resource(TurnState::AwaitingInput);
         // In the source project, set of actions (`Schedule`s) are owned by State (`systems: Schedule`);
         // here, they're owned by the Bevy ECS, as `SystemSet`s.
         build_system_sets(&mut ecs);
@@ -115,7 +115,7 @@ impl State {
             self.ecs
                 .insert_resource(Camera::new(map_builder.player_start));
             self.ecs
-                .insert_resource(NextState(TurnState::AwaitingInput));
+                .insert_resource(TurnState::AwaitingInput);
             // Don't forget! :)
             self.ecs.world.remove_resource::<VirtualKeyCode>();
         }
@@ -142,8 +142,8 @@ impl GameState for State {
         // Unfortunately, with the current source project's design, without refactoring the world init
         // code into systems, we must leak the state into this abstraction.
         if matches!(
-            self.ecs.world.get_resource::<CurrentState<TurnState>>(),
-            Some(CurrentState(TurnState::GameOver))
+            self.ecs.world.get_resource::<TurnState>(),
+            Some(TurnState::GameOver)
         ) {
             self.game_over(ctx);
         }

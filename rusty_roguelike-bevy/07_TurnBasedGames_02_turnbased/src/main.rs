@@ -54,7 +54,7 @@ impl State {
             .add_stage_after(MovePlayer, MoveMonsters, SystemStage::parallel())
             .add_stage_after(MoveMonsters, MonsterCollisions, SystemStage::parallel());
         // Set the startup state.
-        ecs.add_loopless_state(TurnState::AwaitingInput);
+        ecs.insert_resource(TurnState::AwaitingInput);
         // In the source project, set of actions (`Schedule`s) are owned by State (`systems: Schedule`);
         // here, they're owned by the Bevy ECS, as `SystemSet`s.
         build_system_sets(&mut ecs);
