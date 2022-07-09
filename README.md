@@ -61,7 +61,7 @@ The ECS part of this game, originally Legion, has been ported to Bevy (the graph
 
 I wrote a mini book, ["Learn Bevy's ECS by ripping off someone else's project"](https://saveriomiroddi.github.io/learn_bevy_ecs_by_ripping_off), based on this project.
 
-Please note that in all steps except the last (15.02), the FOV flickers. The fix (see [fix commit](/../../commit/71655f2d7e)) can be easily backported to the previous steps; if anybody wants to contribute the backport, they're very welcome 😄.
+Please note that in the steps from 10.x to 15.01 (that is, except the last), the FOV flickers. The fix (see [fix commit](/../../commit/71655f2d7e)) can be easily backported to the previous steps; if anybody wants to contribute the backport, they're very welcome 😄.
 
 ### Soccer/Fyrox
 
