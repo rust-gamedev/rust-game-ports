@@ -5,6 +5,7 @@ mod game_stage;
 mod map;
 mod map_builder;
 mod spawner;
+mod state_label;
 mod systems;
 mod turn_state;
 
@@ -24,6 +25,7 @@ mod prelude {
     pub use crate::map::*;
     pub use crate::map_builder::*;
     pub use crate::spawner::*;
+    pub use crate::state_label::*;
     pub use crate::systems::*;
     pub use crate::turn_state::*;
 }
