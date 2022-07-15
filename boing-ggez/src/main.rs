@@ -1,9 +1,4 @@
-#![feature(is_some_with)]
-#![allow(
-    clippy::type_complexity,
-    clippy::comparison_chain,
-    clippy::derive_partial_eq_without_eq
-)]
+#![allow(clippy::type_complexity, clippy::comparison_chain)]
 
 mod audio_entity;
 mod ball;

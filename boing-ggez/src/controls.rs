@@ -29,7 +29,10 @@ pub fn pad_input(context: &Context, pad_number: PadNum, test: fn(&Gamepad) -> bo
         PadNum::One => pad_iter.nth(1),
     };
 
-    pad.is_some_and(|(_id, pad)| test(pad))
+    match pad {
+        None => false,
+        Some((_id, pad)) => test(&pad),
+    }
 }
 
 pub fn is_pad_up_pressed(context: &Context, pad_number: PadNum) -> bool {
