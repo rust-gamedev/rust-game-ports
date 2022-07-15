@@ -26,7 +26,7 @@ pub fn pad_input(context: &Context, pad_number: PadNum, test: fn(&Gamepad) -> bo
 
     let pad = match pad_number {
         PadNum::Zero => pad_iter.next(),
-        PadNum::One => pad_iter.skip(1).next(),
+        PadNum::One => pad_iter.nth(1),
     };
 
     pad.is_some_and(|(_id, pad)| test(pad))

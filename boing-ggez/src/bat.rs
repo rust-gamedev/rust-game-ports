@@ -66,7 +66,7 @@ impl Bat {
             .collect();
 
         Self {
-            x: x,
+            x,
             y: HALF_HEIGHT,
             player,
             score: 0,
