@@ -40,6 +40,10 @@ The games have been carefully ported; some design details have been implemented 
 
 A very straightforward port 🙂
 
+This port suffers from one bug:
+
+- corruption when running on fullscreen (reported [here](https://github.com/ggez/ggez/issues/1066)).
+
 ### Cavern/Macroquad
 
 ![Cavern](/images/readme/cavern.png?raw=true)
