@@ -3,6 +3,7 @@ temp/
 
 # Rust
 #
+.cargo/
 Cargo.lock
 target/
 target-ra/
