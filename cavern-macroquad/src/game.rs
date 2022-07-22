@@ -63,7 +63,7 @@ impl Game {
             // Keep looking at successive columns (wrapping round if we go off the right-hand side) until
             // we find one where the top grid column is unoccupied
             let grid_x = (r + i) % NUM_COLUMNS;
-            if self.grid[0].as_bytes()[grid_x as usize] == ' ' as u8 {
+            if self.grid[0].as_bytes()[grid_x as usize] == b' ' {
                 return GRID_BLOCK_SIZE * grid_x + LEVEL_X_OFFSET + 12;
             }
         }
@@ -150,9 +150,7 @@ impl Game {
             if self
                 .orbs
                 .iter()
-                .filter(|orb| orb.borrow().trapped_enemy_type.is_some())
-                .collect::<Vec<_>>()
-                .is_empty()
+                .all(|orb| orb.borrow().trapped_enemy_type.is_none())
             {
                 self.next_level();
             }

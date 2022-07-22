@@ -29,7 +29,7 @@ pub fn draw_game_text(text: &str, y: i32, x: Option<i32>) {
 
     let mut x = x.unwrap_or_else(|| {
         // If no X pos specified, draw text in centre of the screen - must first work out total width of text
-        (WIDTH - text.iter().map(|chr| char_width(chr)).sum::<i32>()) / 2
+        (WIDTH - text.iter().map(char_width).sum::<i32>()) / 2
     });
 
     let fonts = &storage::get::<Resources>().fonts;

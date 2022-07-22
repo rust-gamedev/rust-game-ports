@@ -88,8 +88,8 @@ impl Robot {
             // Randomly choose a direction to move in
             // If there's a player, there's a two thirds chance that we'll move towards them
             let mut directions = vec![-1, 1];
-            if player.is_some() {
-                directions.push((player.unwrap().x() - self.x()).signum());
+            if let Some(player) = player {
+                directions.push((player.x() - self.x()).signum());
             }
             self.direction_x = *directions.choose().unwrap();
             self.change_dir_timer = gen_range(100, 250 + 1);
