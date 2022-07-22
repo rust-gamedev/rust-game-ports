@@ -52,7 +52,7 @@ Another very straightforward port 🙂
 
 This port suffers from two Macroquad bugs:
 
-- the music starts with a delay;
+- the music starts with a delay (reported by another developer [here](https://github.com/not-fl3/macroquad/issues/440));
 - on Nvidia cards, on Linux, CPU runs at 100% load (reported [here](https://github.com/not-fl3/macroquad/issues/275#issuecomment-939525290)).
 
 Only the stable part of the library is used (the experimental [`scene`](https://github.com/not-fl3/macroquad/blob/master/src/experimental/scene.rs) API is not used).

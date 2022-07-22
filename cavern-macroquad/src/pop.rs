@@ -19,7 +19,7 @@ pub struct Pop {
 impl Pop {
     pub fn new(x: i32, y: i32, type_: i32) -> Self {
         Self {
-            type_: type_,
+            type_,
             timer: -1,
             x,
             y,

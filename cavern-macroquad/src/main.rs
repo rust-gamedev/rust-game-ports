@@ -1,3 +1,13 @@
+#![allow(
+    clippy::collapsible_else_if,
+    clippy::collapsible_if,
+    clippy::comparison_chain,
+    clippy::derive_partial_eq_without_eq,
+    clippy::len_zero,
+    clippy::manual_range_contains,
+    clippy::type_complexity
+)]
+
 mod actor;
 mod bolt;
 mod collide_actor;

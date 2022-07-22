@@ -14,7 +14,7 @@ fn block(x: i32, y: i32, grid: &[&str]) -> bool {
         grid_x >= 0
             && grid_x < NUM_COLUMNS
             && row.len() > 0
-            && row.as_bytes()[grid_x as usize] != ' ' as u8
+            && row.as_bytes()[grid_x as usize] != b' '
     } else {
         false
     }
