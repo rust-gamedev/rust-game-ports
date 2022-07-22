@@ -41,7 +41,7 @@ fn get_resource_dirs() -> Vec<PathBuf> {
 
     RESOURCE_SUBDIRS
         .iter()
-        .map(|subdir| resources_root_dir.join(subdir))
+        .map(|subdir| resources_root_dir.join(subdir).canonicalize().unwrap())
         .collect()
 }
 
