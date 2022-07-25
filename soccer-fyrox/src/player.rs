@@ -130,7 +130,7 @@ impl Player {
 
         //# One of the main jobs of this method is to decide where the player will run to, and at what speed.
         //# The default is to run slowly towards home position, but target and speed may be overwritten in the code below
-        let mut target = player.home.clone(); //# Take a copy of home position
+        let mut target = player.home; //# Take a copy of home position
         let mut speed = PLAYER_DEFAULT_SPEED;
 
         //# Some shorthand variables to make the code below a bit easier to follow
@@ -184,7 +184,7 @@ impl Player {
                     cost(
                         player.vpos + angle_to_vec(angle) * 3.,
                         player.team,
-                        d.abs() as u8,
+                        d.unsigned_abs(),
                         &game.pools.players,
                     )
                 });
@@ -249,7 +249,7 @@ impl Player {
                         //# We don't do the marking behaviour below for human teams for a number of reasons. Try changing
                         //# the code to see how the game feels when marking behaviour applies to both human and computer
                         //# teams.
-                        target = game.ball.vpos.clone();
+                        target = game.ball.vpos;
                     } else {
                         //# Get vector between the ball and whatever we're marking
                         let (nvec, mut length) = safe_normalise(&(game.ball.vpos - mark_vpos));
@@ -284,8 +284,8 @@ impl Player {
                 //# The code below simulates the ball's movement over a series of frames, working out where it would be
                 //# after each frame. We also work out how far the player could have moved at each frame, and whether
                 //# that distance would be enough to reach the currently simulated location of the ball.
-                target = game.ball.vpos.clone(); //# current simulated location of ball
-                let mut vel = game.ball.vel.clone(); //# ball velocity - slows down each frame due to friction
+                target = game.ball.vpos; //# current simulated location of ball
+                let mut vel = game.ball.vel; //# ball velocity - slows down each frame due to friction
                 let mut frame = 0;
 
                 //# DRIBBLE_DIST_X is the distance at which a player can gain control of the ball.
@@ -364,7 +364,7 @@ impl Player {
         player.shadow.img_indexes = vec![suffix0, suffix1];
 
         //# Update shadow position to track player
-        player.shadow.vpos = player.vpos.clone();
+        player.shadow.vpos = player.vpos;
     }
 }
 

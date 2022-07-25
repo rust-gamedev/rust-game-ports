@@ -9,7 +9,7 @@ use fyrox::{
 
 use crate::prelude::*;
 
-const ZERO_ORD: u8 = '0' as u8;
+const ZERO_ORD: u8 = b'0';
 
 // Drawing is skipped for images with this name.
 //
@@ -23,8 +23,8 @@ const SOUNDS_PATH: &str = "sounds";
 
 // Avoid loading other files, ie. .options
 //
-const SUPPORTED_IMAGE_EXTENSIONS: &'static [&'static str] = &[".gif", ".png"];
-const SUPPORTED_SOUND_EXTENSIONS: &'static [&'static str] = &[".ogg"];
+const SUPPORTED_IMAGE_EXTENSIONS: &[&str] = &[".gif", ".png"];
+const SUPPORTED_SOUND_EXTENSIONS: &[&str] = &[".ogg"];
 
 // It's not easy to make the overall design of the program simple, since Fyrox requires several elements
 // to be carried around (scene, handles, resources...).
@@ -91,7 +91,7 @@ impl Media {
             .map(|(path, texture)| {
                 (
                     path[..(path.len() - 4)].to_string(),
-                    texture.expect(&format!("Error while loading image file '{}'", path)),
+                    texture.unwrap_or_else(|_| panic!("Error while loading image file '{}'", path)),
                 )
             })
             .collect::<HashMap<_, _>>();
@@ -102,7 +102,7 @@ impl Media {
             .map(|(path, sound)| {
                 (
                     path.to_string(),
-                    sound.expect(&format!("Error while loading sound file: '{}'", path)),
+                    sound.unwrap_or_else(|_| panic!("Error while loading sound file: '{}'", path)),
                 )
             })
             .collect::<HashMap<_, _>>();
@@ -177,7 +177,7 @@ impl Media {
 
         self.image_textures
             .get(&full_path)
-            .expect(&format!("Image '{}' not found!", &full_path))
+            .unwrap_or_else(|| panic!("Image '{}' not found!", &full_path))
             .clone()
     }
 
@@ -200,7 +200,7 @@ impl Media {
 
         self.sound_resources
             .get(&full_path)
-            .expect(&format!("Sound '{}' not found!", &full_path))
+            .unwrap_or_else(|| panic!("Sound '{}' not found!", &full_path))
             .clone()
     }
 
