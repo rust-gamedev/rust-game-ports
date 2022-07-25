@@ -224,7 +224,7 @@ impl Ball {
         }
 
         //# Update shadow position to track ball
-        ball.shadow.vpos = ball.vpos.clone();
+        ball.shadow.vpos = ball.vpos;
 
         let mut ball_owner_r = ball
             .owner
@@ -366,7 +366,7 @@ impl Ball {
                         r = HUMAN_PLAYER_WITHOUT_BALL_SPEED * steps(length) as f32
                     }
 
-                    target.clone()
+                    *target
                 } else {
                     //# We're not targeting a player or goal, so just kick the ball straight ahead
 

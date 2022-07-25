@@ -47,7 +47,7 @@ impl GameState for GameGlobal {
         let game_hud = GameHud::new();
 
         let state = State::Menu;
-        let menu_screen = MenuScreen::new(&mut engine.user_interface, &mut media);
+        let menu_screen = MenuScreen::new(&mut engine.user_interface, &media);
         let menu_state = Some(MenuState::NumPlayers);
 
         let game_over_screen = GameOverScreen::new();
@@ -55,7 +55,7 @@ impl GameState for GameGlobal {
         let scene_h = engine.scenes.add(scene);
 
         let win_score = env::var("SOCCER_WIN_SCORE")
-            .unwrap_or(String::from(DEFAULT_WIN_SCORE))
+            .unwrap_or_else(|_| String::from(DEFAULT_WIN_SCORE))
             .parse()
             .unwrap();
 
@@ -120,7 +120,7 @@ impl GameGlobal {
         use VirtualKeyCode::*;
         use {MenuState::*, State::*};
 
-        let mut scene = &mut engine.scenes[self.scene];
+        let scene = &mut engine.scenes[self.scene];
         let user_interface = &mut engine.user_interface;
 
         match &self.state {
@@ -149,7 +149,7 @@ impl GameGlobal {
                                 Some(Controls::new(0)),
                                 Some(Controls::new(1)),
                                 DEFAULT_DIFFICULTY,
-                                &mut scene,
+                                scene,
                                 &mut self.media,
                             )
                         }
@@ -164,7 +164,7 @@ impl GameGlobal {
                             Some(Controls::new(0)),
                             None,
                             self.menu_difficulty,
-                            &mut scene,
+                            scene,
                             &mut self.media,
                         );
                     }
@@ -177,7 +177,7 @@ impl GameGlobal {
                         selection_change = -1;
                     }
                     if selection_change != 0 {
-                        self.media.play_sound(&mut scene, "move", &[]);
+                        self.media.play_sound(scene, "move", &[]);
 
                         if let Some(MenuState::NumPlayers) = self.menu_state {
                             self.menu_num_players = if self.menu_num_players == 1 { 2 } else { 1 };
@@ -220,7 +220,7 @@ impl GameGlobal {
                     self.game_over_screen.display(
                         background_index,
                         &team_scores,
-                        &mut self.media,
+                        &self.media,
                         &mut engine.user_interface,
                     );
                 } else {
@@ -234,13 +234,8 @@ impl GameGlobal {
                     //# Switch to menu state, and create a new game object without a player
                     self.state = State::Menu;
                     self.menu_state = Some(MenuState::NumPlayers);
-                    self.game.reset_game(
-                        None,
-                        None,
-                        DEFAULT_DIFFICULTY,
-                        &mut scene,
-                        &mut self.media,
-                    );
+                    self.game
+                        .reset_game(None, None, DEFAULT_DIFFICULTY, scene, &mut self.media);
 
                     self.menu_screen
                         .display(&self.media, &mut engine.user_interface);

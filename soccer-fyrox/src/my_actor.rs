@@ -13,7 +13,7 @@ pub trait MyActor {
     fn rectangle_h(&self) -> Handle<Node>;
 
     fn prepare_draw(&self, scene: &mut Scene, media: &mut Media, z: f32) {
-        let texture = media.image(self.img_base(), &self.img_indexes());
+        let texture = media.image(self.img_base(), self.img_indexes());
         let (fyrox_coords, texture_dims) =
             to_fyrox_coordinates(self.vpos().x, self.vpos().y, z, self.anchor(), &texture);
 

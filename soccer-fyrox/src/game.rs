@@ -87,7 +87,7 @@ impl Game {
         let arrows = vec![None, None];
 
         //# Focus camera on ball - copy ball pos
-        let camera_focus = ball.vpos.clone();
+        let camera_focus = ball.vpos;
 
         let mut instance = Self {
             teams,
@@ -219,7 +219,7 @@ impl Game {
             .collect();
 
         //# Focus camera on ball - copy ball pos
-        self.camera_focus = self.ball.vpos.clone();
+        self.camera_focus = self.ball.vpos;
     }
 
     pub fn update(&mut self, media: &Media, scene: &mut Scene, input: &InputController) {
@@ -337,19 +337,12 @@ impl Game {
             //
             // The Rust translation is pretty direct, but it's more verbose due to static typing
             // (primarily, conversion to Option<T> and back).
-            let a = a
-                .into_iter()
-                .map(|s| Some(s))
-                .chain([None, None].into_iter());
-            let b = b
-                .into_iter()
-                .map(|s| Some(s))
-                .chain([None, None].into_iter());
+            let a = a.into_iter().map(Some).chain([None, None].into_iter());
+            let b = b.into_iter().map(Some).chain([None, None].into_iter());
             let zipped = a
                 .zip(b)
-                .map(|(s, t)| [s, t])
-                .flatten()
-                .filter_map(|s| s)
+                .flat_map(|(s, t)| [s, t])
+                .flatten() // Remove None
                 .collect::<Vec<_>>();
 
             //# Either one or two players (depending on difficulty settings) follow the ball owner, one from up-field and
@@ -517,6 +510,7 @@ impl Game {
             .prepare_draw(scene, media, DRAW_GOAL_1_Z);
 
         //# Show active players
+        #[allow(clippy::manual_flatten)]
         for arrow in &self.arrows {
             if let Some(arrow) = arrow {
                 arrow.prepare_draw(scene, media, DRAW_ARROWS_Z);

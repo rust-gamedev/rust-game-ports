@@ -1,4 +1,17 @@
 #![feature(is_some_with)]
+#![deny(clippy::all)]
+#![allow(
+    clippy::assign_op_pattern,
+    clippy::collapsible_else_if,
+    clippy::collapsible_if,
+    clippy::comparison_chain,
+    clippy::derive_partial_eq_without_eq,
+    clippy::len_zero,
+    clippy::manual_range_contains,
+    clippy::new_without_default,
+    clippy::too_many_arguments,
+    clippy::type_complexity
+)]
 
 mod anchor;
 mod ball;
