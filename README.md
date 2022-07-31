@@ -9,6 +9,7 @@ My ports of open source games to Rust, using different pure-Rust game engines.
     - [Boing/ggez](#boingggez)
     - [Cavern/Macroquad](#cavernmacroquad)
     - [Rusty Roguelike/Bevy ECS](#rusty-roguelikebevy-ecs)
+    - [Rusty Roguelike/Macroquad](#rusty-roguelikemacroquad)
     - [Soccer/Fyrox](#soccerfyrox)
   - [Source Projects/Libraries](#source-projectslibraries)
   - [Projects structure/configuration](#projects-structureconfiguration)
@@ -22,6 +23,7 @@ The completed ports are:
 | Code the Classics Vol. 1             |      Boing      |    ggez    |
 | Code the Classics Vol. 1             |     Cavern      | Macroquad  |
 | Hands-on Rust: Effective Learning... | Rusty Roguelike | Bevy (ECS) |
+| Hands-on Rust: Effective Learning... | Rusty Roguelike | Macroquad  |
 | Code the Classics Vol. 1             |     Soccer      |   Fyrox    |
 
 I currently don't plan any further ports.
@@ -77,6 +79,13 @@ The port suffers from two Fyrox bugs:
 
 - at least one sound plays with a delay (reported [here](https://github.com/FyroxEngine/Fyrox/issues/324));
 - some images render incorrectly (reported [here](https://github.com/FyroxEngine/Fyrox/issues/320)).
+
+### Rusty Roguelike/Macroquad
+
+![Rusty Roguelike Macroquad](/images/readme/rusty_roguelike-macroquad.png?raw=true)
+
+The graphics portion of the Rusty Roguelike has been ported to Macroquad. The
+ECS used is still Legion, and the pathfinding is from [bracket-lib](https://github.com/amethyst/bracket-lib)).
 
 ## Source Projects/Libraries
 
