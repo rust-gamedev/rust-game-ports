@@ -1,0 +1,75 @@
+(
+    entities : [
+        (
+            entity_type: Item,
+            name : "Healing Potion", sprite : 33, levels : [ 0, 1, 2 ],
+            provides: [ ("Healing", 6) ],
+            frequency: 2
+        ),
+        (
+            entity_type: Item,
+            name : "Weak Healing Potion", sprite : 33, levels : [ 0, 1, 2 ],
+            provides: [ ("Healing", 2) ],
+            frequency: 2
+        ),
+        (
+            entity_type: Item,
+            name : "Dungeon Map", sprite : 123, levels : [ 0, 1, 2 ],
+            provides: [ ("MagicMap", 0) ],
+            frequency: 1
+        ),
+        (
+            entity_type: Item,
+            name : "Short Sword", sprite: 115, levels: [ 0, 1, 2 ],
+            frequency: 1,
+            base_damage: 1
+        ),
+        (
+            entity_type: Item,
+            name : "2-handed Sword", sprite: 83, levels: [ 0, 1, 2 ],
+            frequency: 1,
+            base_damage: 2
+        ),
+        (
+            entity_type: Item,
+            name : "Claymore", sprite: 47, levels: [ 2 ],
+            frequency: 1,
+            base_damage: 3
+        ),
+        (
+            entity_type: Enemy,
+            name : "Bat", sprite : 98, levels : [ 0 ],
+            hp : 1,
+            frequency: 8,
+            base_damage: 1
+        ),
+        (
+            entity_type: Enemy,
+            name : "Kobold", sprite : 103, levels : [ 0, 1 ],
+            hp : 2,
+            frequency: 5,
+            base_damage: 1
+        ),
+        (
+            entity_type: Enemy,
+            name : "2-headed Ogre", sprite : 111, levels : [ 0, 1, 2 ],
+            hp : 4,
+            frequency: 2,
+            base_damage: 1
+        ),
+        (
+            entity_type: Enemy,
+            name : "Deep Troll", sprite : 79, levels : [ 1, 2 ],
+            hp : 6,
+            frequency: 2,
+            base_damage: 2
+        ),
+        (
+            entity_type: Enemy,
+            name : "Lindwyrm", sprite : 69, levels : [ 2 ],
+            hp : 8,
+            frequency: 1,
+            base_damage: 3
+        ),
+    ],
+)
