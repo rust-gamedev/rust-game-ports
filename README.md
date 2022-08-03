@@ -15,14 +15,12 @@ My ports of open source games to Rust, using different pure-Rust game engines.
 
 The completed ports are:
 
-| Source                               |      Game       |   Engine   |
-| ------------------------------------ | :-------------: | :--------: |
-| Code the Classics Vol. 1             |      Boing      |    ggez    |
-| Code the Classics Vol. 1             |     Cavern      | Macroquad  |
-| Hands-on Rust: Effective Learning... | Rusty Roguelike | Bevy (ECS) |
-| Code the Classics Vol. 1             |     Soccer      |   Fyrox    |
-
-I currently don't plan any further ports.
+| Source                               |      Game       |   Engine   | Tested on |
+| ------------------------------------ | :-------------: | :--------: | :-------: |
+| Code the Classics Vol. 1             |      Boing      |    ggez    |   Linux   |
+| Code the Classics Vol. 1             |     Cavern      | Macroquad  |   Linux   |
+| Hands-on Rust: Effective Learning... | Rusty Roguelike | Bevy (ECS) |   Linux   |
+| Code the Classics Vol. 1             |     Soccer      |   Fyrox    |   Linux   |
 
 ## Games
 
