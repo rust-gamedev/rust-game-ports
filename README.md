@@ -4,7 +4,8 @@ My ports of open source games to Rust, using different pure-Rust game engines.
 
 - [Rust Game Ports](#rust-game-ports)
   - [Summary](#summary)
-  - [Games](#games)
+  - [Screenshots](#screenshots)
+  - [Ports](#ports)
     - [Boing/ggez](#boingggez)
     - [Cavern/Macroquad](#cavernmacroquad)
     - [Rusty Roguelike/Bevy ECS](#rusty-roguelikebevy-ecs)
@@ -22,11 +23,27 @@ The completed ports are:
 | Hands-on Rust: Effective Learning... | Rusty Roguelike | Bevy (ECS) |   Linux   |
 | Code the Classics Vol. 1             |     Soccer      |   Fyrox    |   Linux   |
 
-## Games
+## Screenshots
 
-### Boing/ggez
+Boing:
 
 ![Boing](/images/readme/boing.png?raw=true)
+
+Cavern:
+
+![Cavern](/images/readme/cavern.png?raw=true)
+
+Rusty Roguelike:
+
+![Rusty Roguelike](/images/readme/rusty_roguelike.png?raw=true)
+
+Soccer:
+
+![Soccer](/images/readme/soccer.png?raw=true)
+
+## Ports
+
+### Boing/ggez
 
 A very straightforward port 🙂
 
@@ -35,8 +52,6 @@ This port suffers from one bug:
 - corruption when running on fullscreen (reported [here](https://github.com/ggez/ggez/issues/1066)).
 
 ### Cavern/Macroquad
-
-![Cavern](/images/readme/cavern.png?raw=true)
 
 Another very straightforward port 🙂
 
@@ -49,15 +64,11 @@ Only the stable part of the library is used (the experimental [`scene`](https://
 
 ### Rusty Roguelike/Bevy ECS
 
-![Rusty Roguelike](/images/readme/rusty_roguelike.png?raw=true)
-
 The ECS part of this game, originally Legion, has been ported to Bevy (the graphic/input library used is still [bracket-lib](https://github.com/amethyst/bracket-lib)).
 
 I wrote a mini book, ["Learn Bevy's ECS by ripping off someone else's project"](https://saveriomiroddi.github.io/learn_bevy_ecs_by_ripping_off), based on this project.
 
 ### Soccer/Fyrox
-
-![Soccer](/images/readme/soccer.png?raw=true)
 
 This port required a non-trivial restructuring, in order to move to a scene-graph based design.
 
