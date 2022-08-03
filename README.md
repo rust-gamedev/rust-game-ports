@@ -11,7 +11,6 @@ My ports of open source games to Rust, using different pure-Rust game engines.
     - [Rusty Roguelike/Bevy ECS](#rusty-roguelikebevy-ecs)
     - [Soccer/Fyrox](#soccerfyrox)
   - [Source Projects/Libraries](#source-projectslibraries)
-  - [Projects structure/configuration](#projects-structureconfiguration)
 
 ## Summary
 
@@ -89,7 +88,3 @@ Libraries:
 - [Macroquad](https://github.com/not-fl3/macroquad)
 - [Bevy](https://github.com/bevyengine/bevy)
 - [Fyrox](https://github.com/FyroxEngine/Fyrox)
-
-## Projects structure/configuration
-
-- each project has a dedicated Visual Studio Code configuration (`.vscode` directory)
