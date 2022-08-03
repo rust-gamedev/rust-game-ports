@@ -1,6 +1,6 @@
 # Rust Game Ports
 
-My ports of open source games to Rust, using different pure-Rust game engines.
+Official host of games ported using Rust game libraries.
 
 - [Rust Game Ports](#rust-game-ports)
   - [Summary](#summary)
@@ -10,7 +10,8 @@ My ports of open source games to Rust, using different pure-Rust game engines.
     - [Cavern/Macroquad](#cavernmacroquad)
     - [Rusty Roguelike/Bevy ECS](#rusty-roguelikebevy-ecs)
     - [Soccer/Fyrox](#soccerfyrox)
-  - [Source Projects/Libraries](#source-projectslibraries)
+  - [Source Projects](#source-projects)
+  - [Game Libraries](#game-libraries)
 
 ## Summary
 
@@ -77,14 +78,12 @@ The port suffers from two Fyrox bugs:
 - at least one sound plays with a delay (reported [here](https://github.com/FyroxEngine/Fyrox/issues/324));
 - some images render incorrectly (reported [here](https://github.com/FyroxEngine/Fyrox/issues/320)).
 
-## Source Projects/Libraries
+## Source Projects
 
-Projects:
+- Code the Classics Vol. 1 ([repository](https://github.com/Wireframe-Magazine/Code-the-Classics) and [book](https://wireframe.raspberrypi.org/books/code-the-classics1))
+- Rust Roguelike/Hands-on Rust: Effective Learning... ([repository](https://github.com/thebracket/HandsOnRust) and [book](https://pragprog.com/titles/hwrust/hands-on-rust))
 
-- Code the Classics Vol. 1 ([repository](https://github.com/Wireframe-Magazine/Code-the-Classics) and [book](https://wireframe.raspberrypi.org/books/code-the-classics1)): A very beautiful book on beginning game programming, written in Python; the project comprises of several games of different genres, each with a surprising complexity under the hood
-- Rust Roguelike/Hands-on Rust: Effective Learning... ([repository](https://github.com/thebracket/HandsOnRust) and [book](https://pragprog.com/titles/hwrust/hands-on-rust)): Another great book, on writing games in Rust; the project is divided in clear and progressive steps, and it's, in my opinion, the most effective way to learn working with ECSs (in this case, [Legion](https://github.com/amethyst/legion))
-
-Libraries:
+## Game Libraries
 
 - [ggez](https://github.com/ggez/ggez)
 - [Macroquad](https://github.com/not-fl3/macroquad)
