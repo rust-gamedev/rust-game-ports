@@ -11,7 +11,9 @@ Official host of games ported using Rust game libraries.
     - [Rusty Roguelike/Bevy ECS](#rusty-roguelikebevy-ecs)
     - [Soccer/Fyrox](#soccerfyrox)
   - [Source Projects](#source-projects)
-  - [Game Libraries](#game-libraries)
+  - [Libraries](#libraries)
+    - [Sources](#sources)
+    - [Ports](#ports-1)
 
 ## Summary
 
@@ -83,7 +85,14 @@ The port suffers from two Fyrox bugs:
 - Code the Classics Vol. 1 ([repository](https://github.com/Wireframe-Magazine/Code-the-Classics) and [book](https://wireframe.raspberrypi.org/books/code-the-classics1))
 - Rust Roguelike/Hands-on Rust: Effective Learning... ([repository](https://github.com/thebracket/HandsOnRust) and [book](https://pragprog.com/titles/hwrust/hands-on-rust))
 
-## Game Libraries
+## Libraries
+
+### Sources
+
+- [PyGame Zero](https://pygame-zero.readthedocs.io/en/stable)
+- [bracket-lib](https://github.com/amethyst/bracket-lib)
+
+### Ports
 
 - [ggez](https://github.com/ggez/ggez)
 - [Macroquad](https://github.com/not-fl3/macroquad)
