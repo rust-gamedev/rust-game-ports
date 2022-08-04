@@ -17,12 +17,12 @@ Official host of games ported using Rust game libraries.
 
 The completed ports are:
 
-| Source                               |      Game       |   Engine   | Tested on |
-| ------------------------------------ | :-------------: | :--------: | :-------: |
-| Code the Classics Vol. 1             |      Boing      |    ggez    |   Linux   |
-| Code the Classics Vol. 1             |     Cavern      | Macroquad  |   Linux   |
-| Hands-on Rust: Effective Learning... | Rusty Roguelike | Bevy (ECS) |   Linux   |
-| Code the Classics Vol. 1             |     Soccer      |   Fyrox    |   Linux   |
+|      Game       |                Source                | Source Language/Libraries |     Port Libraries      | Tested on |
+| :-------------: | :----------------------------------: | :-----------------------: | :---------------------: | :-------: |
+|      Boing      |       Code the Classics Vol. 1       |    Python, PyGame Zero    |          ggez           |   Linux   |
+|     Cavern      |       Code the Classics Vol. 1       |    Python, PyGame Zero    |        Macroquad        |   Linux   |
+| Rusty Roguelike | Hands-on Rust: Effective Learning... |    bracket-lib, Legion    | bracket-lib, Bevy (ECS) |   Linux   |
+|     Soccer      |       Code the Classics Vol. 1       |    Python, PyGame Zero    |          Fyrox          |   Linux   |
 
 ## Screenshots
 
