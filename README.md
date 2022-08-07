@@ -17,6 +17,7 @@ If you're a developer planning a contribution, it's **crucial** to read the [Con
     - [Boing/ggez](#boingggez)
     - [Cavern/Macroquad](#cavernmacroquad)
     - [Rusty Roguelike/Bevy ECS](#rusty-roguelikebevy-ecs)
+    - [Rusty Roguelike/Macroquad](#rusty-roguelikemacroquad)
     - [Soccer/Fyrox](#soccerfyrox)
   - [Source Projects](#source-projects)
   - [Libraries](#libraries)
@@ -32,6 +33,7 @@ The completed ports are:
 |      Boing      |       Code the Classics Vol. 1       |    Python, PyGame Zero    |          ggez           |   Linux   |
 |     Cavern      |       Code the Classics Vol. 1       |    Python, PyGame Zero    |        Macroquad        |   Linux   |
 | Rusty Roguelike | Hands-on Rust: Effective Learning... |    bracket-lib, Legion    | bracket-lib, Bevy (ECS) |   Linux   |
+| Rusty Roguelike | Hands-on Rust: Effective Learning... |    bracket-lib, Legion    |    Macroquad, Legion    |   Linux   |
 |     Soccer      |       Code the Classics Vol. 1       |    Python, PyGame Zero    |          Fyrox          |   Linux   |
 
 ## Contribution Infos
@@ -133,6 +135,10 @@ The port suffers from two Fyrox bugs:
 
 - at least one sound plays with a delay (reported [here](https://github.com/FyroxEngine/Fyrox/issues/324));
 - some images render incorrectly (reported [here](https://github.com/FyroxEngine/Fyrox/issues/320)).
+
+### Rusty Roguelike/Macroquad
+
+The graphics portion of the Rusty Roguelike has been ported to Macroquad. The ECS used is still Legion, and the pathfinding is from [bracket-lib](https://github.com/amethyst/bracket-lib)).
 
 ## Source Projects
 
