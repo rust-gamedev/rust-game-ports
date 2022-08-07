@@ -7,7 +7,7 @@ version = "0.1.0"
 
 fyrox = "0.26.0" 
 rand = "*" # Use the same as Fyrox
-soccer-macros-fyrox = {path = "../soccer-macros-fyrox"} 
+soccer-macros-fyrox = {path = "./macros"} 
 
 [profile.dev.package."*"]
 opt-level = 3

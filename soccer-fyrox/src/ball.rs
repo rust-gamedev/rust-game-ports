@@ -234,10 +234,10 @@ impl Ball {
         for target in game.pools.players.iter() {
             //# A player can acquire the ball if the ball has no owner, or the player is on the other team
             //# from the owner, and collides with the ball
-            // Restructured the condition, in order to accommodate the Rust approach.
-            if !ball_owner_r.is_some_and(|(_, ball_owner)| ball_owner.team == target.team)
-                && ball.collide(target)
-            {
+            let opponent_owns_ball =
+                matches!(&ball_owner_r, Some((_, ball_owner)) if ball_owner.team == target.team);
+
+            if !opponent_owns_ball && ball.collide(target) {
                 if let Some((_, ball_owner)) = &mut ball_owner_r {
                     //# New player is taking the ball from previous owner
                     //# Set hold-off timer so previous owner can't immediately reacquire the ball
@@ -310,15 +310,16 @@ impl Ball {
                 //# If the owner is computer-controlled, we kick if the ball's hold-off timer has expired
                 //# and there is a targetable player or goal, and the targetable player or goal is in a more
                 //# favourable location (according to cost()) than the owner's location
-                ball.timer <= 0
-                    && target.is_some_and(|target| {
-                        cost(
-                            target.load(&game.pools).vpos(),
-                            ball_owner.team,
-                            0,
-                            &game.pools.players,
-                        ) < cost(ball_owner.vpos, ball_owner.team, 0, &game.pools.players)
-                    })
+                let any_suitable_target = matches!(&target, Some(target) if
+                    cost(
+                        target.load(&game.pools).vpos(),
+                        ball_owner.team,
+                        0,
+                        &game.pools.players,
+                    ) < cost(ball_owner.vpos, ball_owner.team, 0, &game.pools.players)
+                );
+
+                ball.timer <= 0 && any_suitable_target
             };
 
             if do_shoot {
