@@ -61,7 +61,7 @@ For beginners, a good starting point is to take a Rust+IML project, e.g. Boing, 
 
 More adventurous devs can start from a Python/PyGame source, and port it to Rust+IML.
 
-Committed devs can perform ports that require a redesign (e.g. Fyrox Framework to Fyrox Scripted).
+Committed devs can perform ports that require a redesign (e.g. Fyrox Framework to Fyrox scripted).
 
 It's not advised to perform a port that requires a language translation _and_ a redesign
 
@@ -76,11 +76,11 @@ These are the low-level requirements for candidate projects (they will be automa
 - not have any unsafe code (it's not necessary for games)
 - not use any highly unidiomatic Rust (e.g. globals)
 - use symlinks for the resource directories, if they're shared with the source project
-- add the source code, if not present already
+- add the source project code, if not present already
 
 ### High level guidelines
 
-High level guidelines are under discussion. Generally speaking, ports should be performed idiomatically (with particular regard to the game library used), since ports are meant to be examples for Rust game development. You'll be famous! 😎😂
+High level guidelines are under discussion. Generally speaking, ports should be performed according to the intended design of the game library used, since ports are meant to be examples for Rust game development. You'll be famous! 😎😂
 
 ## Screenshots
 
@@ -106,7 +106,7 @@ Soccer:
 
 A very straightforward port 🙂
 
-This port suffers from one bug:
+This port suffers from one (Winit) bug:
 
 - corruption when running on fullscreen (reported [here](https://github.com/ggez/ggez/issues/1066)).
 
@@ -125,11 +125,11 @@ Only the stable part of the library is used (the experimental [`scene`](https://
 
 The ECS part of this game, originally Legion, has been ported to Bevy (the graphic/input library used is still [bracket-lib](https://github.com/amethyst/bracket-lib)).
 
-I wrote a mini book, ["Learn Bevy's ECS by ripping off someone else's project"](https://saveriomiroddi.github.io/learn_bevy_ecs_by_ripping_off), based on this project.
+A mini book, ["Learn Bevy's ECS by ripping off someone else's project"](https://saveriomiroddi.github.io/learn_bevy_ecs_by_ripping_off), is based on this project.
 
 ### Soccer/Fyrox
 
-This port required a non-trivial restructuring, in order to move to a scene-graph based design.
+This port required a redesign, in order to move to a scene graph.
 
 The port suffers from one Fyrox bug:
 
