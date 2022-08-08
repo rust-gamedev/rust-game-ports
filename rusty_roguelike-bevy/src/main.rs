@@ -95,8 +95,7 @@ impl State {
         self.ecs.insert_resource(map_builder.map);
         self.ecs
             .insert_resource(Camera::new(map_builder.player_start));
-        self.ecs
-            .insert_resource(TurnState::AwaitingInput);
+        self.ecs.insert_resource(TurnState::AwaitingInput);
         self.ecs.insert_resource(map_builder.theme);
         // Don't forget! :)
         self.ecs.world.remove_resource::<VirtualKeyCode>();
@@ -160,8 +159,7 @@ impl State {
         self.ecs
             .world
             .insert_resource(Camera::new(map_builder.player_start));
-        self.ecs
-            .insert_resource(TurnState::AwaitingInput);
+        self.ecs.insert_resource(TurnState::AwaitingInput);
         self.ecs.world.insert_resource(map_builder.theme);
     }
 
