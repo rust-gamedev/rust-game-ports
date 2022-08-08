@@ -1,3 +1,6 @@
+#![allow(clippy::all)]
+#![deny(clippy::correctness)]
+
 mod camera_view;
 mod components;
 mod macroquad_utils;
