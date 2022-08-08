@@ -17,8 +17,8 @@ If you're a developer planning a contribution, it's **crucial** to read the [Con
     - [Boing/ggez](#boingggez)
     - [Cavern/Macroquad](#cavernmacroquad)
     - [Rusty Roguelike/Bevy ECS](#rusty-roguelikebevy-ecs)
-    - [Rusty Roguelike/Macroquad](#rusty-roguelikemacroquad)
     - [Soccer/Fyrox](#soccerfyrox)
+    - [Rusty Roguelike/Macroquad](#rusty-roguelikemacroquad)
   - [Source Projects](#source-projects)
   - [Libraries](#libraries)
     - [Sources](#sources)
@@ -28,13 +28,13 @@ If you're a developer planning a contribution, it's **crucial** to read the [Con
 
 The completed ports are:
 
-|      Game       |                Source                | Source Language/Libraries |     Port Libraries      | Tested on |
-| :-------------: | :----------------------------------: | :-----------------------: | :---------------------: | :-------: |
-|      Boing      |       Code the Classics Vol. 1       |    Python, PyGame Zero    |          ggez           |   Linux   |
-|     Cavern      |       Code the Classics Vol. 1       |    Python, PyGame Zero    |        Macroquad        |   Linux   |
-| Rusty Roguelike | Hands-on Rust: Effective Learning... |    bracket-lib, Legion    | bracket-lib, Bevy (ECS) |   Linux   |
-| Rusty Roguelike | Hands-on Rust: Effective Learning... |    bracket-lib, Legion    |    Macroquad, Legion    |   Linux   |
-|     Soccer      |       Code the Classics Vol. 1       |    Python, PyGame Zero    |          Fyrox          |   Linux   |
+|      Game       |                Source                | Source Language/Libraries |       Port Libraries        | Tested on |
+| :-------------: | :----------------------------------: | :-----------------------: | :-------------------------: | :-------: |
+|      Boing      |       Code the Classics Vol. 1       |    Python, PyGame Zero    |          ggez 0.7           |   Linux   |
+|     Cavern      |       Code the Classics Vol. 1       |    Python, PyGame Zero    |        Macroquad 0.3        |   Linux   |
+| Rusty Roguelike | Hands-on Rust: Effective Learning... |    bracket-lib, Legion    | bracket-lib, Bevy (ECS) 0.7 |   Linux   |
+| Rusty Roguelike | Hands-on Rust: Effective Learning... |    bracket-lib, Legion    |    Macroquad 0.3, Legion    |   Linux   |
+|     Soccer      |       Code the Classics Vol. 1       |    Python, PyGame Zero    |         Fyrox 0.26          |   Linux   |
 
 ## Contribution Infos
 
