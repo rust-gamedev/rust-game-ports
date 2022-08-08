@@ -2,24 +2,43 @@ name: CI
 
 on:
   push:
-    branches: [ $default-branch ]
+    branches: [ master ]
   pull_request:
 
 jobs:
+  generate_projects_matrix:
+    name: Generate projects matrix
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.generate-matrix.outputs.matrix }}
+    steps:
+    - uses: actions/checkout@v3
+    - id: generate-matrix
+      run: echo ::set-output name=matrix::$(.github/workflows/generate-projects-matrix.sh ${{ github.workspace }})
   check_code_formatting:
     runs-on: ubuntu-latest
     name: Check code formatting
+    needs: generate_projects_matrix
+    strategy:
+      fail-fast: false
+      matrix:
+        cfg: ${{ fromJson(needs.generate_projects_matrix.outputs.matrix) }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: actions-rs/cargo@v1
         with:
           command: fmt
-          args: --all -- --check
+          args: --all --manifest-path=${{ matrix.cfg.port_manifest }} -- --check
   clippy_correctness_checks:
     runs-on: ubuntu-latest
     name: Clippy correctness checks
+    needs: generate_projects_matrix
+    strategy:
+      fail-fast: false
+      matrix:
+        cfg: ${{fromJson(needs.generate_projects_matrix.outputs.matrix)}}
     steps:
-      - name: Install Alsa dev library
+      - name: Install dev libraries
         run: sudo apt install libasound2-dev libudev-dev
       - uses: actions/checkout@v3
       - uses: actions/cache@v3
@@ -30,8 +49,9 @@ jobs:
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
             target/
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          # Note that we only consider files one level deep (therefore excluding source projects)
+          key: ${{ runner.os }}-cargo-${{ hashFiles('*/Cargo.lock') }}
       - uses: actions-rs/cargo@v1
         with:
           command: clippy
-          args: -- -W clippy::correctness -D warnings
+          args:  --manifest-path=${{ matrix.cfg.port_manifest }} -- -W clippy::correctness -D warnings
