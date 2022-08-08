@@ -1,4 +1,5 @@
-#![allow(clippy::type_complexity, clippy::comparison_chain)]
+#![allow(clippy::all)]
+#![deny(clippy::correctness)]
 
 mod audio_entity;
 mod ball;
