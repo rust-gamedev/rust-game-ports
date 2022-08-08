@@ -131,10 +131,9 @@ I wrote a mini book, ["Learn Bevy's ECS by ripping off someone else's project"](
 
 This port required a non-trivial restructuring, in order to move to a scene-graph based design.
 
-The port suffers from two Fyrox bugs:
+The port suffers from one Fyrox bug:
 
-- at least one sound plays with a delay (reported [here](https://github.com/FyroxEngine/Fyrox/issues/324));
-- some images render incorrectly (reported [here](https://github.com/FyroxEngine/Fyrox/issues/320)).
+- at least one sound plays with a delay (reported [here](https://github.com/FyroxEngine/Fyrox/issues/324)).
 
 ### Rusty Roguelike/Macroquad
 
