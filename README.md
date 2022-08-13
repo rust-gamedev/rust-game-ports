@@ -94,14 +94,12 @@ It's not advised to perform a port that requires a language translation _and_ a 
 
 These are the low-level requirements for candidate projects (they will be automated, so they don't need to be actively take caren of 🙂):
 
-- include a license in the root workspace (can be easily copied and edited from other similar projects)
+- include a license in the port workspace (can be easily copied and edited from other similar projects)
 - work on stable Rust (this is because they ubiquitous Rust Analyzer has some open issues with nighly Rust)
 - be formatted according to `cargo fmt`
 - be linted according to `cargo clippy -- -W clippy::correctness -D warnings`
-- not have any unsafe code (it's not necessary for games)
+- not have any unsafe code (it's not necessary for idiomatically ported games)
 - not use any highly unidiomatic Rust (e.g. globals)
-- use symlinks for the resource directories, if they're shared with the source project
-- add the source project code, if not present already
 
 ### High level guidelines
 
