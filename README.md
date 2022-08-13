@@ -13,28 +13,53 @@ If you're a developer planning a contribution, it's **crucial** to read the [Con
     - [Low-level requirements](#low-level-requirements)
     - [High level guidelines](#high-level-guidelines)
   - [Screenshots](#screenshots)
-  - [Ports](#ports)
+  - [Port notes](#port-notes)
     - [Boing/ggez](#boingggez)
     - [Cavern/Macroquad](#cavernmacroquad)
     - [Rusty Roguelike/Bevy ECS](#rusty-roguelikebevy-ecs)
     - [Soccer/Fyrox](#soccerfyrox)
     - [Rusty Roguelike/Macroquad](#rusty-roguelikemacroquad)
-  - [Source Projects](#source-projects)
-  - [Libraries](#libraries)
-    - [Sources](#sources)
-    - [Ports](#ports-1)
 
 ## Summary
 
 The completed ports are:
 
-|      Game       |                Source                | Source Language/Libraries |       Port Libraries        | Tested on |
-| :-------------: | :----------------------------------: | :-----------------------: | :-------------------------: | :-------: |
-|      Boing      |       Code the Classics Vol. 1       |    Python, PyGame Zero    |          ggez 0.7           |   Linux   |
-|     Cavern      |       Code the Classics Vol. 1       |    Python, PyGame Zero    |        Macroquad 0.3        |   Linux   |
-| Rusty Roguelike | Hands-on Rust: Effective Learning... |    bracket-lib, Legion    | bracket-lib, Bevy (ECS) 0.7 |   Linux   |
-| Rusty Roguelike | Hands-on Rust: Effective Learning... |    bracket-lib, Legion    |    Macroquad 0.3, Legion    |   Linux   |
-|     Soccer      |       Code the Classics Vol. 1       |    Python, PyGame Zero    |         Fyrox 0.26          |   Linux   |
+<!-- Add new releases at the bottom; this makes more likely to found outdated ports at the top -->
+
+|                Game                |                                   Part of                                    | Source Language |               Source Libraries               |                   Port Libraries                   | Tested on |
+| :--------------------------------: | :--------------------------------------------------------------------------: | :-------------: | :------------------------------------------: | :------------------------------------------------: | :-------: |
+|           [Boing][Boing]           |             [Code the Classics Vol. 1][Code the Classics Vol. 1]             |     Python      |          [PyGame Zero][PyGame Zero]          |                  [ggez][ggez] 0.7                  |   Linux   |
+|          [Cavern][Cavern]          |             [Code the Classics Vol. 1][Code the Classics Vol. 1]             |     Python      |          [PyGame Zero][PyGame Zero]          |             [Macroquad][Macroquad] 0.3             |   Linux   |
+|          [Soccer][Soccer]          |             [Code the Classics Vol. 1][Code the Classics Vol. 1]             |     Python      |          [PyGame Zero][PyGame Zero]          |                [Fyrox][Fyrox] 0.26                 |   Linux   |
+| [Rusty Roguelike][Rusty Roguelike] | [Hands-on Rust: Effective Learning...][Hands-on Rust: Effective Learning...] |      Rust       | [bracket-lib][bracket-lib], [Legion][Legion] | [bracket-lib][bracket-lib], [Bevy][Bevy] (ECS) 0.7 |   Linux   |
+| [Rusty Roguelike][Rusty Roguelike] | [Hands-on Rust: Effective Learning...][Hands-on Rust: Effective Learning...] |      Rust       | [bracket-lib][bracket-lib], [Legion][Legion] |  [Macroquad][Macroquad] 0.3, [Legion][Legion] 0.3  |   Linux   |
+
+<!-- Keep the entries of each group sorted by name -->
+
+<!-- Game -->
+
+[Boing]: https://github.com/Wireframe-Magazine/Code-the-Classics/tree/master/boing-master
+[Cavern]: https://github.com/Wireframe-Magazine/Code-the-Classics/tree/master/cavern-master
+[Rusty Roguelike]: https://github.com/thebracket/HandsOnRust
+[Soccer]: https://github.com/Wireframe-Magazine/Code-the-Classics/tree/master/soccer-master
+
+<!-- Part of... -->
+
+[Code the Classics Vol. 1]: https://wireframe.raspberrypi.org/books/code-the-classics1
+[Hands-on Rust: Effective Learning...]: https://pragprog.com/titles/hwrust/hands-on-rust
+
+<!-- Source Libraries -->
+
+[bracket-lib]: https://github.com/amethyst/bracket-lib
+[Legion]: https://github.com/amethyst/legion
+[PyGame Zero]: https://pygame-zero.readthedocs.io/en/stable
+
+<!-- Port Libraries -->
+
+[Bevy]: https://github.com/bevyengine/bevy
+[Fyrox]: https://github.com/FyroxEngine/Fyrox
+[ggez]: https://github.com/ggez/ggez
+[Macroquad]: https://github.com/not-fl3/macroquad
 
 ## Contribution Infos
 
@@ -84,6 +109,8 @@ High level guidelines are under discussion. Generally speaking, ports should be 
 
 ## Screenshots
 
+<!-- Keep the entries sorted by name -->
+
 Boing:
 
 ![Boing](/images/readme/boing.png?raw=true)
@@ -100,7 +127,7 @@ Soccer:
 
 ![Soccer](/images/readme/soccer.png?raw=true)
 
-## Ports
+## Port notes
 
 ### Boing/ggez
 
@@ -138,22 +165,3 @@ The port suffers from one Fyrox bug:
 ### Rusty Roguelike/Macroquad
 
 The graphics portion of the Rusty Roguelike has been ported to Macroquad. The ECS used is still Legion, and the pathfinding is from [bracket-lib](https://github.com/amethyst/bracket-lib)).
-
-## Source Projects
-
-- Code the Classics Vol. 1 ([repository](https://github.com/Wireframe-Magazine/Code-the-Classics) and [book](https://wireframe.raspberrypi.org/books/code-the-classics1))
-- Rust Roguelike/Hands-on Rust: Effective Learning... ([repository](https://github.com/thebracket/HandsOnRust) and [book](https://pragprog.com/titles/hwrust/hands-on-rust))
-
-## Libraries
-
-### Sources
-
-- [PyGame Zero](https://pygame-zero.readthedocs.io/en/stable)
-- [bracket-lib](https://github.com/amethyst/bracket-lib)
-
-### Ports
-
-- [ggez](https://github.com/ggez/ggez)
-- [Macroquad](https://github.com/not-fl3/macroquad)
-- [Bevy](https://github.com/bevyengine/bevy)
-- [Fyrox](https://github.com/FyroxEngine/Fyrox)
