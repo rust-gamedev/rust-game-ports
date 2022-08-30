@@ -19,6 +19,7 @@ If you're a developer planning a contribution, it's **crucial** to read the [Con
     - [Rusty Roguelike/Bevy ECS](#rusty-roguelikebevy-ecs)
     - [Soccer/Fyrox](#soccerfyrox)
     - [Rusty Roguelike/Macroquad](#rusty-roguelikemacroquad)
+    - [Bunner/Macroquad](#bunnermacroquad)
 
 ## Summary
 
@@ -33,12 +34,14 @@ The completed ports are:
 |          [Soccer][Soccer]          |             [Code the Classics Vol. 1][Code the Classics Vol. 1]             |     Python      |          [PyGame Zero][PyGame Zero]          |                [Fyrox][Fyrox] 0.26                 |   Linux   |
 | [Rusty Roguelike][Rusty Roguelike] | [Hands-on Rust: Effective Learning...][Hands-on Rust: Effective Learning...] |      Rust       | [bracket-lib][bracket-lib], [Legion][Legion] | [bracket-lib][bracket-lib], [Bevy][Bevy] (ECS) 0.7 |   Linux   |
 | [Rusty Roguelike][Rusty Roguelike] | [Hands-on Rust: Effective Learning...][Hands-on Rust: Effective Learning...] |      Rust       | [bracket-lib][bracket-lib], [Legion][Legion] |  [Macroquad][Macroquad] 0.3, [Legion][Legion] 0.3  |   Linux   |
+|          [Bunner][Bunner]          |             [Code the Classics Vol. 1][Code the Classics Vol. 1]             |     Python      |          [PyGame Zero][PyGame Zero]          |             [Macroquad][Macroquad] 0.3             |   Linux   |
 
 <!-- Keep the entries of each group sorted by name -->
 
 <!-- Game -->
 
 [Boing]: https://github.com/Wireframe-Magazine/Code-the-Classics/tree/master/boing-master
+[Bunner]: https://github.com/Wireframe-Magazine/Code-the-Classics/tree/master/bunner-master
 [Cavern]: https://github.com/Wireframe-Magazine/Code-the-Classics/tree/master/cavern-master
 [Rusty Roguelike]: https://github.com/thebracket/HandsOnRust
 [Soccer]: https://github.com/Wireframe-Magazine/Code-the-Classics/tree/master/soccer-master
@@ -113,6 +116,10 @@ Boing:
 
 ![Boing](/images/readme/boing.png?raw=true)
 
+Bunner:
+
+![Bunner](/images/readme/bunner.png?raw=true)
+
 Cavern:
 
 ![Cavern](/images/readme/cavern.png?raw=true)
@@ -163,3 +170,7 @@ The port suffers from one Fyrox bug:
 ### Rusty Roguelike/Macroquad
 
 The graphics portion of the Rusty Roguelike has been ported to Macroquad. The ECS used is still Legion, and the pathfinding is from [bracket-lib](https://github.com/amethyst/bracket-lib)).
+
+### Bunner/Macroquad
+
+A straight port from PyGame Zero to Macroquad of this infinite frogger like game.
