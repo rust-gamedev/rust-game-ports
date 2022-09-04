@@ -159,12 +159,12 @@ impl Grass {
             }
         });
         // Ensure there is at least one gap
-        mask.insert(rand::gen_range(0, 11), HedgeMask::Empty);
+        let _ = std::mem::replace(&mut mask[rand::gen_range(0, 11)], HedgeMask::Empty);
 
         let mut new_mask = Vec::with_capacity(12);
         for i in 0..12 {
             let low_index = 0.max(i as i32 - 1) as usize;
-            let high_index = 12.min(i + 1);
+            let high_index = 11.min(i + 1);
             new_mask.push(
                 if mask[low_index..=high_index]
                     .iter()
