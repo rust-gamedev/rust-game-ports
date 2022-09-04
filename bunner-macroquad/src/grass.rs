@@ -152,7 +152,7 @@ impl Grass {
     pub fn generate_hedge_mask() -> Vec<HedgeMask> {
         let mut mask = Vec::new();
         mask.resize_with(12, || {
-            if rand::gen_range::<u8>(1, 100) > 1 {
+            if rand::gen_range::<u8>(0, 100) >= 1 {
                 HedgeMask::Hedge
             } else {
                 HedgeMask::Empty
