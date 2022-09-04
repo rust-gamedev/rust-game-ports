@@ -76,14 +76,12 @@ impl Grass {
         index: i32,
         y: i32,
     ) -> Self {
-        let (hedge_mask, hedge_row) =
-            if previous_hedge_mask.is_none() || previous_hedge_row == HedgeRow::None {
-                Self::first_hedge_row(index)
-            } else if previous_hedge_row == HedgeRow::First {
-                (previous_hedge_mask.unwrap(), HedgeRow::Second)
-            } else {
-                (Vec::new(), HedgeRow::None)
-            };
+        let (hedge_mask, hedge_row) = match previous_hedge_mask {
+            Some(_) if previous_hedge_row == HedgeRow::None => Self::first_hedge_row(index),
+            Some(mask) if previous_hedge_row == HedgeRow::First => (mask, HedgeRow::Second),
+            Some(_) => (Vec::new(), HedgeRow::None),
+            None => Self::first_hedge_row(index),
+        };
 
         let mut children: Vec<Child> = Vec::new();
         if hedge_row != HedgeRow::None {
