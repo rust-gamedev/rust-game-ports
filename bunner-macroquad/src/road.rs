@@ -108,7 +108,7 @@ impl Row for Road {
     }
 
     fn allow_movement(&self, x: i32) -> bool {
-        (16..=WIDTH - 16).contains(&x) && !self.collide(x, 8)
+        (16..=WIDTH - 16).contains(&x)
     }
 
     fn check_collision(&self, x: i32) -> PlayerState {

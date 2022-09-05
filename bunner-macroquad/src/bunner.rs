@@ -4,7 +4,10 @@ use crate::{
 };
 use macroquad::{
     audio::play_sound_once,
-    prelude::{collections::storage, draw_texture, KeyCode, Texture2D, WHITE},
+    color::colors::WHITE,
+    experimental::collections::storage,
+    input::KeyCode,
+    texture::{draw_texture, Texture2D},
 };
 use std::collections::VecDeque;
 
@@ -42,7 +45,7 @@ impl Bunner {
         self.input_queue.append(
             &mut input_queue
                 .iter()
-                .filter_map(|d| match d {
+                .filter_map(|key_code| match key_code {
                     KeyCode::Up => Some(PlayerDirection::Up),
                     KeyCode::Right => Some(PlayerDirection::Right),
                     KeyCode::Down => Some(PlayerDirection::Down),

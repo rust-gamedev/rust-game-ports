@@ -9,7 +9,12 @@ use crate::{
 };
 use macroquad::{
     audio::{play_sound, set_sound_volume, PlaySoundParams, Sound},
-    prelude::{collections::storage, draw_texture, miniquad, rand, KeyCode, WHITE},
+    color::colors::WHITE,
+    experimental::collections::storage,
+    input::KeyCode,
+    miniquad::{self},
+    rand::{self},
+    texture::draw_texture,
 };
 use std::collections::VecDeque;
 #[cfg(not(target_arch = "wasm32"))]
@@ -33,9 +38,11 @@ impl miniquad::EventHandler for GlobalState {
         _ctx: &mut miniquad::Context,
         keycode: KeyCode,
         _keymods: miniquad::KeyMods,
-        _repeat: bool,
+        repeat: bool,
     ) {
-        self.input_queue.push_back(keycode);
+        if !repeat {
+            self.input_queue.push_back(keycode);
+        }
     }
 }
 
@@ -75,9 +82,10 @@ impl GlobalState {
                     // Switch to play state, and create a new Game object, passing it a new Player object to use
                     self.state = State::Play;
                     self.game = Game::new(Some(Bunner::new(Position::new(240, -320))));
+                    self.input_queue.clear();
                     set_sound_volume(self.music, 0.3);
                 } else {
-                    self.game.update(self.input_queue.clone());
+                    self.game.update(self.input_queue.drain(..).collect());
                 }
             }
             State::Play => {
@@ -90,7 +98,7 @@ impl GlobalState {
 
                     self.state = State::GameOver;
                 } else {
-                    self.game.update(self.input_queue.clone());
+                    self.game.update(self.input_queue.drain(..).collect());
                 }
             }
             State::GameOver => {
@@ -98,11 +106,11 @@ impl GlobalState {
                     // Switch to menu state, and create a new game object
                     self.state = State::Menu;
                     self.game = Game::new(None);
+                    self.input_queue.clear();
                     set_sound_volume(self.music, 1.0);
                 }
             }
         }
-        self.input_queue.clear();
     }
 
     pub fn draw(&mut self) {

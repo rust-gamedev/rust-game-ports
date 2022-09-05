@@ -4,8 +4,8 @@
 use macroquad::{
     audio::{self},
     input::{is_key_pressed, utils::*, KeyCode},
-    prelude::{next_frame, Conf},
     time::get_frame_time,
+    window::{next_frame, Conf},
 };
 
 use bunner_macroquad::{
