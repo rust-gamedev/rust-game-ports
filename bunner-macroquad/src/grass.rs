@@ -159,7 +159,7 @@ impl Grass {
             }
         });
         // Ensure there is at least one gap
-        let _ = std::mem::replace(&mut mask[rand::gen_range(0, 11)], HedgeMask::Empty);
+        mask[rand::gen_range(0, 11)] = HedgeMask::Empty;
 
         let mut new_mask = Vec::with_capacity(12);
         for i in 0..12 {
