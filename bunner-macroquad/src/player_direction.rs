@@ -1,9 +1,9 @@
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum PlayerDirection {
-    Up = 0,
-    Right = 1,
-    Down = 2,
-    Left = 3,
+    Up,
+    Right,
+    Down,
+    Left,
 }
 
 impl Default for PlayerDirection {
