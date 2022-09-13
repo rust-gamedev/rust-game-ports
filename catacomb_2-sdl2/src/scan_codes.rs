@@ -1,0 +1,222 @@
+/// Rust port: This could be simplified (removed) by using the Rust library enums, although it's a lot
+/// of tedious work (in particular, because the key semantics are different; here the unknown key is 0,
+/// in the Rust library are None, so the logic must be changed to be Option).
+pub type SDL_Scancode = u32;
+
+pub const SDL_SCANCODE_RSHIFT: SDL_Scancode = 229;
+pub const SDL_SCANCODE_LALT: SDL_Scancode = 226;
+pub const SDL_SCANCODE_LSHIFT: SDL_Scancode = 225;
+pub const SDL_SCANCODE_LCTRL: SDL_Scancode = 224;
+pub const SDL_SCANCODE_SYSREQ: SDL_Scancode = 154;
+pub const SDL_SCANCODE_KP_5: SDL_Scancode = 93;
+pub const SDL_SCANCODE_KP_PLUS: SDL_Scancode = 87;
+pub const SDL_SCANCODE_KP_MINUS: SDL_Scancode = 86;
+pub const SDL_SCANCODE_NUMLOCKCLEAR: SDL_Scancode = 83;
+pub const SDL_SCANCODE_UP: SDL_Scancode = 82;
+pub const SDL_SCANCODE_DOWN: SDL_Scancode = 81;
+pub const SDL_SCANCODE_LEFT: SDL_Scancode = 80;
+pub const SDL_SCANCODE_RIGHT: SDL_Scancode = 79;
+pub const SDL_SCANCODE_PAGEDOWN: SDL_Scancode = 78;
+pub const SDL_SCANCODE_END: SDL_Scancode = 77;
+pub const SDL_SCANCODE_DELETE: SDL_Scancode = 76;
+pub const SDL_SCANCODE_PAGEUP: SDL_Scancode = 75;
+pub const SDL_SCANCODE_HOME: SDL_Scancode = 74;
+pub const SDL_SCANCODE_INSERT: SDL_Scancode = 73;
+pub const SDL_SCANCODE_SCROLLLOCK: SDL_Scancode = 71;
+pub const SDL_SCANCODE_F12: SDL_Scancode = 69;
+pub const SDL_SCANCODE_F11: SDL_Scancode = 68;
+pub const SDL_SCANCODE_F10: SDL_Scancode = 67;
+pub const SDL_SCANCODE_F9: SDL_Scancode = 66;
+pub const SDL_SCANCODE_F8: SDL_Scancode = 65;
+pub const SDL_SCANCODE_F7: SDL_Scancode = 64;
+pub const SDL_SCANCODE_F6: SDL_Scancode = 63;
+pub const SDL_SCANCODE_F5: SDL_Scancode = 62;
+pub const SDL_SCANCODE_F4: SDL_Scancode = 61;
+pub const SDL_SCANCODE_F3: SDL_Scancode = 60;
+pub const SDL_SCANCODE_F2: SDL_Scancode = 59;
+pub const SDL_SCANCODE_F1: SDL_Scancode = 58;
+pub const SDL_SCANCODE_CAPSLOCK: SDL_Scancode = 57;
+pub const SDL_SCANCODE_SLASH: SDL_Scancode = 56;
+pub const SDL_SCANCODE_PERIOD: SDL_Scancode = 55;
+pub const SDL_SCANCODE_COMMA: SDL_Scancode = 54;
+pub const SDL_SCANCODE_GRAVE: SDL_Scancode = 53;
+pub const SDL_SCANCODE_APOSTROPHE: SDL_Scancode = 52;
+pub const SDL_SCANCODE_SEMICOLON: SDL_Scancode = 51;
+pub const SDL_SCANCODE_BACKSLASH: SDL_Scancode = 49;
+pub const SDL_SCANCODE_RIGHTBRACKET: SDL_Scancode = 48;
+pub const SDL_SCANCODE_LEFTBRACKET: SDL_Scancode = 47;
+pub const SDL_SCANCODE_EQUALS: SDL_Scancode = 46;
+pub const SDL_SCANCODE_MINUS: SDL_Scancode = 45;
+pub const SDL_SCANCODE_SPACE: SDL_Scancode = 44;
+pub const SDL_SCANCODE_TAB: SDL_Scancode = 43;
+pub const SDL_SCANCODE_BACKSPACE: SDL_Scancode = 42;
+pub const SDL_SCANCODE_ESCAPE: SDL_Scancode = 41;
+pub const SDL_SCANCODE_RETURN: SDL_Scancode = 40;
+pub const SDL_SCANCODE_0: SDL_Scancode = 39;
+pub const SDL_SCANCODE_9: SDL_Scancode = 38;
+pub const SDL_SCANCODE_8: SDL_Scancode = 37;
+pub const SDL_SCANCODE_7: SDL_Scancode = 36;
+pub const SDL_SCANCODE_6: SDL_Scancode = 35;
+pub const SDL_SCANCODE_5: SDL_Scancode = 34;
+pub const SDL_SCANCODE_4: SDL_Scancode = 33;
+pub const SDL_SCANCODE_3: SDL_Scancode = 32;
+pub const SDL_SCANCODE_2: SDL_Scancode = 31;
+pub const SDL_SCANCODE_1: SDL_Scancode = 30;
+pub const SDL_SCANCODE_Z: SDL_Scancode = 29;
+pub const SDL_SCANCODE_Y: SDL_Scancode = 28;
+pub const SDL_SCANCODE_X: SDL_Scancode = 27;
+pub const SDL_SCANCODE_W: SDL_Scancode = 26;
+pub const SDL_SCANCODE_V: SDL_Scancode = 25;
+pub const SDL_SCANCODE_U: SDL_Scancode = 24;
+pub const SDL_SCANCODE_T: SDL_Scancode = 23;
+pub const SDL_SCANCODE_S: SDL_Scancode = 22;
+pub const SDL_SCANCODE_R: SDL_Scancode = 21;
+pub const SDL_SCANCODE_Q: SDL_Scancode = 20;
+pub const SDL_SCANCODE_P: SDL_Scancode = 19;
+pub const SDL_SCANCODE_O: SDL_Scancode = 18;
+pub const SDL_SCANCODE_N: SDL_Scancode = 17;
+pub const SDL_SCANCODE_M: SDL_Scancode = 16;
+pub const SDL_SCANCODE_L: SDL_Scancode = 15;
+pub const SDL_SCANCODE_K: SDL_Scancode = 14;
+pub const SDL_SCANCODE_J: SDL_Scancode = 13;
+pub const SDL_SCANCODE_I: SDL_Scancode = 12;
+pub const SDL_SCANCODE_H: SDL_Scancode = 11;
+pub const SDL_SCANCODE_G: SDL_Scancode = 10;
+pub const SDL_SCANCODE_F: SDL_Scancode = 9;
+pub const SDL_SCANCODE_E: SDL_Scancode = 8;
+pub const SDL_SCANCODE_D: SDL_Scancode = 7;
+pub const SDL_SCANCODE_C: SDL_Scancode = 6;
+pub const SDL_SCANCODE_B: SDL_Scancode = 5;
+pub const SDL_SCANCODE_A: SDL_Scancode = 4;
+pub const SDL_SCANCODE_UNKNOWN: SDL_Scancode = 0;
+
+pub const DOSScanCodeMap: [SDL_Scancode; 128] = [
+    SDL_SCANCODE_UNKNOWN,
+    SDL_SCANCODE_ESCAPE,
+    SDL_SCANCODE_1,
+    SDL_SCANCODE_2,
+    SDL_SCANCODE_3,
+    SDL_SCANCODE_4,
+    SDL_SCANCODE_5,
+    SDL_SCANCODE_6,
+    SDL_SCANCODE_7,
+    SDL_SCANCODE_8,
+    SDL_SCANCODE_9,
+    SDL_SCANCODE_0,
+    SDL_SCANCODE_MINUS,
+    SDL_SCANCODE_EQUALS,
+    SDL_SCANCODE_BACKSPACE,
+    SDL_SCANCODE_TAB,
+    SDL_SCANCODE_Q,
+    SDL_SCANCODE_W,
+    SDL_SCANCODE_E,
+    SDL_SCANCODE_R,
+    SDL_SCANCODE_T,
+    SDL_SCANCODE_Y,
+    SDL_SCANCODE_U,
+    SDL_SCANCODE_I,
+    SDL_SCANCODE_O,
+    SDL_SCANCODE_P,
+    SDL_SCANCODE_LEFTBRACKET,
+    SDL_SCANCODE_RIGHTBRACKET,
+    SDL_SCANCODE_RETURN,
+    SDL_SCANCODE_LCTRL,
+    SDL_SCANCODE_A,
+    SDL_SCANCODE_S,
+    SDL_SCANCODE_D,
+    SDL_SCANCODE_F,
+    SDL_SCANCODE_G,
+    SDL_SCANCODE_H,
+    SDL_SCANCODE_J,
+    SDL_SCANCODE_K,
+    SDL_SCANCODE_L,
+    SDL_SCANCODE_SEMICOLON,
+    SDL_SCANCODE_APOSTROPHE,
+    SDL_SCANCODE_GRAVE,
+    SDL_SCANCODE_LSHIFT,
+    SDL_SCANCODE_BACKSLASH,
+    SDL_SCANCODE_Z,
+    SDL_SCANCODE_X,
+    SDL_SCANCODE_C,
+    SDL_SCANCODE_V,
+    SDL_SCANCODE_B,
+    SDL_SCANCODE_N,
+    SDL_SCANCODE_M,
+    SDL_SCANCODE_COMMA,
+    SDL_SCANCODE_PERIOD,
+    SDL_SCANCODE_SLASH,
+    SDL_SCANCODE_RSHIFT,
+    SDL_SCANCODE_SYSREQ,
+    SDL_SCANCODE_LALT,
+    SDL_SCANCODE_SPACE,
+    SDL_SCANCODE_CAPSLOCK,
+    SDL_SCANCODE_F1,
+    SDL_SCANCODE_F2,
+    SDL_SCANCODE_F3,
+    SDL_SCANCODE_F4,
+    SDL_SCANCODE_F5,
+    SDL_SCANCODE_F6,
+    SDL_SCANCODE_F7,
+    SDL_SCANCODE_F8,
+    SDL_SCANCODE_F9,
+    SDL_SCANCODE_F10,
+    SDL_SCANCODE_NUMLOCKCLEAR,
+    SDL_SCANCODE_SCROLLLOCK,
+    SDL_SCANCODE_HOME,
+    SDL_SCANCODE_UP,
+    SDL_SCANCODE_PAGEUP,
+    SDL_SCANCODE_KP_MINUS,
+    SDL_SCANCODE_LEFT,
+    SDL_SCANCODE_KP_5,
+    SDL_SCANCODE_RIGHT,
+    SDL_SCANCODE_KP_PLUS,
+    SDL_SCANCODE_END,
+    SDL_SCANCODE_DOWN,
+    SDL_SCANCODE_PAGEDOWN,
+    SDL_SCANCODE_INSERT,
+    SDL_SCANCODE_DELETE,
+    SDL_SCANCODE_UNKNOWN,
+    SDL_SCANCODE_UNKNOWN,
+    SDL_SCANCODE_UNKNOWN,
+    SDL_SCANCODE_F11,
+    SDL_SCANCODE_F12,
+    SDL_SCANCODE_UNKNOWN,
+    SDL_SCANCODE_UNKNOWN,
+    SDL_SCANCODE_UNKNOWN,
+    SDL_SCANCODE_UNKNOWN,
+    SDL_SCANCODE_UNKNOWN,
+    SDL_SCANCODE_UNKNOWN,
+    SDL_SCANCODE_UNKNOWN,
+    SDL_SCANCODE_UNKNOWN,
+    SDL_SCANCODE_UNKNOWN,
+    SDL_SCANCODE_UNKNOWN,
+    SDL_SCANCODE_UNKNOWN,
+    SDL_SCANCODE_UNKNOWN,
+    SDL_SCANCODE_UNKNOWN,
+    SDL_SCANCODE_UNKNOWN,
+    SDL_SCANCODE_UNKNOWN,
+    SDL_SCANCODE_UNKNOWN,
+    SDL_SCANCODE_UNKNOWN,
+    SDL_SCANCODE_UNKNOWN,
+    SDL_SCANCODE_UNKNOWN,
+    SDL_SCANCODE_UNKNOWN,
+    SDL_SCANCODE_UNKNOWN,
+    SDL_SCANCODE_UNKNOWN,
+    SDL_SCANCODE_UNKNOWN,
+    SDL_SCANCODE_UNKNOWN,
+    SDL_SCANCODE_UNKNOWN,
+    SDL_SCANCODE_UNKNOWN,
+    SDL_SCANCODE_UNKNOWN,
+    SDL_SCANCODE_UNKNOWN,
+    SDL_SCANCODE_UNKNOWN,
+    SDL_SCANCODE_UNKNOWN,
+    SDL_SCANCODE_UNKNOWN,
+    SDL_SCANCODE_UNKNOWN,
+    SDL_SCANCODE_UNKNOWN,
+    SDL_SCANCODE_UNKNOWN,
+    SDL_SCANCODE_UNKNOWN,
+    SDL_SCANCODE_UNKNOWN,
+    SDL_SCANCODE_UNKNOWN,
+    SDL_SCANCODE_UNKNOWN,
+    SDL_SCANCODE_UNKNOWN,
+];
