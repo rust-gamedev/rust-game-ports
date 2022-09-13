@@ -1,0 +1,15 @@
+[package]
+name = "catacomb"
+version = "0.1.0"
+edition = "2018"
+
+[[bin]]
+path = "src/main.rs"
+name = "catacomb"
+
+[dependencies]
+num = "0.4.0"
+num-derive = "0.3"
+num-traits = "0.2.15"
+serdine = "~0.3"
+sdl2 = "0.35.2"

@@ -20,6 +20,7 @@ If you're a developer planning a contribution, it's **crucial** to read the [Con
     - [Soccer/Fyrox](#soccerfyrox)
     - [Rusty Roguelike/Macroquad](#rusty-roguelikemacroquad)
     - [Bunner/Macroquad](#bunnermacroquad)
+    - [Catacomb II/SDL 2](#catacomb-iisdl-2)
 
 ## Summary
 
@@ -27,14 +28,15 @@ The completed ports are:
 
 <!-- Add new releases at the bottom; this makes more likely to found outdated ports at the top -->
 
-|                Game                |                                   Part of                                    | Source Language |               Source Libraries               |                   Port Libraries                   | Tested on |
-| :--------------------------------: | :--------------------------------------------------------------------------: | :-------------: | :------------------------------------------: | :------------------------------------------------: | :-------: |
-|           [Boing][Boing]           |             [Code the Classics Vol. 1][Code the Classics Vol. 1]             |     Python      |          [PyGame Zero][PyGame Zero]          |                  [ggez][ggez] 0.7                  |   Linux   |
-|          [Cavern][Cavern]          |             [Code the Classics Vol. 1][Code the Classics Vol. 1]             |     Python      |          [PyGame Zero][PyGame Zero]          |             [Macroquad][Macroquad] 0.3             |   Linux   |
-|          [Soccer][Soccer]          |             [Code the Classics Vol. 1][Code the Classics Vol. 1]             |     Python      |          [PyGame Zero][PyGame Zero]          |                [Fyrox][Fyrox] 0.26                 |   Linux   |
-| [Rusty Roguelike][Rusty Roguelike] | [Hands-on Rust: Effective Learning...][Hands-on Rust: Effective Learning...] |      Rust       | [bracket-lib][bracket-lib], [Legion][Legion] | [bracket-lib][bracket-lib], [Bevy][Bevy] (ECS) 0.7 |   Linux   |
-| [Rusty Roguelike][Rusty Roguelike] | [Hands-on Rust: Effective Learning...][Hands-on Rust: Effective Learning...] |      Rust       | [bracket-lib][bracket-lib], [Legion][Legion] |  [Macroquad][Macroquad] 0.3, [Legion][Legion] 0.3  |   Linux   |
-|          [Bunner][Bunner]          |             [Code the Classics Vol. 1][Code the Classics Vol. 1]             |     Python      |          [PyGame Zero][PyGame Zero]          |             [Macroquad][Macroquad] 0.3             |   Linux   |
+|                  Game                  |                                   Part of                                    | Source Language |               Source Libraries               |                   Port Libraries                   | Tested on |
+| :------------------------------------: | :--------------------------------------------------------------------------: | :-------------: | :------------------------------------------: | :------------------------------------------------: | :-------: |
+|             [Boing][Boing]             |             [Code the Classics Vol. 1][Code the Classics Vol. 1]             |     Python      |          [PyGame Zero][PyGame Zero]          |                  [ggez][ggez] 0.7                  |   Linux   |
+| [Catacomb II (SDL)][Catacomb II (SDL)] |                                      -                                       |        C        |                [SDL 2][SDL 2]                |            [Rust-SDL2][Rust-SDL2] 0.35             |   Linux   |
+|            [Cavern][Cavern]            |             [Code the Classics Vol. 1][Code the Classics Vol. 1]             |     Python      |          [PyGame Zero][PyGame Zero]          |             [Macroquad][Macroquad] 0.3             |   Linux   |
+|            [Soccer][Soccer]            |             [Code the Classics Vol. 1][Code the Classics Vol. 1]             |     Python      |          [PyGame Zero][PyGame Zero]          |                [Fyrox][Fyrox] 0.26                 |   Linux   |
+|   [Rusty Roguelike][Rusty Roguelike]   | [Hands-on Rust: Effective Learning...][Hands-on Rust: Effective Learning...] |      Rust       | [bracket-lib][bracket-lib], [Legion][Legion] | [bracket-lib][bracket-lib], [Bevy][Bevy] (ECS) 0.7 |   Linux   |
+|   [Rusty Roguelike][Rusty Roguelike]   | [Hands-on Rust: Effective Learning...][Hands-on Rust: Effective Learning...] |      Rust       | [bracket-lib][bracket-lib], [Legion][Legion] |  [Macroquad][Macroquad] 0.3, [Legion][Legion] 0.3  |   Linux   |
+|            [Bunner][Bunner]            |             [Code the Classics Vol. 1][Code the Classics Vol. 1]             |     Python      |          [PyGame Zero][PyGame Zero]          |             [Macroquad][Macroquad] 0.3             |   Linux   |
 
 <!-- Keep the entries of each group sorted by name -->
 
@@ -42,6 +44,7 @@ The completed ports are:
 
 [Boing]: https://github.com/Wireframe-Magazine/Code-the-Classics/tree/master/boing-master
 [Bunner]: https://github.com/Wireframe-Magazine/Code-the-Classics/tree/master/bunner-master
+[Catacomb II (SDL)]: https://github.com/Blzut3/CatacombSDL
 [Cavern]: https://github.com/Wireframe-Magazine/Code-the-Classics/tree/master/cavern-master
 [Rusty Roguelike]: https://github.com/thebracket/HandsOnRust
 [Soccer]: https://github.com/Wireframe-Magazine/Code-the-Classics/tree/master/soccer-master
@@ -56,6 +59,8 @@ The completed ports are:
 [bracket-lib]: https://github.com/amethyst/bracket-lib
 [Legion]: https://github.com/amethyst/legion
 [PyGame Zero]: https://pygame-zero.readthedocs.io/en/stable
+[Rust-SDL2]: https://github.com/Rust-SDL2/rust-sdl2
+[SDL 2]: https://www.libsdl.org/
 
 <!-- Port Libraries -->
 
@@ -132,6 +137,10 @@ Soccer:
 
 ![Soccer](/images/readme/soccer.png?raw=true)
 
+Catacomb II:
+
+![Catacomb II](/images/readme/catacomb_2.png?raw=true)
+
 ## Port notes
 
 ### Boing/ggez
@@ -174,3 +183,11 @@ The graphics portion of the Rusty Roguelike has been ported to Macroquad. The EC
 ### Bunner/Macroquad
 
 A straight port from PyGame Zero to Macroquad of this infinite frogger like game.
+
+### Catacomb II/SDL 2
+
+This is an exact port of the source codebase, performed in two stages - first transpiling to unsafe Rust via [C2Rust](https://github.com/immunant/c2rust), then manually converting to safe Rust.
+
+Since the objective was testing such type of port, the result is not idiomatic Rust; nonetheless, the code is still 100% safe, and the Rust-SDL2 library is properly used. More details are provided on the [port project repository](https://github.com/64kramsystem/catacomb_ii-64k).
+
+In order to play this game, the game datafiles are required; a pack with all the Catacomb games [currently costs just 4$ on GOG](https://www.gog.com/de/game/catacombs_pack).
