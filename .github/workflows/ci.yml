@@ -13,8 +13,18 @@ jobs:
       matrix: ${{ steps.generate-matrix.outputs.matrix }}
     steps:
     - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+    - name: Get changed files
+      id: changed-files
+      uses: tj-actions/changed-files@v31
+      with:
+        # Newlines are better, but are currently unsupported (https://github.com/tj-actions/changed-files#known-limitation);
+        # commas are equally safe for this project, though.
+        separator: ","
+        dir_names: true
     - id: generate-matrix
-      run: echo ::set-output name=matrix::$(.github/workflows/generate-projects-matrix.sh ${{ github.workspace }})
+      run: echo ::set-output name=matrix::$(.github/workflows/generate-projects-matrix.sh ${{ steps.changed-files.outputs.all_changed_files }})
   check_code_formatting:
     runs-on: ubuntu-latest
     name: Check code formatting
@@ -23,6 +33,7 @@ jobs:
       fail-fast: false
       matrix:
         cfg: ${{ fromJson(needs.generate_projects_matrix.outputs.matrix) }}
+    if: ${{ needs.generate_projects_matrix.outputs.matrix != '[]' }}
     steps:
       - uses: actions/checkout@v3
       - uses: actions-rs/cargo@v1
@@ -37,6 +48,7 @@ jobs:
       fail-fast: false
       matrix:
         cfg: ${{fromJson(needs.generate_projects_matrix.outputs.matrix)}}
+    if: ${{ needs.generate_projects_matrix.outputs.matrix != '[]' }}
     steps:
       - name: Install dev libraries
         run: sudo apt install libasound2-dev libudev-dev
