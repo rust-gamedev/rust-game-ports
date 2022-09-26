@@ -49,7 +49,6 @@ jobs:
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
             target/
-          # Note that we only consider files one level deep (therefore excluding source projects)
           key: ${{ runner.os }}-cargo-${{ hashFiles('*/Cargo.lock') }}
       - uses: actions-rs/cargo@v1
         with:
