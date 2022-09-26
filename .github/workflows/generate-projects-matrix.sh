@@ -13,7 +13,7 @@ function main {
   #
   # - jq is cool, and it's also unredable 😂;
   # - we (can) assume that we don't need quoting;
-  # - since the source projects are one level below, they're not included, due to maxdepth 2;
+  # - exclude subprojects, e.g. macro crates;
   # - the JSON is actually JSON5, since a trailing comma is present inside the array; screw JSON.
 
   echo "["
