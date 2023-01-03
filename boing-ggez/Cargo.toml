@@ -1,6 +1,6 @@
 [package]
 authors = ["Saverio Miroddi <saverio.pub2@gmail.com>"]
-edition = "2018"
+edition = "2021"
 name = "boing-ggez"
 version = "0.1.0"
 
