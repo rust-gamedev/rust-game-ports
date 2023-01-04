@@ -49,7 +49,7 @@ impl GraphicEntity for Ball {
 
 impl Ball {
     pub fn new(context: &mut Context, dx: f32) -> Self {
-        let image = Image::new(context, "/ball.png").unwrap();
+        let image = Image::from_path(context, "/ball.png").unwrap();
         let hit_sounds = (0..5)
             .map(|i| {
                 let sound_name = format!("/hit{}.ogg", i);

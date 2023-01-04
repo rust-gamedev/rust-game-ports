@@ -1,9 +1,7 @@
 use ggez::{
-    event::{Axis, Button, KeyCode},
-    input::{
-        gamepad::{self, Gamepad},
-        keyboard,
-    },
+    event::{Axis, Button},
+    input::gamepad::Gamepad,
+    winit::event::VirtualKeyCode,
     Context,
 };
 
@@ -22,7 +20,7 @@ pub const ANALOG_STICK_TOLERANCE: f32 = 0.1;
 // The pad functions are for convenience.
 //
 pub fn pad_input(context: &Context, pad_number: PadNum, test: fn(&Gamepad) -> bool) -> bool {
-    let mut pad_iter = gamepad::gamepads(context);
+    let mut pad_iter = context.gamepad.gamepads();
 
     let pad = match pad_number {
         PadNum::Zero => pad_iter.next(),
@@ -74,14 +72,14 @@ pub fn p1_controls(context: &Context, _ball: &Ball, _ai_offset: f32, _bat: &Bat)
         pad.is_pressed(Button::DPadDown) || pad.value(Axis::LeftStickY) < -ANALOG_STICK_TOLERANCE
     });
 
-    let keys_pressed = keyboard::pressed_keys(context);
+    let keys_pressed = context.keyboard.pressed_keys();
 
     let move_down = pad_0_down_pressed
-        || keys_pressed.contains(&KeyCode::Z)
-        || keys_pressed.contains(&KeyCode::Down);
+        || keys_pressed.contains(&VirtualKeyCode::Z)
+        || keys_pressed.contains(&VirtualKeyCode::Down);
     let move_up = pad_0_up_pressed
-        || keys_pressed.contains(&KeyCode::A)
-        || keys_pressed.contains(&KeyCode::Up);
+        || keys_pressed.contains(&VirtualKeyCode::A)
+        || keys_pressed.contains(&VirtualKeyCode::Up);
 
     if move_down {
         PLAYER_SPEED
@@ -100,10 +98,10 @@ pub fn p2_controls(context: &Context, _ball: &Ball, _ai_offset: f32, _bat: &Bat)
         pad.is_pressed(Button::DPadDown) || pad.value(Axis::LeftStickY) < -ANALOG_STICK_TOLERANCE
     });
 
-    let keys_pressed = keyboard::pressed_keys(context);
+    let keys_pressed = context.keyboard.pressed_keys();
 
-    let move_down = pad_1_down_pressed || keys_pressed.contains(&KeyCode::M);
-    let move_up = pad_1_up_pressed || keys_pressed.contains(&KeyCode::K);
+    let move_down = pad_1_down_pressed || keys_pressed.contains(&VirtualKeyCode::M);
+    let move_up = pad_1_up_pressed || keys_pressed.contains(&VirtualKeyCode::K);
 
     if move_down {
         PLAYER_SPEED

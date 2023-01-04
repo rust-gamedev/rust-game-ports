@@ -14,7 +14,7 @@ mod state;
 use std::env;
 use std::path::PathBuf;
 
-use ggez::{event, graphics::Rect, Context, GameError, GameResult};
+use ggez::{event, graphics::Rect, winit::dpi::PhysicalSize, Context, GameResult};
 
 use global_state::GlobalState;
 
@@ -46,36 +46,51 @@ fn get_resource_dirs() -> Vec<PathBuf> {
         .collect()
 }
 
-fn configure_window_and_viewport(context: &mut Context) -> Result<(), GameError> {
-    let (drawable_width, drawable_height) = ggez::graphics::drawable_size(context);
+// Returns the viewport and scissor coordinates.
+//
+fn compute_viewport(context: &Context) -> (Rect, Rect) {
+    // Assume that the pixels are square.
+    //
+    let PhysicalSize {
+        width: screen_width,
+        height: screen_height,
+    } = context.gfx.window().inner_size();
 
-    let (new_drawable_width, new_drawable_height) =
-        if drawable_width / drawable_height > WINDOW_WIDTH / WINDOW_HEIGHT {
-            (
-                WINDOW_HEIGHT * (drawable_width / drawable_height),
-                WINDOW_HEIGHT,
-            )
-        } else {
-            (
-                WINDOW_WIDTH,
-                WINDOW_WIDTH * (drawable_height / drawable_width),
-            )
-        };
+    let game_ratio = WINDOW_WIDTH / WINDOW_HEIGHT;
+    let screen_ratio = screen_width as f32 / screen_height as f32;
 
-    ggez::graphics::set_drawable_size(context, new_drawable_width, new_drawable_height)?;
+    let (viewport_width, viewport_height, scaling_ratio) = if screen_ratio >= game_ratio {
+        (
+            WINDOW_HEIGHT * screen_ratio,
+            WINDOW_HEIGHT,
+            screen_height as f32 / WINDOW_HEIGHT,
+        )
+    } else {
+        (
+            WINDOW_WIDTH,
+            WINDOW_WIDTH / screen_ratio,
+            screen_width as f32 / WINDOW_WIDTH,
+        )
+    };
 
-    let tot_border_width = new_drawable_width - WINDOW_WIDTH;
-    let tot_border_height = new_drawable_height - WINDOW_HEIGHT;
+    let tot_border_width = viewport_width - WINDOW_WIDTH;
+    let tot_border_height = viewport_height - WINDOW_HEIGHT;
 
-    ggez::graphics::set_screen_coordinates(
-        context,
-        Rect::new(
-            -tot_border_width / 2.,
-            -tot_border_height / 2.,
-            new_drawable_width,
-            new_drawable_height,
-        ),
-    )
+    let viewport_rect = Rect::new(
+        -tot_border_width / 2.,
+        -tot_border_height / 2.,
+        viewport_width,
+        viewport_height,
+    );
+
+    let scissors_rect = Rect::new(
+        (screen_width as f32 - WINDOW_WIDTH * scaling_ratio) / 2.,
+        (screen_height as f32 - WINDOW_HEIGHT * scaling_ratio) / 2.,
+        viewport_rect.w * scaling_ratio,
+        viewport_rect.h * scaling_ratio,
+    );
+
+    (viewport_rect, scissors_rect)
 }
 
 fn main() -> GameResult {
@@ -93,9 +108,9 @@ fn main() -> GameResult {
 
     let (mut context, event_loop) = context_builder.build()?;
 
-    configure_window_and_viewport(&mut context)?;
+    let (viewport_rect, scissors_rect) = compute_viewport(&context);
 
-    let mut state = GlobalState::new(&mut context);
+    let mut state = GlobalState::new(&mut context, viewport_rect, scissors_rect);
 
     state.play_music(&mut context)?;
 
