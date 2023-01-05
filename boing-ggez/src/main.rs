@@ -52,42 +52,43 @@ fn compute_viewport(context: &Context) -> (Rect, Rect) {
     // Assume that the pixels are square.
     //
     let PhysicalSize {
-        width: screen_width,
-        height: screen_height,
+        width: screen_physical_width,
+        height: screen_physical_height,
     } = context.gfx.window().inner_size();
 
-    let game_ratio = WINDOW_WIDTH / WINDOW_HEIGHT;
-    let screen_ratio = screen_width as f32 / screen_height as f32;
+    let window_ratio = WINDOW_WIDTH / WINDOW_HEIGHT;
+    let screen_physical_ratio = screen_physical_width as f32 / screen_physical_height as f32;
 
-    let (viewport_width, viewport_height, scaling_ratio) = if screen_ratio >= game_ratio {
-        (
-            WINDOW_HEIGHT * screen_ratio,
-            WINDOW_HEIGHT,
-            screen_height as f32 / WINDOW_HEIGHT,
-        )
-    } else {
-        (
-            WINDOW_WIDTH,
-            WINDOW_WIDTH / screen_ratio,
-            screen_width as f32 / WINDOW_WIDTH,
-        )
-    };
+    let (screen_logical_width, screen_logical_height, logical_scale) =
+        if screen_physical_ratio >= window_ratio {
+            (
+                WINDOW_HEIGHT * screen_physical_ratio,
+                WINDOW_HEIGHT,
+                screen_physical_height as f32 / WINDOW_HEIGHT,
+            )
+        } else {
+            (
+                WINDOW_WIDTH,
+                WINDOW_WIDTH / screen_physical_ratio,
+                screen_physical_width as f32 / WINDOW_WIDTH,
+            )
+        };
 
-    let tot_border_width = viewport_width - WINDOW_WIDTH;
-    let tot_border_height = viewport_height - WINDOW_HEIGHT;
+    let horizontal_bar_width = (screen_logical_width - WINDOW_WIDTH) / 2.;
+    let vertical_bar_height = (screen_logical_height - WINDOW_HEIGHT) / 2.;
 
     let viewport_rect = Rect::new(
-        -tot_border_width / 2.,
-        -tot_border_height / 2.,
-        viewport_width,
-        viewport_height,
+        -horizontal_bar_width,
+        -vertical_bar_height,
+        screen_logical_width,
+        screen_logical_height,
     );
 
     let scissors_rect = Rect::new(
-        (screen_width as f32 - WINDOW_WIDTH * scaling_ratio) / 2.,
-        (screen_height as f32 - WINDOW_HEIGHT * scaling_ratio) / 2.,
-        viewport_rect.w * scaling_ratio,
-        viewport_rect.h * scaling_ratio,
+        (screen_physical_width as f32 - WINDOW_WIDTH * logical_scale) / 2.,
+        (screen_physical_height as f32 - WINDOW_HEIGHT * logical_scale) / 2.,
+        viewport_rect.w * logical_scale,
+        viewport_rect.h * logical_scale,
     );
 
     (viewport_rect, scissors_rect)
