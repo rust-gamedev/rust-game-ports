@@ -59,7 +59,7 @@ impl Bat {
                 (0..3)
                     .map(|image_i| {
                         let image_name = format!("/bat{}{}.png", player, image_i);
-                        Image::new(context, image_name).unwrap()
+                        Image::from_path(context, image_name).unwrap()
                     })
                     .collect()
             })

@@ -1,10 +1,10 @@
 [package]
 authors = ["Saverio Miroddi <saverio.pub2@gmail.com>"]
-edition = "2018"
+edition = "2021"
 name = "boing-ggez"
 version = "0.1.0"
 
 [dependencies]
 fastrand = "1.7.0"
-ggez = "0.7.0"
+ggez = "0.9.3"
 glam = {version = "0.20.5", features = ["mint"]}

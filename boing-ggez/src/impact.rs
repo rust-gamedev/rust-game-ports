@@ -32,7 +32,7 @@ impl Impact {
         let images = (0..5)
             .map(|i| {
                 let image_filename = format!("/impact{}.png", i / 2);
-                Image::new(context, image_filename).unwrap()
+                Image::from_path(context, image_filename).unwrap()
             })
             .collect();
 

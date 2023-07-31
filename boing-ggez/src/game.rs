@@ -1,4 +1,4 @@
-use ggez::graphics::{DrawParam, Drawable, Image};
+use ggez::graphics::{Canvas, DrawParam, Drawable, Image};
 use ggez::{audio, Context, GameResult};
 use glam::Vec2;
 
@@ -39,11 +39,11 @@ impl Game {
             Option<fn(&Context, &Ball, f32, &Bat) -> f32>,
         ),
     ) -> Self {
-        let table_image = Image::new(context, "/table.png").unwrap();
+        let table_image = Image::from_path(context, "/table.png").unwrap();
         let effect_images = (0..2)
             .map(|image_i| {
                 let image_name = format!("/effect{}.png", image_i);
-                Image::new(context, image_name).unwrap()
+                Image::from_path(context, image_name).unwrap()
             })
             .collect();
         let digit_images = (0..3)
@@ -51,7 +51,7 @@ impl Game {
                 (0..=9)
                     .map(|image_i| {
                         let image_name = format!("/digit{}{}.png", player, image_i);
-                        Image::new(context, image_name).unwrap()
+                        Image::from_path(context, image_name).unwrap()
                     })
                     .collect()
             })
@@ -126,14 +126,14 @@ impl Game {
         Ok(())
     }
 
-    pub fn draw(&mut self, context: &mut Context) -> GameResult {
+    pub fn draw(&mut self, context: &mut Canvas) -> GameResult {
         // Draw background
-        self.table_image.draw(context, DrawParam::new())?;
+        self.table_image.draw(context, DrawParam::new());
 
         // Draw 'just scored' effects, if required
         for (p, bat) in self.bats.iter().enumerate() {
             if bat.timer > 0 && self.ball.out() {
-                self.effect_images[p].draw(context, DrawParam::new())?;
+                self.effect_images[p].draw(context, DrawParam::new());
             }
         }
 
@@ -142,13 +142,13 @@ impl Game {
         // the objects together and iterate them, but for this simplification only, it's not worth.
 
         for bat in &mut self.bats {
-            bat.draw(context)?;
+            bat.draw(context);
         }
 
-        self.ball.draw(context)?;
+        self.ball.draw(context);
 
         for impact in &mut self.impacts {
-            impact.draw(context)?;
+            impact.draw(context);
         }
 
         // Display scores - outer loop goes through each player
@@ -180,7 +180,7 @@ impl Game {
                 self.digit_images[colour][score_char_val].draw(
                     context,
                     DrawParam::new().dest(Vec2::new((255 + (160 * p) + (i * 55)) as f32, 46.)),
-                )?;
+                );
             }
         }
 

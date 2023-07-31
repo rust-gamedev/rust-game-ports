@@ -1,7 +1,4 @@
-use ggez::{
-    graphics::{self, DrawParam, Image},
-    Context, GameResult,
-};
+use ggez::graphics::{Canvas, DrawParam, Image};
 use glam::Vec2;
 
 /// Trait for implementing the drawing part of an Actor.
@@ -12,11 +9,11 @@ pub trait GraphicEntity {
 
     /// Draws an image, anchored to its center.
     /// This is due to ggez not supporting anchoring.
-    fn draw(&mut self, context: &mut Context) -> GameResult {
+    fn draw(&mut self, canvas: &mut Canvas) {
         let dest = Vec2::new(
             self.x() - (self.image().width() / 2) as f32,
             self.y() - (self.image().height() / 2) as f32,
         );
-        graphics::draw(context, self.image(), DrawParam::new().dest(dest))
+        canvas.draw(self.image(), DrawParam::new().dest(dest));
     }
 }

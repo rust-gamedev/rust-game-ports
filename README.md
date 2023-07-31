@@ -28,15 +28,15 @@ The completed ports are:
 
 <!-- Add new releases at the bottom; this makes more likely to found outdated ports at the top -->
 
-|                  Game                  |                                   Part of                                    | Source Language |               Source Libraries               |                   Port Libraries                   | Tested on |
-| :------------------------------------: | :--------------------------------------------------------------------------: | :-------------: | :------------------------------------------: | :------------------------------------------------: | :-------: |
-|             [Boing][Boing]             |             [Code the Classics Vol. 1][Code the Classics Vol. 1]             |     Python      |          [PyGame Zero][PyGame Zero]          |                  [ggez][ggez] 0.7                  |   Linux   |
-| [Catacomb II (SDL)][Catacomb II (SDL)] |                                      -                                       |        C        |                [SDL 2][SDL 2]                |            [Rust-SDL2][Rust-SDL2] 0.35             |   Linux   |
-|            [Cavern][Cavern]            |             [Code the Classics Vol. 1][Code the Classics Vol. 1]             |     Python      |          [PyGame Zero][PyGame Zero]          |             [Macroquad][Macroquad] 0.3             |   Linux   |
-|            [Soccer][Soccer]            |             [Code the Classics Vol. 1][Code the Classics Vol. 1]             |     Python      |          [PyGame Zero][PyGame Zero]          |                [Fyrox][Fyrox] 0.26                 |   Linux   |
-|   [Rusty Roguelike][Rusty Roguelike]   | [Hands-on Rust: Effective Learning...][Hands-on Rust: Effective Learning...] |      Rust       | [bracket-lib][bracket-lib], [Legion][Legion] | [bracket-lib][bracket-lib], [Bevy][Bevy] (ECS) 0.7 |   Linux   |
-|   [Rusty Roguelike][Rusty Roguelike]   | [Hands-on Rust: Effective Learning...][Hands-on Rust: Effective Learning...] |      Rust       | [bracket-lib][bracket-lib], [Legion][Legion] |  [Macroquad][Macroquad] 0.3, [Legion][Legion] 0.3  |   Linux   |
-|            [Bunner][Bunner]            |             [Code the Classics Vol. 1][Code the Classics Vol. 1]             |     Python      |          [PyGame Zero][PyGame Zero]          |             [Macroquad][Macroquad] 0.3             |   Linux   |
+|                  Game                  |                                   Part of                                    | Source Language |               Source Libraries               |                   Port Libraries                   |   Tested on   |
+| :------------------------------------: | :--------------------------------------------------------------------------: | :-------------: | :------------------------------------------: | :------------------------------------------------: | :-----------: |
+|             [Boing][Boing]             |             [Code the Classics Vol. 1][Code the Classics Vol. 1]             |     Python      |          [PyGame Zero][PyGame Zero]          |                  [ggez][ggez] 0.9                  | Linux/Windows |
+| [Catacomb II (SDL)][Catacomb II (SDL)] |                                      -                                       |        C        |                [SDL 2][SDL 2]                |            [Rust-SDL2][Rust-SDL2] 0.35             |     Linux     |
+|            [Cavern][Cavern]            |             [Code the Classics Vol. 1][Code the Classics Vol. 1]             |     Python      |          [PyGame Zero][PyGame Zero]          |             [Macroquad][Macroquad] 0.3             |     Linux     |
+|            [Soccer][Soccer]            |             [Code the Classics Vol. 1][Code the Classics Vol. 1]             |     Python      |          [PyGame Zero][PyGame Zero]          |                [Fyrox][Fyrox] 0.26                 |     Linux     |
+|   [Rusty Roguelike][Rusty Roguelike]   | [Hands-on Rust: Effective Learning...][Hands-on Rust: Effective Learning...] |      Rust       | [bracket-lib][bracket-lib], [Legion][Legion] | [bracket-lib][bracket-lib], [Bevy][Bevy] (ECS) 0.7 |     Linux     |
+|   [Rusty Roguelike][Rusty Roguelike]   | [Hands-on Rust: Effective Learning...][Hands-on Rust: Effective Learning...] |      Rust       | [bracket-lib][bracket-lib], [Legion][Legion] |  [Macroquad][Macroquad] 0.3, [Legion][Legion] 0.3  |     Linux     |
+|            [Bunner][Bunner]            |             [Code the Classics Vol. 1][Code the Classics Vol. 1]             |     Python      |          [PyGame Zero][PyGame Zero]          |             [Macroquad][Macroquad] 0.3             |     Linux     |
 
 <!-- Keep the entries of each group sorted by name -->
 
@@ -147,9 +147,9 @@ Catacomb II:
 
 A very straightforward port 🙂
 
-This port suffers from one (Winit) bug:
+This port suffers from one bug (it's currently unclear if it's a port or library problem):
 
-- corruption when running on fullscreen (reported [here](https://github.com/ggez/ggez/issues/1066)).
+- game running too fast (issue [here](https://github.com/rust-gamedev/rust-game-ports/issues/150)).
 
 ### Cavern/Macroquad
 
